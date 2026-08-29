@@ -18,3 +18,7 @@ node_modules/
 # OS files
 .DS_Store
 Thumbs.db
+
+*.pyc
+.env
+.streamlit/secrets.toml
