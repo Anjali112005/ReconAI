@@ -5,6 +5,7 @@ from app.reconciliation.fuzzy_matcher import find_fuzzy_matches
 from app.reconciliation.mismatch_detector import detect_amount_mismatches
 from app.reconciliation.duplicate_detector import detect_duplicates
 from app.reconciliation.exception_detector import detect_exceptions
+from app.reconciliation.risk_scorer import score_exceptions
 
 
 def reconcile(bank_df: pd.DataFrame, ledger_df: pd.DataFrame):
@@ -42,7 +43,6 @@ def reconcile(bank_df: pd.DataFrame, ledger_df: pd.DataFrame):
 
     # =====================================
     # PASS 2 — FUZZY MATCHING
-    # Includes settlement delay detection
     # =====================================
 
     fuzzy_results = find_fuzzy_matches(
@@ -52,21 +52,18 @@ def reconcile(bank_df: pd.DataFrame, ledger_df: pd.DataFrame):
         matched_ledger_indexes
     )
 
-    # Separate normal fuzzy matches
     fuzzy_matches = [
         match
         for match in fuzzy_results
         if match["match_type"] == "FUZZY"
     ]
 
-    # Separate settlement delays
     settlement_delays = [
         match
         for match in fuzzy_results
         if match["match_type"] == "SETTLEMENT_DELAY"
     ]
 
-    # Successful reconciliation matches
     all_matches = (
         exact_matches
         + fuzzy_matches
@@ -124,10 +121,22 @@ def reconcile(bank_df: pd.DataFrame, ledger_df: pd.DataFrame):
         matched_ledger_indexes
     )
 
+    # =====================================
+    # COMBINE EXCEPTIONS
+    # =====================================
+
     exceptions = (
         amount_mismatches
         + duplicates
         + basic_exceptions
+    )
+
+    # =====================================
+    # PASS 6 — RISK SCORING
+    # =====================================
+
+    scored_exceptions = score_exceptions(
+        exceptions
     )
 
     # =====================================
@@ -144,8 +153,10 @@ def reconcile(bank_df: pd.DataFrame, ledger_df: pd.DataFrame):
             "amount_mismatches": len(amount_mismatches),
             "possible_duplicates": len(duplicates),
             "total_matches": len(all_matches),
-            "exceptions": len(exceptions)
+            "exceptions": len(scored_exceptions)
         },
+
         "matches": all_matches,
-        "exceptions": exceptions
+
+        "exceptions": scored_exceptions
     }
