@@ -3,6 +3,7 @@ import pandas as pd
 from app.reconciliation.exact_matcher import find_exact_matches
 from app.reconciliation.fuzzy_matcher import find_fuzzy_matches
 from app.reconciliation.mismatch_detector import detect_amount_mismatches
+from app.reconciliation.duplicate_detector import detect_duplicates
 from app.reconciliation.exception_detector import detect_exceptions
 
 
@@ -29,7 +30,6 @@ def reconcile(bank_df: pd.DataFrame, ledger_df: pd.DataFrame):
         ledger_df
     )
 
-    # Store successfully matched indexes
     matched_bank_indexes = {
         match["bank_index"]
         for match in exact_matches
@@ -42,17 +42,36 @@ def reconcile(bank_df: pd.DataFrame, ledger_df: pd.DataFrame):
 
     # =====================================
     # PASS 2 — FUZZY MATCHING
+    # Includes settlement delay detection
     # =====================================
 
-    fuzzy_matches = find_fuzzy_matches(
+    fuzzy_results = find_fuzzy_matches(
         bank_df,
         ledger_df,
         matched_bank_indexes,
         matched_ledger_indexes
     )
 
-    # Combine successful matches
-    all_matches = exact_matches + fuzzy_matches
+    # Separate normal fuzzy matches
+    fuzzy_matches = [
+        match
+        for match in fuzzy_results
+        if match["match_type"] == "FUZZY"
+    ]
+
+    # Separate settlement delays
+    settlement_delays = [
+        match
+        for match in fuzzy_results
+        if match["match_type"] == "SETTLEMENT_DELAY"
+    ]
+
+    # Successful reconciliation matches
+    all_matches = (
+        exact_matches
+        + fuzzy_matches
+        + settlement_delays
+    )
 
     # =====================================
     # PASS 3 — AMOUNT MISMATCH DETECTION
@@ -65,8 +84,6 @@ def reconcile(bank_df: pd.DataFrame, ledger_df: pd.DataFrame):
         matched_ledger_indexes
     )
 
-    # Mark mismatch transactions as handled
-    # so they don't also appear as missing entries
     for mismatch in amount_mismatches:
 
         matched_bank_indexes.add(
@@ -78,7 +95,26 @@ def reconcile(bank_df: pd.DataFrame, ledger_df: pd.DataFrame):
         )
 
     # =====================================
-    # PASS 4 — BASIC EXCEPTION DETECTION
+    # PASS 4 — DUPLICATE DETECTION
+    # =====================================
+
+    duplicates = detect_duplicates(
+        ledger_df,
+        matched_ledger_indexes
+    )
+
+    for duplicate in duplicates:
+
+        matched_ledger_indexes.add(
+            duplicate["ledger_index_1"]
+        )
+
+        matched_ledger_indexes.add(
+            duplicate["ledger_index_2"]
+        )
+
+    # =====================================
+    # PASS 5 — BASIC EXCEPTIONS
     # =====================================
 
     basic_exceptions = detect_exceptions(
@@ -88,9 +124,9 @@ def reconcile(bank_df: pd.DataFrame, ledger_df: pd.DataFrame):
         matched_ledger_indexes
     )
 
-    # Combine all exceptions
     exceptions = (
         amount_mismatches
+        + duplicates
         + basic_exceptions
     )
 
@@ -104,7 +140,9 @@ def reconcile(bank_df: pd.DataFrame, ledger_df: pd.DataFrame):
             "ledger_transactions": len(ledger_df),
             "exact_matches": len(exact_matches),
             "fuzzy_matches": len(fuzzy_matches),
+            "settlement_delays": len(settlement_delays),
             "amount_mismatches": len(amount_mismatches),
+            "possible_duplicates": len(duplicates),
             "total_matches": len(all_matches),
             "exceptions": len(exceptions)
         },
