@@ -7,6 +7,9 @@ from app.reconciliation.duplicate_detector import detect_duplicates
 from app.reconciliation.exception_detector import detect_exceptions
 from app.reconciliation.risk_scorer import score_exceptions
 
+# AI Investigation Agent
+from app.ai.investigator import investigate_exceptions
+
 
 def reconcile(bank_df: pd.DataFrame, ledger_df: pd.DataFrame):
 
@@ -52,18 +55,21 @@ def reconcile(bank_df: pd.DataFrame, ledger_df: pd.DataFrame):
         matched_ledger_indexes
     )
 
+    # Normal fuzzy matches
     fuzzy_matches = [
         match
         for match in fuzzy_results
         if match["match_type"] == "FUZZY"
     ]
 
+    # Settlement delay matches
     settlement_delays = [
         match
         for match in fuzzy_results
         if match["match_type"] == "SETTLEMENT_DELAY"
     ]
 
+    # Combine successful matches
     all_matches = (
         exact_matches
         + fuzzy_matches
@@ -81,6 +87,8 @@ def reconcile(bank_df: pd.DataFrame, ledger_df: pd.DataFrame):
         matched_ledger_indexes
     )
 
+    # Mark mismatch transactions as processed
+    # so they are not reported again as missing
     for mismatch in amount_mismatches:
 
         matched_bank_indexes.add(
@@ -100,6 +108,7 @@ def reconcile(bank_df: pd.DataFrame, ledger_df: pd.DataFrame):
         matched_ledger_indexes
     )
 
+    # Mark duplicate transactions as processed
     for duplicate in duplicates:
 
         matched_ledger_indexes.add(
@@ -122,7 +131,7 @@ def reconcile(bank_df: pd.DataFrame, ledger_df: pd.DataFrame):
     )
 
     # =====================================
-    # COMBINE EXCEPTIONS
+    # COMBINE ALL EXCEPTIONS
     # =====================================
 
     exceptions = (
@@ -140,6 +149,14 @@ def reconcile(bank_df: pd.DataFrame, ledger_df: pd.DataFrame):
     )
 
     # =====================================
+    # PASS 7 — AI INVESTIGATION
+    # =====================================
+
+    investigations = investigate_exceptions(
+        scored_exceptions
+    )
+
+    # =====================================
     # FINAL RESPONSE
     # =====================================
 
@@ -147,16 +164,38 @@ def reconcile(bank_df: pd.DataFrame, ledger_df: pd.DataFrame):
         "summary": {
             "bank_transactions": len(bank_df),
             "ledger_transactions": len(ledger_df),
+
             "exact_matches": len(exact_matches),
+
             "fuzzy_matches": len(fuzzy_matches),
-            "settlement_delays": len(settlement_delays),
-            "amount_mismatches": len(amount_mismatches),
-            "possible_duplicates": len(duplicates),
-            "total_matches": len(all_matches),
-            "exceptions": len(scored_exceptions)
+
+            "settlement_delays": len(
+                settlement_delays
+            ),
+
+            "amount_mismatches": len(
+                amount_mismatches
+            ),
+
+            "possible_duplicates": len(
+                duplicates
+            ),
+
+            "total_matches": len(
+                all_matches
+            ),
+
+            "exceptions": len(
+                scored_exceptions
+            )
         },
 
+        # Successful transaction matches
         "matches": all_matches,
 
-        "exceptions": scored_exceptions
+        # Financial exceptions ranked by risk
+        "exceptions": scored_exceptions,
+
+        # AI investigation reports
+        "investigations": investigations
     }
