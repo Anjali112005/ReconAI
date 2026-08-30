@@ -22,3 +22,8 @@ Thumbs.db
 *.pyc
 .env
 .streamlit/secrets.toml
+
+backend/.env
+backend/venv/
+__pycache__/
+*.pyc

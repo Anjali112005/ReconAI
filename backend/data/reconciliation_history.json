@@ -1,0 +1,3326 @@
+[
+    {
+        "id": "f71a8ed5-067f-46e8-92f4-a58dee435ba5",
+        "created_at": "2026-08-30 21:14:35",
+        "summary": {
+            "bank_transactions": 5,
+            "ledger_transactions": 5,
+            "exact_matches": 0,
+            "fuzzy_matches": 3,
+            "settlement_delays": 1,
+            "amount_mismatches": 1,
+            "possible_duplicates": 0,
+            "total_matches": 4,
+            "exceptions": 1
+        },
+        "result": {
+            "summary": {
+                "bank_transactions": 5,
+                "ledger_transactions": 5,
+                "exact_matches": 0,
+                "fuzzy_matches": 3,
+                "settlement_delays": 1,
+                "amount_mismatches": 1,
+                "possible_duplicates": 0,
+                "total_matches": 4,
+                "exceptions": 1
+            },
+            "matches": [
+                {
+                    "bank_index": 0,
+                    "ledger_index": 0,
+                    "bank_ref": "BANK001",
+                    "ledger_ref": "LEDGER001",
+                    "amount": 50000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 2,
+                    "ledger_index": 2,
+                    "bank_ref": "BANK003",
+                    "ledger_ref": "LEDGER003",
+                    "amount": 40000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 4,
+                    "ledger_index": 4,
+                    "bank_ref": "BANK005",
+                    "ledger_ref": "LEDGER005",
+                    "amount": 10000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 3,
+                    "ledger_index": 3,
+                    "bank_ref": "BANK004",
+                    "ledger_ref": "LEDGER004",
+                    "amount": 30000.0,
+                    "match_type": "SETTLEMENT_DELAY",
+                    "confidence": 0.83,
+                    "reason": "Transaction matched successfully, but bank settlement occurred later than the ledger transaction date",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 2,
+                        "name_similarity": 100.0
+                    }
+                }
+            ],
+            "exceptions": [
+                {
+                    "source": "RECONCILIATION",
+                    "bank_index": 1,
+                    "ledger_index": 1,
+                    "bank_ref": "BANK002",
+                    "ledger_ref": "LEDGER002",
+                    "date": "2026-08-02",
+                    "bank_amount": 25000.0,
+                    "ledger_amount": 27000.0,
+                    "difference": 2000.0,
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "severity": "HIGH",
+                    "reason": "Transaction details are similar, but the bank and ledger amounts differ",
+                    "details": {
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    },
+                    "risk_score": 60,
+                    "priority": "MEDIUM",
+                    "amount_at_risk": 2000.0,
+                    "recommended_action": "Compare the bank and ledger amounts and verify whether the difference is due to fees, partial settlement, or an incorrect entry."
+                }
+            ],
+            "investigations": [
+                {
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "priority": "MEDIUM",
+                    "risk_score": 60,
+                    "amount_at_risk": 2000.0,
+                    "analysis": "The bank transaction and internal ledger appear to represent related transactions, but their recorded amounts are different.",
+                    "possible_causes": [
+                        "Processing or settlement fee",
+                        "Partial settlement",
+                        "Incorrect ledger entry",
+                        "Incorrect bank transaction amount"
+                    ],
+                    "investigation_steps": [
+                        "Compare the original payment records",
+                        "Check whether fees were deducted during settlement",
+                        "Verify the expected settlement amount",
+                        "Correct the inaccurate record if an error is confirmed"
+                    ],
+                    "amount_difference": 2000.0
+                }
+            ]
+        }
+    },
+    {
+        "id": "6c5c47b3-c3cf-4fb5-918a-c5f144411266",
+        "created_at": "2026-08-30 20:50:54",
+        "summary": {
+            "bank_transactions": 5,
+            "ledger_transactions": 5,
+            "exact_matches": 0,
+            "fuzzy_matches": 3,
+            "settlement_delays": 1,
+            "amount_mismatches": 1,
+            "possible_duplicates": 0,
+            "total_matches": 4,
+            "exceptions": 1
+        },
+        "result": {
+            "summary": {
+                "bank_transactions": 5,
+                "ledger_transactions": 5,
+                "exact_matches": 0,
+                "fuzzy_matches": 3,
+                "settlement_delays": 1,
+                "amount_mismatches": 1,
+                "possible_duplicates": 0,
+                "total_matches": 4,
+                "exceptions": 1
+            },
+            "matches": [
+                {
+                    "bank_index": 0,
+                    "ledger_index": 0,
+                    "bank_ref": "BANK001",
+                    "ledger_ref": "LEDGER001",
+                    "amount": 50000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 2,
+                    "ledger_index": 2,
+                    "bank_ref": "BANK003",
+                    "ledger_ref": "LEDGER003",
+                    "amount": 40000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 4,
+                    "ledger_index": 4,
+                    "bank_ref": "BANK005",
+                    "ledger_ref": "LEDGER005",
+                    "amount": 10000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 3,
+                    "ledger_index": 3,
+                    "bank_ref": "BANK004",
+                    "ledger_ref": "LEDGER004",
+                    "amount": 30000.0,
+                    "match_type": "SETTLEMENT_DELAY",
+                    "confidence": 0.83,
+                    "reason": "Transaction matched successfully, but bank settlement occurred later than the ledger transaction date",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 2,
+                        "name_similarity": 100.0
+                    }
+                }
+            ],
+            "exceptions": [
+                {
+                    "source": "RECONCILIATION",
+                    "bank_index": 1,
+                    "ledger_index": 1,
+                    "bank_ref": "BANK002",
+                    "ledger_ref": "LEDGER002",
+                    "date": "2026-08-02",
+                    "bank_amount": 25000.0,
+                    "ledger_amount": 27000.0,
+                    "difference": 2000.0,
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "severity": "HIGH",
+                    "reason": "Transaction details are similar, but the bank and ledger amounts differ",
+                    "details": {
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    },
+                    "risk_score": 60,
+                    "priority": "MEDIUM",
+                    "amount_at_risk": 2000.0,
+                    "recommended_action": "Compare the bank and ledger amounts and verify whether the difference is due to fees, partial settlement, or an incorrect entry."
+                }
+            ],
+            "investigations": [
+                {
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "priority": "MEDIUM",
+                    "risk_score": 60,
+                    "amount_at_risk": 2000.0,
+                    "analysis": "The bank transaction and internal ledger appear to represent related transactions, but their recorded amounts are different.",
+                    "possible_causes": [
+                        "Processing or settlement fee",
+                        "Partial settlement",
+                        "Incorrect ledger entry",
+                        "Incorrect bank transaction amount"
+                    ],
+                    "investigation_steps": [
+                        "Compare the original payment records",
+                        "Check whether fees were deducted during settlement",
+                        "Verify the expected settlement amount",
+                        "Correct the inaccurate record if an error is confirmed"
+                    ],
+                    "amount_difference": 2000.0
+                }
+            ]
+        }
+    },
+    {
+        "id": "093fb683-217b-4fc4-b9dc-bbd5632bffa7",
+        "created_at": "2026-08-30 20:49:55",
+        "summary": {
+            "bank_transactions": 7,
+            "ledger_transactions": 8,
+            "exact_matches": 3,
+            "fuzzy_matches": 1,
+            "settlement_delays": 1,
+            "amount_mismatches": 1,
+            "possible_duplicates": 1,
+            "total_matches": 5,
+            "exceptions": 3
+        },
+        "result": {
+            "summary": {
+                "bank_transactions": 7,
+                "ledger_transactions": 8,
+                "exact_matches": 3,
+                "fuzzy_matches": 1,
+                "settlement_delays": 1,
+                "amount_mismatches": 1,
+                "possible_duplicates": 1,
+                "total_matches": 5,
+                "exceptions": 3
+            },
+            "matches": [
+                {
+                    "bank_index": 0,
+                    "ledger_index": 0,
+                    "bank_ref": "TXN100001",
+                    "ledger_ref": "TXN100001",
+                    "amount": 10000.0,
+                    "match_type": "EXACT",
+                    "confidence": 1.0,
+                    "reason": "Exact transaction ID and amount match"
+                },
+                {
+                    "bank_index": 1,
+                    "ledger_index": 1,
+                    "bank_ref": "TXN100002",
+                    "ledger_ref": "TXN100002",
+                    "amount": 25000.0,
+                    "match_type": "EXACT",
+                    "confidence": 1.0,
+                    "reason": "Exact transaction ID and amount match"
+                },
+                {
+                    "bank_index": 2,
+                    "ledger_index": 2,
+                    "bank_ref": "TXN100003",
+                    "ledger_ref": "TXN100003",
+                    "amount": 5000.0,
+                    "match_type": "EXACT",
+                    "confidence": 1.0,
+                    "reason": "Exact transaction ID and amount match"
+                },
+                {
+                    "bank_index": 3,
+                    "ledger_index": 3,
+                    "bank_ref": "NA",
+                    "ledger_ref": "TXN100004",
+                    "amount": 15000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 6,
+                    "ledger_index": 7,
+                    "bank_ref": "NA",
+                    "ledger_ref": "TXN100009",
+                    "amount": 8000.0,
+                    "match_type": "SETTLEMENT_DELAY",
+                    "confidence": 0.83,
+                    "reason": "Transaction matched successfully, but bank settlement occurred later than the ledger transaction date",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 2,
+                        "name_similarity": 100.0
+                    }
+                }
+            ],
+            "exceptions": [
+                {
+                    "source": "LEDGER",
+                    "ledger_index_1": 5,
+                    "ledger_index_2": 6,
+                    "txn_id_1": "TXN100007",
+                    "txn_id_2": "TXN100008",
+                    "date_1": "2026-08-16",
+                    "date_2": "2026-08-16",
+                    "amount_1": 12000.0,
+                    "amount_2": 12000.0,
+                    "merchant_1": "Smart Electronics",
+                    "merchant_2": "Smart Electronics",
+                    "exception_type": "POSSIBLE_DUPLICATE",
+                    "severity": "HIGH",
+                    "confidence": 1.0,
+                    "reason": "Two ledger transactions have very similar amount, date, and merchant details",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    },
+                    "risk_score": 90,
+                    "priority": "CRITICAL",
+                    "amount_at_risk": 12000.0,
+                    "recommended_action": "Investigate immediately and verify whether a duplicate transaction was processed."
+                },
+                {
+                    "source": "RECONCILIATION",
+                    "bank_index": 5,
+                    "ledger_index": 4,
+                    "bank_ref": "TXN100006",
+                    "ledger_ref": "TXN100006",
+                    "date": "2026-08-15",
+                    "bank_amount": 10000.0,
+                    "ledger_amount": 9500.0,
+                    "difference": 500.0,
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "severity": "MEDIUM",
+                    "reason": "Transaction details are similar, but the bank and ledger amounts differ",
+                    "details": {
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    },
+                    "risk_score": 55,
+                    "priority": "MEDIUM",
+                    "amount_at_risk": 500.0,
+                    "recommended_action": "Compare the bank and ledger amounts and verify whether the difference is due to fees, partial settlement, or an incorrect entry."
+                },
+                {
+                    "source": "BANK",
+                    "index": 4,
+                    "reference_id": "TXN100005",
+                    "date": "2026-08-14",
+                    "amount": 423.29,
+                    "narration": "BANK SERVICE CHARGE",
+                    "exception_type": "BANK_FEE",
+                    "severity": "LOW",
+                    "reason": "Bank fee or service charge with no matching ledger transaction",
+                    "risk_score": 20,
+                    "priority": "LOW",
+                    "amount_at_risk": 423.29,
+                    "recommended_action": "Verify the bank fee against the applicable bank fee schedule."
+                }
+            ],
+            "investigations": [
+                {
+                    "exception_type": "POSSIBLE_DUPLICATE",
+                    "priority": "CRITICAL",
+                    "risk_score": 90,
+                    "amount_at_risk": 12000.0,
+                    "analysis": "Two ledger transactions have highly similar transaction details. This may indicate that the same transaction was recorded more than once.",
+                    "possible_causes": [
+                        "Duplicate transaction entry",
+                        "Payment retry after a processing timeout",
+                        "Duplicate API or webhook event",
+                        "Manual accounting entry error"
+                    ],
+                    "investigation_steps": [
+                        "Compare the original transaction references",
+                        "Check payment gateway or bank settlement records",
+                        "Verify whether both transactions resulted in a payment",
+                        "Reverse or correct the duplicate entry if confirmed"
+                    ]
+                },
+                {
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "priority": "MEDIUM",
+                    "risk_score": 55,
+                    "amount_at_risk": 500.0,
+                    "analysis": "The bank transaction and internal ledger appear to represent related transactions, but their recorded amounts are different.",
+                    "possible_causes": [
+                        "Processing or settlement fee",
+                        "Partial settlement",
+                        "Incorrect ledger entry",
+                        "Incorrect bank transaction amount"
+                    ],
+                    "investigation_steps": [
+                        "Compare the original payment records",
+                        "Check whether fees were deducted during settlement",
+                        "Verify the expected settlement amount",
+                        "Correct the inaccurate record if an error is confirmed"
+                    ],
+                    "amount_difference": 500.0
+                },
+                {
+                    "exception_type": "BANK_FEE",
+                    "priority": "LOW",
+                    "risk_score": 20,
+                    "amount_at_risk": 423.29,
+                    "analysis": "A bank charge was detected without a corresponding internal ledger transaction.",
+                    "possible_causes": [
+                        "Scheduled bank service fee",
+                        "Transaction processing charge",
+                        "Account maintenance charge"
+                    ],
+                    "investigation_steps": [
+                        "Check the applicable bank fee schedule",
+                        "Verify the charge against the bank statement",
+                        "Confirm whether the fee should be recorded internally",
+                        "Create an accounting entry if required"
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "id": "a833abec-575b-417b-aea7-281740822df6",
+        "created_at": "2026-08-30 19:49:30",
+        "summary": {
+            "bank_transactions": 5,
+            "ledger_transactions": 5,
+            "exact_matches": 0,
+            "fuzzy_matches": 3,
+            "settlement_delays": 1,
+            "amount_mismatches": 1,
+            "possible_duplicates": 0,
+            "total_matches": 4,
+            "exceptions": 1
+        },
+        "result": {
+            "summary": {
+                "bank_transactions": 5,
+                "ledger_transactions": 5,
+                "exact_matches": 0,
+                "fuzzy_matches": 3,
+                "settlement_delays": 1,
+                "amount_mismatches": 1,
+                "possible_duplicates": 0,
+                "total_matches": 4,
+                "exceptions": 1
+            },
+            "matches": [
+                {
+                    "bank_index": 0,
+                    "ledger_index": 0,
+                    "bank_ref": "BANK001",
+                    "ledger_ref": "LEDGER001",
+                    "amount": 50000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 2,
+                    "ledger_index": 2,
+                    "bank_ref": "BANK003",
+                    "ledger_ref": "LEDGER003",
+                    "amount": 40000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 4,
+                    "ledger_index": 4,
+                    "bank_ref": "BANK005",
+                    "ledger_ref": "LEDGER005",
+                    "amount": 10000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 3,
+                    "ledger_index": 3,
+                    "bank_ref": "BANK004",
+                    "ledger_ref": "LEDGER004",
+                    "amount": 30000.0,
+                    "match_type": "SETTLEMENT_DELAY",
+                    "confidence": 0.83,
+                    "reason": "Transaction matched successfully, but bank settlement occurred later than the ledger transaction date",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 2,
+                        "name_similarity": 100.0
+                    }
+                }
+            ],
+            "exceptions": [
+                {
+                    "source": "RECONCILIATION",
+                    "bank_index": 1,
+                    "ledger_index": 1,
+                    "bank_ref": "BANK002",
+                    "ledger_ref": "LEDGER002",
+                    "date": "2026-08-02",
+                    "bank_amount": 25000.0,
+                    "ledger_amount": 27000.0,
+                    "difference": 2000.0,
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "severity": "HIGH",
+                    "reason": "Transaction details are similar, but the bank and ledger amounts differ",
+                    "details": {
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    },
+                    "risk_score": 60,
+                    "priority": "MEDIUM",
+                    "amount_at_risk": 2000.0,
+                    "recommended_action": "Compare the bank and ledger amounts and verify whether the difference is due to fees, partial settlement, or an incorrect entry."
+                }
+            ],
+            "investigations": [
+                {
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "priority": "MEDIUM",
+                    "risk_score": 60,
+                    "amount_at_risk": 2000.0,
+                    "analysis": "The bank transaction and internal ledger appear to represent related transactions, but their recorded amounts are different.",
+                    "possible_causes": [
+                        "Processing or settlement fee",
+                        "Partial settlement",
+                        "Incorrect ledger entry",
+                        "Incorrect bank transaction amount"
+                    ],
+                    "investigation_steps": [
+                        "Compare the original payment records",
+                        "Check whether fees were deducted during settlement",
+                        "Verify the expected settlement amount",
+                        "Correct the inaccurate record if an error is confirmed"
+                    ],
+                    "amount_difference": 2000.0
+                }
+            ]
+        }
+    },
+    {
+        "id": "9109def5-c64a-40c0-8271-f1f5322aed7b",
+        "created_at": "2026-08-30 19:38:12",
+        "summary": {
+            "bank_transactions": 5,
+            "ledger_transactions": 5,
+            "exact_matches": 0,
+            "fuzzy_matches": 3,
+            "settlement_delays": 1,
+            "amount_mismatches": 1,
+            "possible_duplicates": 0,
+            "total_matches": 4,
+            "exceptions": 1
+        },
+        "result": {
+            "summary": {
+                "bank_transactions": 5,
+                "ledger_transactions": 5,
+                "exact_matches": 0,
+                "fuzzy_matches": 3,
+                "settlement_delays": 1,
+                "amount_mismatches": 1,
+                "possible_duplicates": 0,
+                "total_matches": 4,
+                "exceptions": 1
+            },
+            "matches": [
+                {
+                    "bank_index": 0,
+                    "ledger_index": 0,
+                    "bank_ref": "BANK001",
+                    "ledger_ref": "LEDGER001",
+                    "amount": 50000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 2,
+                    "ledger_index": 2,
+                    "bank_ref": "BANK003",
+                    "ledger_ref": "LEDGER003",
+                    "amount": 40000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 4,
+                    "ledger_index": 4,
+                    "bank_ref": "BANK005",
+                    "ledger_ref": "LEDGER005",
+                    "amount": 10000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 3,
+                    "ledger_index": 3,
+                    "bank_ref": "BANK004",
+                    "ledger_ref": "LEDGER004",
+                    "amount": 30000.0,
+                    "match_type": "SETTLEMENT_DELAY",
+                    "confidence": 0.83,
+                    "reason": "Transaction matched successfully, but bank settlement occurred later than the ledger transaction date",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 2,
+                        "name_similarity": 100.0
+                    }
+                }
+            ],
+            "exceptions": [
+                {
+                    "source": "RECONCILIATION",
+                    "bank_index": 1,
+                    "ledger_index": 1,
+                    "bank_ref": "BANK002",
+                    "ledger_ref": "LEDGER002",
+                    "date": "2026-08-02",
+                    "bank_amount": 25000.0,
+                    "ledger_amount": 27000.0,
+                    "difference": 2000.0,
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "severity": "HIGH",
+                    "reason": "Transaction details are similar, but the bank and ledger amounts differ",
+                    "details": {
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    },
+                    "risk_score": 60,
+                    "priority": "MEDIUM",
+                    "amount_at_risk": 2000.0,
+                    "recommended_action": "Compare the bank and ledger amounts and verify whether the difference is due to fees, partial settlement, or an incorrect entry."
+                }
+            ],
+            "investigations": [
+                {
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "priority": "MEDIUM",
+                    "risk_score": 60,
+                    "amount_at_risk": 2000.0,
+                    "analysis": "The bank transaction and internal ledger appear to represent related transactions, but their recorded amounts are different.",
+                    "possible_causes": [
+                        "Processing or settlement fee",
+                        "Partial settlement",
+                        "Incorrect ledger entry",
+                        "Incorrect bank transaction amount"
+                    ],
+                    "investigation_steps": [
+                        "Compare the original payment records",
+                        "Check whether fees were deducted during settlement",
+                        "Verify the expected settlement amount",
+                        "Correct the inaccurate record if an error is confirmed"
+                    ],
+                    "amount_difference": 2000.0
+                }
+            ]
+        }
+    },
+    {
+        "id": "71e41f3f-b349-4a04-ad0d-a02849fcfe87",
+        "created_at": "2026-08-30 19:20:59",
+        "summary": {
+            "bank_transactions": 5,
+            "ledger_transactions": 5,
+            "exact_matches": 0,
+            "fuzzy_matches": 3,
+            "settlement_delays": 1,
+            "amount_mismatches": 1,
+            "possible_duplicates": 0,
+            "total_matches": 4,
+            "exceptions": 1
+        },
+        "result": {
+            "summary": {
+                "bank_transactions": 5,
+                "ledger_transactions": 5,
+                "exact_matches": 0,
+                "fuzzy_matches": 3,
+                "settlement_delays": 1,
+                "amount_mismatches": 1,
+                "possible_duplicates": 0,
+                "total_matches": 4,
+                "exceptions": 1
+            },
+            "matches": [
+                {
+                    "bank_index": 0,
+                    "ledger_index": 0,
+                    "bank_ref": "BANK001",
+                    "ledger_ref": "LEDGER001",
+                    "amount": 50000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 2,
+                    "ledger_index": 2,
+                    "bank_ref": "BANK003",
+                    "ledger_ref": "LEDGER003",
+                    "amount": 40000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 4,
+                    "ledger_index": 4,
+                    "bank_ref": "BANK005",
+                    "ledger_ref": "LEDGER005",
+                    "amount": 10000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 3,
+                    "ledger_index": 3,
+                    "bank_ref": "BANK004",
+                    "ledger_ref": "LEDGER004",
+                    "amount": 30000.0,
+                    "match_type": "SETTLEMENT_DELAY",
+                    "confidence": 0.83,
+                    "reason": "Transaction matched successfully, but bank settlement occurred later than the ledger transaction date",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 2,
+                        "name_similarity": 100.0
+                    }
+                }
+            ],
+            "exceptions": [
+                {
+                    "source": "RECONCILIATION",
+                    "bank_index": 1,
+                    "ledger_index": 1,
+                    "bank_ref": "BANK002",
+                    "ledger_ref": "LEDGER002",
+                    "date": "2026-08-02",
+                    "bank_amount": 25000.0,
+                    "ledger_amount": 27000.0,
+                    "difference": 2000.0,
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "severity": "HIGH",
+                    "reason": "Transaction details are similar, but the bank and ledger amounts differ",
+                    "details": {
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    },
+                    "risk_score": 60,
+                    "priority": "MEDIUM",
+                    "amount_at_risk": 2000.0,
+                    "recommended_action": "Compare the bank and ledger amounts and verify whether the difference is due to fees, partial settlement, or an incorrect entry."
+                }
+            ],
+            "investigations": [
+                {
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "priority": "MEDIUM",
+                    "risk_score": 60,
+                    "amount_at_risk": 2000.0,
+                    "analysis": "The bank transaction and internal ledger appear to represent related transactions, but their recorded amounts are different.",
+                    "possible_causes": [
+                        "Processing or settlement fee",
+                        "Partial settlement",
+                        "Incorrect ledger entry",
+                        "Incorrect bank transaction amount"
+                    ],
+                    "investigation_steps": [
+                        "Compare the original payment records",
+                        "Check whether fees were deducted during settlement",
+                        "Verify the expected settlement amount",
+                        "Correct the inaccurate record if an error is confirmed"
+                    ],
+                    "amount_difference": 2000.0
+                }
+            ]
+        }
+    },
+    {
+        "id": "386159d4-6ef0-489f-967d-06bdf74bc3c8",
+        "created_at": "2026-08-30 16:26:31",
+        "summary": {
+            "bank_transactions": 5,
+            "ledger_transactions": 5,
+            "exact_matches": 0,
+            "fuzzy_matches": 3,
+            "settlement_delays": 1,
+            "amount_mismatches": 1,
+            "possible_duplicates": 0,
+            "total_matches": 4,
+            "exceptions": 1
+        },
+        "result": {
+            "summary": {
+                "bank_transactions": 5,
+                "ledger_transactions": 5,
+                "exact_matches": 0,
+                "fuzzy_matches": 3,
+                "settlement_delays": 1,
+                "amount_mismatches": 1,
+                "possible_duplicates": 0,
+                "total_matches": 4,
+                "exceptions": 1
+            },
+            "matches": [
+                {
+                    "bank_index": 0,
+                    "ledger_index": 0,
+                    "bank_ref": "BANK001",
+                    "ledger_ref": "LEDGER001",
+                    "amount": 50000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 2,
+                    "ledger_index": 2,
+                    "bank_ref": "BANK003",
+                    "ledger_ref": "LEDGER003",
+                    "amount": 40000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 4,
+                    "ledger_index": 4,
+                    "bank_ref": "BANK005",
+                    "ledger_ref": "LEDGER005",
+                    "amount": 10000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 3,
+                    "ledger_index": 3,
+                    "bank_ref": "BANK004",
+                    "ledger_ref": "LEDGER004",
+                    "amount": 30000.0,
+                    "match_type": "SETTLEMENT_DELAY",
+                    "confidence": 0.83,
+                    "reason": "Transaction matched successfully, but bank settlement occurred later than the ledger transaction date",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 2,
+                        "name_similarity": 100.0
+                    }
+                }
+            ],
+            "exceptions": [
+                {
+                    "source": "RECONCILIATION",
+                    "bank_index": 1,
+                    "ledger_index": 1,
+                    "bank_ref": "BANK002",
+                    "ledger_ref": "LEDGER002",
+                    "date": "2026-08-02",
+                    "bank_amount": 25000.0,
+                    "ledger_amount": 27000.0,
+                    "difference": 2000.0,
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "severity": "HIGH",
+                    "reason": "Transaction details are similar, but the bank and ledger amounts differ",
+                    "details": {
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    },
+                    "risk_score": 60,
+                    "priority": "MEDIUM",
+                    "amount_at_risk": 2000.0,
+                    "recommended_action": "Compare the bank and ledger amounts and verify whether the difference is due to fees, partial settlement, or an incorrect entry."
+                }
+            ],
+            "investigations": [
+                {
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "priority": "MEDIUM",
+                    "risk_score": 60,
+                    "amount_at_risk": 2000.0,
+                    "analysis": "The bank transaction and internal ledger appear to represent related transactions, but their recorded amounts are different.",
+                    "possible_causes": [
+                        "Processing or settlement fee",
+                        "Partial settlement",
+                        "Incorrect ledger entry",
+                        "Incorrect bank transaction amount"
+                    ],
+                    "investigation_steps": [
+                        "Compare the original payment records",
+                        "Check whether fees were deducted during settlement",
+                        "Verify the expected settlement amount",
+                        "Correct the inaccurate record if an error is confirmed"
+                    ],
+                    "amount_difference": 2000.0
+                }
+            ]
+        }
+    },
+    {
+        "id": "0f3b78ec-4ec2-421c-bfa8-fcd59927214d",
+        "created_at": "2026-08-30 16:21:37",
+        "summary": {
+            "bank_transactions": 5,
+            "ledger_transactions": 5,
+            "exact_matches": 0,
+            "fuzzy_matches": 3,
+            "settlement_delays": 1,
+            "amount_mismatches": 1,
+            "possible_duplicates": 0,
+            "total_matches": 4,
+            "exceptions": 1
+        },
+        "result": {
+            "summary": {
+                "bank_transactions": 5,
+                "ledger_transactions": 5,
+                "exact_matches": 0,
+                "fuzzy_matches": 3,
+                "settlement_delays": 1,
+                "amount_mismatches": 1,
+                "possible_duplicates": 0,
+                "total_matches": 4,
+                "exceptions": 1
+            },
+            "matches": [
+                {
+                    "bank_index": 0,
+                    "ledger_index": 0,
+                    "bank_ref": "BANK001",
+                    "ledger_ref": "LEDGER001",
+                    "amount": 50000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 2,
+                    "ledger_index": 2,
+                    "bank_ref": "BANK003",
+                    "ledger_ref": "LEDGER003",
+                    "amount": 40000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 4,
+                    "ledger_index": 4,
+                    "bank_ref": "BANK005",
+                    "ledger_ref": "LEDGER005",
+                    "amount": 10000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 3,
+                    "ledger_index": 3,
+                    "bank_ref": "BANK004",
+                    "ledger_ref": "LEDGER004",
+                    "amount": 30000.0,
+                    "match_type": "SETTLEMENT_DELAY",
+                    "confidence": 0.83,
+                    "reason": "Transaction matched successfully, but bank settlement occurred later than the ledger transaction date",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 2,
+                        "name_similarity": 100.0
+                    }
+                }
+            ],
+            "exceptions": [
+                {
+                    "source": "RECONCILIATION",
+                    "bank_index": 1,
+                    "ledger_index": 1,
+                    "bank_ref": "BANK002",
+                    "ledger_ref": "LEDGER002",
+                    "date": "2026-08-02",
+                    "bank_amount": 25000.0,
+                    "ledger_amount": 27000.0,
+                    "difference": 2000.0,
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "severity": "HIGH",
+                    "reason": "Transaction details are similar, but the bank and ledger amounts differ",
+                    "details": {
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    },
+                    "risk_score": 60,
+                    "priority": "MEDIUM",
+                    "amount_at_risk": 2000.0,
+                    "recommended_action": "Compare the bank and ledger amounts and verify whether the difference is due to fees, partial settlement, or an incorrect entry."
+                }
+            ],
+            "investigations": [
+                {
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "priority": "MEDIUM",
+                    "risk_score": 60,
+                    "amount_at_risk": 2000.0,
+                    "analysis": "The bank transaction and internal ledger appear to represent related transactions, but their recorded amounts are different.",
+                    "possible_causes": [
+                        "Processing or settlement fee",
+                        "Partial settlement",
+                        "Incorrect ledger entry",
+                        "Incorrect bank transaction amount"
+                    ],
+                    "investigation_steps": [
+                        "Compare the original payment records",
+                        "Check whether fees were deducted during settlement",
+                        "Verify the expected settlement amount",
+                        "Correct the inaccurate record if an error is confirmed"
+                    ],
+                    "amount_difference": 2000.0
+                }
+            ]
+        }
+    },
+    {
+        "id": "64faea9b-901b-4508-ad47-b36faf37f921",
+        "created_at": "2026-08-30 16:17:30",
+        "summary": {
+            "bank_transactions": 5,
+            "ledger_transactions": 5,
+            "exact_matches": 0,
+            "fuzzy_matches": 3,
+            "settlement_delays": 1,
+            "amount_mismatches": 1,
+            "possible_duplicates": 0,
+            "total_matches": 4,
+            "exceptions": 1
+        },
+        "result": {
+            "summary": {
+                "bank_transactions": 5,
+                "ledger_transactions": 5,
+                "exact_matches": 0,
+                "fuzzy_matches": 3,
+                "settlement_delays": 1,
+                "amount_mismatches": 1,
+                "possible_duplicates": 0,
+                "total_matches": 4,
+                "exceptions": 1
+            },
+            "matches": [
+                {
+                    "bank_index": 0,
+                    "ledger_index": 0,
+                    "bank_ref": "BANK001",
+                    "ledger_ref": "LEDGER001",
+                    "amount": 50000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 2,
+                    "ledger_index": 2,
+                    "bank_ref": "BANK003",
+                    "ledger_ref": "LEDGER003",
+                    "amount": 40000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 4,
+                    "ledger_index": 4,
+                    "bank_ref": "BANK005",
+                    "ledger_ref": "LEDGER005",
+                    "amount": 10000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 3,
+                    "ledger_index": 3,
+                    "bank_ref": "BANK004",
+                    "ledger_ref": "LEDGER004",
+                    "amount": 30000.0,
+                    "match_type": "SETTLEMENT_DELAY",
+                    "confidence": 0.83,
+                    "reason": "Transaction matched successfully, but bank settlement occurred later than the ledger transaction date",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 2,
+                        "name_similarity": 100.0
+                    }
+                }
+            ],
+            "exceptions": [
+                {
+                    "source": "RECONCILIATION",
+                    "bank_index": 1,
+                    "ledger_index": 1,
+                    "bank_ref": "BANK002",
+                    "ledger_ref": "LEDGER002",
+                    "date": "2026-08-02",
+                    "bank_amount": 25000.0,
+                    "ledger_amount": 27000.0,
+                    "difference": 2000.0,
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "severity": "HIGH",
+                    "reason": "Transaction details are similar, but the bank and ledger amounts differ",
+                    "details": {
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    },
+                    "risk_score": 60,
+                    "priority": "MEDIUM",
+                    "amount_at_risk": 2000.0,
+                    "recommended_action": "Compare the bank and ledger amounts and verify whether the difference is due to fees, partial settlement, or an incorrect entry."
+                }
+            ],
+            "investigations": [
+                {
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "priority": "MEDIUM",
+                    "risk_score": 60,
+                    "amount_at_risk": 2000.0,
+                    "analysis": "The bank transaction and internal ledger appear to represent related transactions, but their recorded amounts are different.",
+                    "possible_causes": [
+                        "Processing or settlement fee",
+                        "Partial settlement",
+                        "Incorrect ledger entry",
+                        "Incorrect bank transaction amount"
+                    ],
+                    "investigation_steps": [
+                        "Compare the original payment records",
+                        "Check whether fees were deducted during settlement",
+                        "Verify the expected settlement amount",
+                        "Correct the inaccurate record if an error is confirmed"
+                    ],
+                    "amount_difference": 2000.0
+                }
+            ]
+        }
+    },
+    {
+        "id": "37eb14fd-fbb0-4156-9f21-64ce33b51f32",
+        "created_at": "2026-08-30 16:10:11",
+        "summary": {
+            "bank_transactions": 5,
+            "ledger_transactions": 5,
+            "exact_matches": 0,
+            "fuzzy_matches": 3,
+            "settlement_delays": 1,
+            "amount_mismatches": 1,
+            "possible_duplicates": 0,
+            "total_matches": 4,
+            "exceptions": 1
+        },
+        "result": {
+            "summary": {
+                "bank_transactions": 5,
+                "ledger_transactions": 5,
+                "exact_matches": 0,
+                "fuzzy_matches": 3,
+                "settlement_delays": 1,
+                "amount_mismatches": 1,
+                "possible_duplicates": 0,
+                "total_matches": 4,
+                "exceptions": 1
+            },
+            "matches": [
+                {
+                    "bank_index": 0,
+                    "ledger_index": 0,
+                    "bank_ref": "BANK001",
+                    "ledger_ref": "LEDGER001",
+                    "amount": 50000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 2,
+                    "ledger_index": 2,
+                    "bank_ref": "BANK003",
+                    "ledger_ref": "LEDGER003",
+                    "amount": 40000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 4,
+                    "ledger_index": 4,
+                    "bank_ref": "BANK005",
+                    "ledger_ref": "LEDGER005",
+                    "amount": 10000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 3,
+                    "ledger_index": 3,
+                    "bank_ref": "BANK004",
+                    "ledger_ref": "LEDGER004",
+                    "amount": 30000.0,
+                    "match_type": "SETTLEMENT_DELAY",
+                    "confidence": 0.83,
+                    "reason": "Transaction matched successfully, but bank settlement occurred later than the ledger transaction date",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 2,
+                        "name_similarity": 100.0
+                    }
+                }
+            ],
+            "exceptions": [
+                {
+                    "source": "RECONCILIATION",
+                    "bank_index": 1,
+                    "ledger_index": 1,
+                    "bank_ref": "BANK002",
+                    "ledger_ref": "LEDGER002",
+                    "date": "2026-08-02",
+                    "bank_amount": 25000.0,
+                    "ledger_amount": 27000.0,
+                    "difference": 2000.0,
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "severity": "HIGH",
+                    "reason": "Transaction details are similar, but the bank and ledger amounts differ",
+                    "details": {
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    },
+                    "risk_score": 60,
+                    "priority": "MEDIUM",
+                    "amount_at_risk": 2000.0,
+                    "recommended_action": "Compare the bank and ledger amounts and verify whether the difference is due to fees, partial settlement, or an incorrect entry."
+                }
+            ],
+            "investigations": [
+                {
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "priority": "MEDIUM",
+                    "risk_score": 60,
+                    "amount_at_risk": 2000.0,
+                    "analysis": "The bank transaction and internal ledger appear to represent related transactions, but their recorded amounts are different.",
+                    "possible_causes": [
+                        "Processing or settlement fee",
+                        "Partial settlement",
+                        "Incorrect ledger entry",
+                        "Incorrect bank transaction amount"
+                    ],
+                    "investigation_steps": [
+                        "Compare the original payment records",
+                        "Check whether fees were deducted during settlement",
+                        "Verify the expected settlement amount",
+                        "Correct the inaccurate record if an error is confirmed"
+                    ],
+                    "amount_difference": 2000.0
+                }
+            ]
+        }
+    },
+    {
+        "id": "0e1c1406-7249-4da5-86bf-991926c1a410",
+        "created_at": "2026-08-30 13:43:17",
+        "summary": {
+            "bank_transactions": 5,
+            "ledger_transactions": 5,
+            "exact_matches": 0,
+            "fuzzy_matches": 3,
+            "settlement_delays": 1,
+            "amount_mismatches": 1,
+            "possible_duplicates": 0,
+            "total_matches": 4,
+            "exceptions": 1
+        },
+        "result": {
+            "summary": {
+                "bank_transactions": 5,
+                "ledger_transactions": 5,
+                "exact_matches": 0,
+                "fuzzy_matches": 3,
+                "settlement_delays": 1,
+                "amount_mismatches": 1,
+                "possible_duplicates": 0,
+                "total_matches": 4,
+                "exceptions": 1
+            },
+            "matches": [
+                {
+                    "bank_index": 0,
+                    "ledger_index": 0,
+                    "bank_ref": "BANK001",
+                    "ledger_ref": "LEDGER001",
+                    "amount": 50000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 2,
+                    "ledger_index": 2,
+                    "bank_ref": "BANK003",
+                    "ledger_ref": "LEDGER003",
+                    "amount": 40000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 4,
+                    "ledger_index": 4,
+                    "bank_ref": "BANK005",
+                    "ledger_ref": "LEDGER005",
+                    "amount": 10000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 3,
+                    "ledger_index": 3,
+                    "bank_ref": "BANK004",
+                    "ledger_ref": "LEDGER004",
+                    "amount": 30000.0,
+                    "match_type": "SETTLEMENT_DELAY",
+                    "confidence": 0.83,
+                    "reason": "Transaction matched successfully, but bank settlement occurred later than the ledger transaction date",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 2,
+                        "name_similarity": 100.0
+                    }
+                }
+            ],
+            "exceptions": [
+                {
+                    "source": "RECONCILIATION",
+                    "bank_index": 1,
+                    "ledger_index": 1,
+                    "bank_ref": "BANK002",
+                    "ledger_ref": "LEDGER002",
+                    "date": "2026-08-02",
+                    "bank_amount": 25000.0,
+                    "ledger_amount": 27000.0,
+                    "difference": 2000.0,
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "severity": "HIGH",
+                    "reason": "Transaction details are similar, but the bank and ledger amounts differ",
+                    "details": {
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    },
+                    "risk_score": 60,
+                    "priority": "MEDIUM",
+                    "amount_at_risk": 2000.0,
+                    "recommended_action": "Compare the bank and ledger amounts and verify whether the difference is due to fees, partial settlement, or an incorrect entry."
+                }
+            ],
+            "investigations": [
+                {
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "priority": "MEDIUM",
+                    "risk_score": 60,
+                    "amount_at_risk": 2000.0,
+                    "analysis": "The bank transaction and internal ledger appear to represent related transactions, but their recorded amounts are different.",
+                    "possible_causes": [
+                        "Processing or settlement fee",
+                        "Partial settlement",
+                        "Incorrect ledger entry",
+                        "Incorrect bank transaction amount"
+                    ],
+                    "investigation_steps": [
+                        "Compare the original payment records",
+                        "Check whether fees were deducted during settlement",
+                        "Verify the expected settlement amount",
+                        "Correct the inaccurate record if an error is confirmed"
+                    ],
+                    "amount_difference": 2000.0
+                }
+            ]
+        }
+    },
+    {
+        "id": "68adf1b2-deaf-4e91-aded-81ca460223b3",
+        "created_at": "2026-08-30 13:34:07",
+        "summary": {
+            "bank_transactions": 5,
+            "ledger_transactions": 5,
+            "exact_matches": 0,
+            "fuzzy_matches": 3,
+            "settlement_delays": 1,
+            "amount_mismatches": 1,
+            "possible_duplicates": 0,
+            "total_matches": 4,
+            "exceptions": 1
+        },
+        "result": {
+            "summary": {
+                "bank_transactions": 5,
+                "ledger_transactions": 5,
+                "exact_matches": 0,
+                "fuzzy_matches": 3,
+                "settlement_delays": 1,
+                "amount_mismatches": 1,
+                "possible_duplicates": 0,
+                "total_matches": 4,
+                "exceptions": 1
+            },
+            "matches": [
+                {
+                    "bank_index": 0,
+                    "ledger_index": 0,
+                    "bank_ref": "BANK001",
+                    "ledger_ref": "LEDGER001",
+                    "amount": 50000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 2,
+                    "ledger_index": 2,
+                    "bank_ref": "BANK003",
+                    "ledger_ref": "LEDGER003",
+                    "amount": 40000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 4,
+                    "ledger_index": 4,
+                    "bank_ref": "BANK005",
+                    "ledger_ref": "LEDGER005",
+                    "amount": 10000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 3,
+                    "ledger_index": 3,
+                    "bank_ref": "BANK004",
+                    "ledger_ref": "LEDGER004",
+                    "amount": 30000.0,
+                    "match_type": "SETTLEMENT_DELAY",
+                    "confidence": 0.83,
+                    "reason": "Transaction matched successfully, but bank settlement occurred later than the ledger transaction date",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 2,
+                        "name_similarity": 100.0
+                    }
+                }
+            ],
+            "exceptions": [
+                {
+                    "source": "RECONCILIATION",
+                    "bank_index": 1,
+                    "ledger_index": 1,
+                    "bank_ref": "BANK002",
+                    "ledger_ref": "LEDGER002",
+                    "date": "2026-08-02",
+                    "bank_amount": 25000.0,
+                    "ledger_amount": 27000.0,
+                    "difference": 2000.0,
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "severity": "HIGH",
+                    "reason": "Transaction details are similar, but the bank and ledger amounts differ",
+                    "details": {
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    },
+                    "risk_score": 60,
+                    "priority": "MEDIUM",
+                    "amount_at_risk": 2000.0,
+                    "recommended_action": "Compare the bank and ledger amounts and verify whether the difference is due to fees, partial settlement, or an incorrect entry."
+                }
+            ],
+            "investigations": [
+                {
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "priority": "MEDIUM",
+                    "risk_score": 60,
+                    "amount_at_risk": 2000.0,
+                    "analysis": "The bank transaction and internal ledger appear to represent related transactions, but their recorded amounts are different.",
+                    "possible_causes": [
+                        "Processing or settlement fee",
+                        "Partial settlement",
+                        "Incorrect ledger entry",
+                        "Incorrect bank transaction amount"
+                    ],
+                    "investigation_steps": [
+                        "Compare the original payment records",
+                        "Check whether fees were deducted during settlement",
+                        "Verify the expected settlement amount",
+                        "Correct the inaccurate record if an error is confirmed"
+                    ],
+                    "amount_difference": 2000.0
+                }
+            ]
+        }
+    },
+    {
+        "id": "8ec0137e-57aa-4e23-9635-8f1fedd3f97e",
+        "created_at": "2026-08-30 13:12:02",
+        "summary": {
+            "bank_transactions": 5,
+            "ledger_transactions": 5,
+            "exact_matches": 0,
+            "fuzzy_matches": 3,
+            "settlement_delays": 1,
+            "amount_mismatches": 1,
+            "possible_duplicates": 0,
+            "total_matches": 4,
+            "exceptions": 1
+        },
+        "result": {
+            "summary": {
+                "bank_transactions": 5,
+                "ledger_transactions": 5,
+                "exact_matches": 0,
+                "fuzzy_matches": 3,
+                "settlement_delays": 1,
+                "amount_mismatches": 1,
+                "possible_duplicates": 0,
+                "total_matches": 4,
+                "exceptions": 1
+            },
+            "matches": [
+                {
+                    "bank_index": 0,
+                    "ledger_index": 0,
+                    "bank_ref": "BANK001",
+                    "ledger_ref": "LEDGER001",
+                    "amount": 50000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 2,
+                    "ledger_index": 2,
+                    "bank_ref": "BANK003",
+                    "ledger_ref": "LEDGER003",
+                    "amount": 40000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 4,
+                    "ledger_index": 4,
+                    "bank_ref": "BANK005",
+                    "ledger_ref": "LEDGER005",
+                    "amount": 10000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 3,
+                    "ledger_index": 3,
+                    "bank_ref": "BANK004",
+                    "ledger_ref": "LEDGER004",
+                    "amount": 30000.0,
+                    "match_type": "SETTLEMENT_DELAY",
+                    "confidence": 0.83,
+                    "reason": "Transaction matched successfully, but bank settlement occurred later than the ledger transaction date",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 2,
+                        "name_similarity": 100.0
+                    }
+                }
+            ],
+            "exceptions": [
+                {
+                    "source": "RECONCILIATION",
+                    "bank_index": 1,
+                    "ledger_index": 1,
+                    "bank_ref": "BANK002",
+                    "ledger_ref": "LEDGER002",
+                    "date": "2026-08-02",
+                    "bank_amount": 25000.0,
+                    "ledger_amount": 27000.0,
+                    "difference": 2000.0,
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "severity": "HIGH",
+                    "reason": "Transaction details are similar, but the bank and ledger amounts differ",
+                    "details": {
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    },
+                    "risk_score": 60,
+                    "priority": "MEDIUM",
+                    "amount_at_risk": 2000.0,
+                    "recommended_action": "Compare the bank and ledger amounts and verify whether the difference is due to fees, partial settlement, or an incorrect entry."
+                }
+            ],
+            "investigations": [
+                {
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "priority": "MEDIUM",
+                    "risk_score": 60,
+                    "amount_at_risk": 2000.0,
+                    "analysis": "The bank transaction and internal ledger appear to represent related transactions, but their recorded amounts are different.",
+                    "possible_causes": [
+                        "Processing or settlement fee",
+                        "Partial settlement",
+                        "Incorrect ledger entry",
+                        "Incorrect bank transaction amount"
+                    ],
+                    "investigation_steps": [
+                        "Compare the original payment records",
+                        "Check whether fees were deducted during settlement",
+                        "Verify the expected settlement amount",
+                        "Correct the inaccurate record if an error is confirmed"
+                    ],
+                    "amount_difference": 2000.0
+                }
+            ]
+        }
+    },
+    {
+        "id": "096235ec-bbe1-4736-818a-9dbaf2f60048",
+        "created_at": "2026-08-30 13:04:55",
+        "summary": {
+            "bank_transactions": 5,
+            "ledger_transactions": 5,
+            "exact_matches": 0,
+            "fuzzy_matches": 3,
+            "settlement_delays": 1,
+            "amount_mismatches": 1,
+            "possible_duplicates": 0,
+            "total_matches": 4,
+            "exceptions": 1
+        },
+        "result": {
+            "summary": {
+                "bank_transactions": 5,
+                "ledger_transactions": 5,
+                "exact_matches": 0,
+                "fuzzy_matches": 3,
+                "settlement_delays": 1,
+                "amount_mismatches": 1,
+                "possible_duplicates": 0,
+                "total_matches": 4,
+                "exceptions": 1
+            },
+            "matches": [
+                {
+                    "bank_index": 0,
+                    "ledger_index": 0,
+                    "bank_ref": "BANK001",
+                    "ledger_ref": "LEDGER001",
+                    "amount": 50000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 2,
+                    "ledger_index": 2,
+                    "bank_ref": "BANK003",
+                    "ledger_ref": "LEDGER003",
+                    "amount": 40000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 4,
+                    "ledger_index": 4,
+                    "bank_ref": "BANK005",
+                    "ledger_ref": "LEDGER005",
+                    "amount": 10000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 3,
+                    "ledger_index": 3,
+                    "bank_ref": "BANK004",
+                    "ledger_ref": "LEDGER004",
+                    "amount": 30000.0,
+                    "match_type": "SETTLEMENT_DELAY",
+                    "confidence": 0.83,
+                    "reason": "Transaction matched successfully, but bank settlement occurred later than the ledger transaction date",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 2,
+                        "name_similarity": 100.0
+                    }
+                }
+            ],
+            "exceptions": [
+                {
+                    "source": "RECONCILIATION",
+                    "bank_index": 1,
+                    "ledger_index": 1,
+                    "bank_ref": "BANK002",
+                    "ledger_ref": "LEDGER002",
+                    "date": "2026-08-02",
+                    "bank_amount": 25000.0,
+                    "ledger_amount": 27000.0,
+                    "difference": 2000.0,
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "severity": "HIGH",
+                    "reason": "Transaction details are similar, but the bank and ledger amounts differ",
+                    "details": {
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    },
+                    "risk_score": 60,
+                    "priority": "MEDIUM",
+                    "amount_at_risk": 2000.0,
+                    "recommended_action": "Compare the bank and ledger amounts and verify whether the difference is due to fees, partial settlement, or an incorrect entry."
+                }
+            ],
+            "investigations": [
+                {
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "priority": "MEDIUM",
+                    "risk_score": 60,
+                    "amount_at_risk": 2000.0,
+                    "analysis": "The bank transaction and internal ledger appear to represent related transactions, but their recorded amounts are different.",
+                    "possible_causes": [
+                        "Processing or settlement fee",
+                        "Partial settlement",
+                        "Incorrect ledger entry",
+                        "Incorrect bank transaction amount"
+                    ],
+                    "investigation_steps": [
+                        "Compare the original payment records",
+                        "Check whether fees were deducted during settlement",
+                        "Verify the expected settlement amount",
+                        "Correct the inaccurate record if an error is confirmed"
+                    ],
+                    "amount_difference": 2000.0
+                }
+            ]
+        }
+    },
+    {
+        "id": "e27f6575-cbfb-4357-ac52-d7c96d516e3c",
+        "created_at": "2026-08-30 12:58:27",
+        "summary": {
+            "bank_transactions": 5,
+            "ledger_transactions": 5,
+            "exact_matches": 0,
+            "fuzzy_matches": 3,
+            "settlement_delays": 1,
+            "amount_mismatches": 1,
+            "possible_duplicates": 0,
+            "total_matches": 4,
+            "exceptions": 1
+        },
+        "result": {
+            "summary": {
+                "bank_transactions": 5,
+                "ledger_transactions": 5,
+                "exact_matches": 0,
+                "fuzzy_matches": 3,
+                "settlement_delays": 1,
+                "amount_mismatches": 1,
+                "possible_duplicates": 0,
+                "total_matches": 4,
+                "exceptions": 1
+            },
+            "matches": [
+                {
+                    "bank_index": 0,
+                    "ledger_index": 0,
+                    "bank_ref": "BANK001",
+                    "ledger_ref": "LEDGER001",
+                    "amount": 50000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 2,
+                    "ledger_index": 2,
+                    "bank_ref": "BANK003",
+                    "ledger_ref": "LEDGER003",
+                    "amount": 40000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 4,
+                    "ledger_index": 4,
+                    "bank_ref": "BANK005",
+                    "ledger_ref": "LEDGER005",
+                    "amount": 10000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 3,
+                    "ledger_index": 3,
+                    "bank_ref": "BANK004",
+                    "ledger_ref": "LEDGER004",
+                    "amount": 30000.0,
+                    "match_type": "SETTLEMENT_DELAY",
+                    "confidence": 0.83,
+                    "reason": "Transaction matched successfully, but bank settlement occurred later than the ledger transaction date",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 2,
+                        "name_similarity": 100.0
+                    }
+                }
+            ],
+            "exceptions": [
+                {
+                    "source": "RECONCILIATION",
+                    "bank_index": 1,
+                    "ledger_index": 1,
+                    "bank_ref": "BANK002",
+                    "ledger_ref": "LEDGER002",
+                    "date": "2026-08-02",
+                    "bank_amount": 25000.0,
+                    "ledger_amount": 27000.0,
+                    "difference": 2000.0,
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "severity": "HIGH",
+                    "reason": "Transaction details are similar, but the bank and ledger amounts differ",
+                    "details": {
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    },
+                    "risk_score": 60,
+                    "priority": "MEDIUM",
+                    "amount_at_risk": 2000.0,
+                    "recommended_action": "Compare the bank and ledger amounts and verify whether the difference is due to fees, partial settlement, or an incorrect entry."
+                }
+            ],
+            "investigations": [
+                {
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "priority": "MEDIUM",
+                    "risk_score": 60,
+                    "amount_at_risk": 2000.0,
+                    "analysis": "The bank transaction and internal ledger appear to represent related transactions, but their recorded amounts are different.",
+                    "possible_causes": [
+                        "Processing or settlement fee",
+                        "Partial settlement",
+                        "Incorrect ledger entry",
+                        "Incorrect bank transaction amount"
+                    ],
+                    "investigation_steps": [
+                        "Compare the original payment records",
+                        "Check whether fees were deducted during settlement",
+                        "Verify the expected settlement amount",
+                        "Correct the inaccurate record if an error is confirmed"
+                    ],
+                    "amount_difference": 2000.0
+                }
+            ]
+        }
+    },
+    {
+        "id": "e9920904-ba3e-499a-af54-9178adb89e9f",
+        "created_at": "2026-08-30 12:50:22",
+        "summary": {
+            "bank_transactions": 5,
+            "ledger_transactions": 5,
+            "exact_matches": 0,
+            "fuzzy_matches": 3,
+            "settlement_delays": 1,
+            "amount_mismatches": 1,
+            "possible_duplicates": 0,
+            "total_matches": 4,
+            "exceptions": 1
+        },
+        "result": {
+            "summary": {
+                "bank_transactions": 5,
+                "ledger_transactions": 5,
+                "exact_matches": 0,
+                "fuzzy_matches": 3,
+                "settlement_delays": 1,
+                "amount_mismatches": 1,
+                "possible_duplicates": 0,
+                "total_matches": 4,
+                "exceptions": 1
+            },
+            "matches": [
+                {
+                    "bank_index": 0,
+                    "ledger_index": 0,
+                    "bank_ref": "BANK001",
+                    "ledger_ref": "LEDGER001",
+                    "amount": 50000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 2,
+                    "ledger_index": 2,
+                    "bank_ref": "BANK003",
+                    "ledger_ref": "LEDGER003",
+                    "amount": 40000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 4,
+                    "ledger_index": 4,
+                    "bank_ref": "BANK005",
+                    "ledger_ref": "LEDGER005",
+                    "amount": 10000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 3,
+                    "ledger_index": 3,
+                    "bank_ref": "BANK004",
+                    "ledger_ref": "LEDGER004",
+                    "amount": 30000.0,
+                    "match_type": "SETTLEMENT_DELAY",
+                    "confidence": 0.83,
+                    "reason": "Transaction matched successfully, but bank settlement occurred later than the ledger transaction date",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 2,
+                        "name_similarity": 100.0
+                    }
+                }
+            ],
+            "exceptions": [
+                {
+                    "source": "RECONCILIATION",
+                    "bank_index": 1,
+                    "ledger_index": 1,
+                    "bank_ref": "BANK002",
+                    "ledger_ref": "LEDGER002",
+                    "date": "2026-08-02",
+                    "bank_amount": 25000.0,
+                    "ledger_amount": 27000.0,
+                    "difference": 2000.0,
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "severity": "HIGH",
+                    "reason": "Transaction details are similar, but the bank and ledger amounts differ",
+                    "details": {
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    },
+                    "risk_score": 60,
+                    "priority": "MEDIUM",
+                    "amount_at_risk": 2000.0,
+                    "recommended_action": "Compare the bank and ledger amounts and verify whether the difference is due to fees, partial settlement, or an incorrect entry."
+                }
+            ],
+            "investigations": [
+                {
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "priority": "MEDIUM",
+                    "risk_score": 60,
+                    "amount_at_risk": 2000.0,
+                    "analysis": "The bank transaction and internal ledger appear to represent related transactions, but their recorded amounts are different.",
+                    "possible_causes": [
+                        "Processing or settlement fee",
+                        "Partial settlement",
+                        "Incorrect ledger entry",
+                        "Incorrect bank transaction amount"
+                    ],
+                    "investigation_steps": [
+                        "Compare the original payment records",
+                        "Check whether fees were deducted during settlement",
+                        "Verify the expected settlement amount",
+                        "Correct the inaccurate record if an error is confirmed"
+                    ],
+                    "amount_difference": 2000.0
+                }
+            ]
+        }
+    },
+    {
+        "id": "414101d4-b8e3-4a63-a935-54083f385fab",
+        "created_at": "2026-08-30 12:33:58",
+        "summary": {
+            "bank_transactions": 7,
+            "ledger_transactions": 8,
+            "exact_matches": 3,
+            "fuzzy_matches": 1,
+            "settlement_delays": 1,
+            "amount_mismatches": 1,
+            "possible_duplicates": 1,
+            "total_matches": 5,
+            "exceptions": 3
+        },
+        "result": {
+            "summary": {
+                "bank_transactions": 7,
+                "ledger_transactions": 8,
+                "exact_matches": 3,
+                "fuzzy_matches": 1,
+                "settlement_delays": 1,
+                "amount_mismatches": 1,
+                "possible_duplicates": 1,
+                "total_matches": 5,
+                "exceptions": 3
+            },
+            "matches": [
+                {
+                    "bank_index": 0,
+                    "ledger_index": 0,
+                    "bank_ref": "TXN100001",
+                    "ledger_ref": "TXN100001",
+                    "amount": 10000.0,
+                    "match_type": "EXACT",
+                    "confidence": 1.0,
+                    "reason": "Exact transaction ID and amount match"
+                },
+                {
+                    "bank_index": 1,
+                    "ledger_index": 1,
+                    "bank_ref": "TXN100002",
+                    "ledger_ref": "TXN100002",
+                    "amount": 25000.0,
+                    "match_type": "EXACT",
+                    "confidence": 1.0,
+                    "reason": "Exact transaction ID and amount match"
+                },
+                {
+                    "bank_index": 2,
+                    "ledger_index": 2,
+                    "bank_ref": "TXN100003",
+                    "ledger_ref": "TXN100003",
+                    "amount": 5000.0,
+                    "match_type": "EXACT",
+                    "confidence": 1.0,
+                    "reason": "Exact transaction ID and amount match"
+                },
+                {
+                    "bank_index": 3,
+                    "ledger_index": 3,
+                    "bank_ref": "None",
+                    "ledger_ref": "TXN100004",
+                    "amount": 15000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 6,
+                    "ledger_index": 7,
+                    "bank_ref": "None",
+                    "ledger_ref": "TXN100009",
+                    "amount": 8000.0,
+                    "match_type": "SETTLEMENT_DELAY",
+                    "confidence": 0.83,
+                    "reason": "Transaction matched successfully, but bank settlement occurred later than the ledger transaction date",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 2,
+                        "name_similarity": 100.0
+                    }
+                }
+            ],
+            "exceptions": [
+                {
+                    "source": "LEDGER",
+                    "ledger_index_1": 5,
+                    "ledger_index_2": 6,
+                    "txn_id_1": "TXN100007",
+                    "txn_id_2": "TXN100008",
+                    "date_1": "2026-08-16",
+                    "date_2": "2026-08-16",
+                    "amount_1": 12000.0,
+                    "amount_2": 12000.0,
+                    "merchant_1": "Smart Electronics",
+                    "merchant_2": "Smart Electronics",
+                    "exception_type": "POSSIBLE_DUPLICATE",
+                    "severity": "HIGH",
+                    "confidence": 1.0,
+                    "reason": "Two ledger transactions have very similar amount, date, and merchant details",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    },
+                    "risk_score": 90,
+                    "priority": "CRITICAL",
+                    "amount_at_risk": 12000.0,
+                    "recommended_action": "Investigate immediately and verify whether a duplicate transaction was processed."
+                },
+                {
+                    "source": "RECONCILIATION",
+                    "bank_index": 5,
+                    "ledger_index": 4,
+                    "bank_ref": "TXN100006",
+                    "ledger_ref": "TXN100006",
+                    "date": "2026-08-15",
+                    "bank_amount": 10000.0,
+                    "ledger_amount": 9500.0,
+                    "difference": 500.0,
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "severity": "MEDIUM",
+                    "reason": "Transaction details are similar, but the bank and ledger amounts differ",
+                    "details": {
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    },
+                    "risk_score": 55,
+                    "priority": "MEDIUM",
+                    "amount_at_risk": 500.0,
+                    "recommended_action": "Compare the bank and ledger amounts and verify whether the difference is due to fees, partial settlement, or an incorrect entry."
+                },
+                {
+                    "source": "BANK",
+                    "index": 4,
+                    "reference_id": "TXN100005",
+                    "date": "2026-08-14",
+                    "amount": 423.29,
+                    "narration": "BANK SERVICE CHARGE",
+                    "exception_type": "BANK_FEE",
+                    "severity": "LOW",
+                    "reason": "Bank fee or service charge with no matching ledger transaction",
+                    "risk_score": 20,
+                    "priority": "LOW",
+                    "amount_at_risk": 423.29,
+                    "recommended_action": "Verify the bank fee against the applicable bank fee schedule."
+                }
+            ],
+            "investigations": [
+                {
+                    "exception_type": "POSSIBLE_DUPLICATE",
+                    "priority": "CRITICAL",
+                    "risk_score": 90,
+                    "amount_at_risk": 12000.0,
+                    "analysis": "Two ledger transactions have highly similar transaction details. This may indicate that the same transaction was recorded more than once.",
+                    "possible_causes": [
+                        "Duplicate transaction entry",
+                        "Payment retry after a processing timeout",
+                        "Duplicate API or webhook event",
+                        "Manual accounting entry error"
+                    ],
+                    "investigation_steps": [
+                        "Compare the original transaction references",
+                        "Check payment gateway or bank settlement records",
+                        "Verify whether both transactions resulted in a payment",
+                        "Reverse or correct the duplicate entry if confirmed"
+                    ]
+                },
+                {
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "priority": "MEDIUM",
+                    "risk_score": 55,
+                    "amount_at_risk": 500.0,
+                    "analysis": "The bank transaction and internal ledger appear to represent related transactions, but their recorded amounts are different.",
+                    "possible_causes": [
+                        "Processing or settlement fee",
+                        "Partial settlement",
+                        "Incorrect ledger entry",
+                        "Incorrect bank transaction amount"
+                    ],
+                    "investigation_steps": [
+                        "Compare the original payment records",
+                        "Check whether fees were deducted during settlement",
+                        "Verify the expected settlement amount",
+                        "Correct the inaccurate record if an error is confirmed"
+                    ],
+                    "amount_difference": 500.0
+                },
+                {
+                    "exception_type": "BANK_FEE",
+                    "priority": "LOW",
+                    "risk_score": 20,
+                    "amount_at_risk": 423.29,
+                    "analysis": "A bank charge was detected without a corresponding internal ledger transaction.",
+                    "possible_causes": [
+                        "Scheduled bank service fee",
+                        "Transaction processing charge",
+                        "Account maintenance charge"
+                    ],
+                    "investigation_steps": [
+                        "Check the applicable bank fee schedule",
+                        "Verify the charge against the bank statement",
+                        "Confirm whether the fee should be recorded internally",
+                        "Create an accounting entry if required"
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "id": "cfa42a5f-9d8e-473b-9ae9-996c64811f41",
+        "created_at": "2026-08-30 12:27:39",
+        "summary": {
+            "bank_transactions": 7,
+            "ledger_transactions": 8,
+            "exact_matches": 3,
+            "fuzzy_matches": 1,
+            "settlement_delays": 1,
+            "amount_mismatches": 1,
+            "possible_duplicates": 1,
+            "total_matches": 5,
+            "exceptions": 3
+        },
+        "result": {
+            "summary": {
+                "bank_transactions": 7,
+                "ledger_transactions": 8,
+                "exact_matches": 3,
+                "fuzzy_matches": 1,
+                "settlement_delays": 1,
+                "amount_mismatches": 1,
+                "possible_duplicates": 1,
+                "total_matches": 5,
+                "exceptions": 3
+            },
+            "matches": [
+                {
+                    "bank_index": 0,
+                    "ledger_index": 0,
+                    "bank_ref": "TXN100001",
+                    "ledger_ref": "TXN100001",
+                    "amount": 10000.0,
+                    "match_type": "EXACT",
+                    "confidence": 1.0,
+                    "reason": "Exact transaction ID and amount match"
+                },
+                {
+                    "bank_index": 1,
+                    "ledger_index": 1,
+                    "bank_ref": "TXN100002",
+                    "ledger_ref": "TXN100002",
+                    "amount": 25000.0,
+                    "match_type": "EXACT",
+                    "confidence": 1.0,
+                    "reason": "Exact transaction ID and amount match"
+                },
+                {
+                    "bank_index": 2,
+                    "ledger_index": 2,
+                    "bank_ref": "TXN100003",
+                    "ledger_ref": "TXN100003",
+                    "amount": 5000.0,
+                    "match_type": "EXACT",
+                    "confidence": 1.0,
+                    "reason": "Exact transaction ID and amount match"
+                },
+                {
+                    "bank_index": 3,
+                    "ledger_index": 3,
+                    "bank_ref": "None",
+                    "ledger_ref": "TXN100004",
+                    "amount": 15000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 6,
+                    "ledger_index": 7,
+                    "bank_ref": "None",
+                    "ledger_ref": "TXN100009",
+                    "amount": 8000.0,
+                    "match_type": "SETTLEMENT_DELAY",
+                    "confidence": 0.83,
+                    "reason": "Transaction matched successfully, but bank settlement occurred later than the ledger transaction date",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 2,
+                        "name_similarity": 100.0
+                    }
+                }
+            ],
+            "exceptions": [
+                {
+                    "source": "LEDGER",
+                    "ledger_index_1": 5,
+                    "ledger_index_2": 6,
+                    "txn_id_1": "TXN100007",
+                    "txn_id_2": "TXN100008",
+                    "date_1": "2026-08-16",
+                    "date_2": "2026-08-16",
+                    "amount_1": 12000.0,
+                    "amount_2": 12000.0,
+                    "merchant_1": "Smart Electronics",
+                    "merchant_2": "Smart Electronics",
+                    "exception_type": "POSSIBLE_DUPLICATE",
+                    "severity": "HIGH",
+                    "confidence": 1.0,
+                    "reason": "Two ledger transactions have very similar amount, date, and merchant details",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    },
+                    "risk_score": 90,
+                    "priority": "CRITICAL",
+                    "amount_at_risk": 12000.0,
+                    "recommended_action": "Investigate immediately and verify whether a duplicate transaction was processed."
+                },
+                {
+                    "source": "RECONCILIATION",
+                    "bank_index": 5,
+                    "ledger_index": 4,
+                    "bank_ref": "TXN100006",
+                    "ledger_ref": "TXN100006",
+                    "date": "2026-08-15",
+                    "bank_amount": 10000.0,
+                    "ledger_amount": 9500.0,
+                    "difference": 500.0,
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "severity": "MEDIUM",
+                    "reason": "Transaction details are similar, but the bank and ledger amounts differ",
+                    "details": {
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    },
+                    "risk_score": 55,
+                    "priority": "MEDIUM",
+                    "amount_at_risk": 500.0,
+                    "recommended_action": "Compare the bank and ledger amounts and verify whether the difference is due to fees, partial settlement, or an incorrect entry."
+                },
+                {
+                    "source": "BANK",
+                    "index": 4,
+                    "reference_id": "TXN100005",
+                    "date": "2026-08-14",
+                    "amount": 423.29,
+                    "narration": "BANK SERVICE CHARGE",
+                    "exception_type": "BANK_FEE",
+                    "severity": "LOW",
+                    "reason": "Bank fee or service charge with no matching ledger transaction",
+                    "risk_score": 20,
+                    "priority": "LOW",
+                    "amount_at_risk": 423.29,
+                    "recommended_action": "Verify the bank fee against the applicable bank fee schedule."
+                }
+            ],
+            "investigations": [
+                {
+                    "exception_type": "POSSIBLE_DUPLICATE",
+                    "priority": "CRITICAL",
+                    "risk_score": 90,
+                    "amount_at_risk": 12000.0,
+                    "analysis": "Two ledger transactions have highly similar transaction details. This may indicate that the same transaction was recorded more than once.",
+                    "possible_causes": [
+                        "Duplicate transaction entry",
+                        "Payment retry after a processing timeout",
+                        "Duplicate API or webhook event",
+                        "Manual accounting entry error"
+                    ],
+                    "investigation_steps": [
+                        "Compare the original transaction references",
+                        "Check payment gateway or bank settlement records",
+                        "Verify whether both transactions resulted in a payment",
+                        "Reverse or correct the duplicate entry if confirmed"
+                    ]
+                },
+                {
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "priority": "MEDIUM",
+                    "risk_score": 55,
+                    "amount_at_risk": 500.0,
+                    "analysis": "The bank transaction and internal ledger appear to represent related transactions, but their recorded amounts are different.",
+                    "possible_causes": [
+                        "Processing or settlement fee",
+                        "Partial settlement",
+                        "Incorrect ledger entry",
+                        "Incorrect bank transaction amount"
+                    ],
+                    "investigation_steps": [
+                        "Compare the original payment records",
+                        "Check whether fees were deducted during settlement",
+                        "Verify the expected settlement amount",
+                        "Correct the inaccurate record if an error is confirmed"
+                    ],
+                    "amount_difference": 500.0
+                },
+                {
+                    "exception_type": "BANK_FEE",
+                    "priority": "LOW",
+                    "risk_score": 20,
+                    "amount_at_risk": 423.29,
+                    "analysis": "A bank charge was detected without a corresponding internal ledger transaction.",
+                    "possible_causes": [
+                        "Scheduled bank service fee",
+                        "Transaction processing charge",
+                        "Account maintenance charge"
+                    ],
+                    "investigation_steps": [
+                        "Check the applicable bank fee schedule",
+                        "Verify the charge against the bank statement",
+                        "Confirm whether the fee should be recorded internally",
+                        "Create an accounting entry if required"
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "id": "f59664fe-f3a4-45a5-b90e-407962347730",
+        "created_at": "2026-08-30 12:18:36",
+        "summary": {
+            "bank_transactions": 7,
+            "ledger_transactions": 8,
+            "exact_matches": 3,
+            "fuzzy_matches": 1,
+            "settlement_delays": 1,
+            "amount_mismatches": 1,
+            "possible_duplicates": 1,
+            "total_matches": 5,
+            "exceptions": 3
+        },
+        "result": {
+            "summary": {
+                "bank_transactions": 7,
+                "ledger_transactions": 8,
+                "exact_matches": 3,
+                "fuzzy_matches": 1,
+                "settlement_delays": 1,
+                "amount_mismatches": 1,
+                "possible_duplicates": 1,
+                "total_matches": 5,
+                "exceptions": 3
+            },
+            "matches": [
+                {
+                    "bank_index": 0,
+                    "ledger_index": 0,
+                    "bank_ref": "TXN100001",
+                    "ledger_ref": "TXN100001",
+                    "amount": 10000.0,
+                    "match_type": "EXACT",
+                    "confidence": 1.0,
+                    "reason": "Exact transaction ID and amount match"
+                },
+                {
+                    "bank_index": 1,
+                    "ledger_index": 1,
+                    "bank_ref": "TXN100002",
+                    "ledger_ref": "TXN100002",
+                    "amount": 25000.0,
+                    "match_type": "EXACT",
+                    "confidence": 1.0,
+                    "reason": "Exact transaction ID and amount match"
+                },
+                {
+                    "bank_index": 2,
+                    "ledger_index": 2,
+                    "bank_ref": "TXN100003",
+                    "ledger_ref": "TXN100003",
+                    "amount": 5000.0,
+                    "match_type": "EXACT",
+                    "confidence": 1.0,
+                    "reason": "Exact transaction ID and amount match"
+                },
+                {
+                    "bank_index": 3,
+                    "ledger_index": 3,
+                    "bank_ref": "None",
+                    "ledger_ref": "TXN100004",
+                    "amount": 15000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 6,
+                    "ledger_index": 7,
+                    "bank_ref": "None",
+                    "ledger_ref": "TXN100009",
+                    "amount": 8000.0,
+                    "match_type": "SETTLEMENT_DELAY",
+                    "confidence": 0.83,
+                    "reason": "Transaction matched successfully, but bank settlement occurred later than the ledger transaction date",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 2,
+                        "name_similarity": 100.0
+                    }
+                }
+            ],
+            "exceptions": [
+                {
+                    "source": "LEDGER",
+                    "ledger_index_1": 5,
+                    "ledger_index_2": 6,
+                    "txn_id_1": "TXN100007",
+                    "txn_id_2": "TXN100008",
+                    "date_1": "2026-08-16",
+                    "date_2": "2026-08-16",
+                    "amount_1": 12000.0,
+                    "amount_2": 12000.0,
+                    "merchant_1": "Smart Electronics",
+                    "merchant_2": "Smart Electronics",
+                    "exception_type": "POSSIBLE_DUPLICATE",
+                    "severity": "HIGH",
+                    "confidence": 1.0,
+                    "reason": "Two ledger transactions have very similar amount, date, and merchant details",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    },
+                    "risk_score": 90,
+                    "priority": "CRITICAL",
+                    "amount_at_risk": 12000.0,
+                    "recommended_action": "Investigate immediately and verify whether a duplicate transaction was processed."
+                },
+                {
+                    "source": "RECONCILIATION",
+                    "bank_index": 5,
+                    "ledger_index": 4,
+                    "bank_ref": "TXN100006",
+                    "ledger_ref": "TXN100006",
+                    "date": "2026-08-15",
+                    "bank_amount": 10000.0,
+                    "ledger_amount": 9500.0,
+                    "difference": 500.0,
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "severity": "MEDIUM",
+                    "reason": "Transaction details are similar, but the bank and ledger amounts differ",
+                    "details": {
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    },
+                    "risk_score": 55,
+                    "priority": "MEDIUM",
+                    "amount_at_risk": 500.0,
+                    "recommended_action": "Compare the bank and ledger amounts and verify whether the difference is due to fees, partial settlement, or an incorrect entry."
+                },
+                {
+                    "source": "BANK",
+                    "index": 4,
+                    "reference_id": "TXN100005",
+                    "date": "2026-08-14",
+                    "amount": 423.29,
+                    "narration": "BANK SERVICE CHARGE",
+                    "exception_type": "BANK_FEE",
+                    "severity": "LOW",
+                    "reason": "Bank fee or service charge with no matching ledger transaction",
+                    "risk_score": 20,
+                    "priority": "LOW",
+                    "amount_at_risk": 423.29,
+                    "recommended_action": "Verify the bank fee against the applicable bank fee schedule."
+                }
+            ],
+            "investigations": [
+                {
+                    "exception_type": "POSSIBLE_DUPLICATE",
+                    "priority": "CRITICAL",
+                    "risk_score": 90,
+                    "amount_at_risk": 12000.0,
+                    "analysis": "Two ledger transactions have highly similar transaction details. This may indicate that the same transaction was recorded more than once.",
+                    "possible_causes": [
+                        "Duplicate transaction entry",
+                        "Payment retry after a processing timeout",
+                        "Duplicate API or webhook event",
+                        "Manual accounting entry error"
+                    ],
+                    "investigation_steps": [
+                        "Compare the original transaction references",
+                        "Check payment gateway or bank settlement records",
+                        "Verify whether both transactions resulted in a payment",
+                        "Reverse or correct the duplicate entry if confirmed"
+                    ]
+                },
+                {
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "priority": "MEDIUM",
+                    "risk_score": 55,
+                    "amount_at_risk": 500.0,
+                    "analysis": "The bank transaction and internal ledger appear to represent related transactions, but their recorded amounts are different.",
+                    "possible_causes": [
+                        "Processing or settlement fee",
+                        "Partial settlement",
+                        "Incorrect ledger entry",
+                        "Incorrect bank transaction amount"
+                    ],
+                    "investigation_steps": [
+                        "Compare the original payment records",
+                        "Check whether fees were deducted during settlement",
+                        "Verify the expected settlement amount",
+                        "Correct the inaccurate record if an error is confirmed"
+                    ],
+                    "amount_difference": 500.0
+                },
+                {
+                    "exception_type": "BANK_FEE",
+                    "priority": "LOW",
+                    "risk_score": 20,
+                    "amount_at_risk": 423.29,
+                    "analysis": "A bank charge was detected without a corresponding internal ledger transaction.",
+                    "possible_causes": [
+                        "Scheduled bank service fee",
+                        "Transaction processing charge",
+                        "Account maintenance charge"
+                    ],
+                    "investigation_steps": [
+                        "Check the applicable bank fee schedule",
+                        "Verify the charge against the bank statement",
+                        "Confirm whether the fee should be recorded internally",
+                        "Create an accounting entry if required"
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "id": "2c0b6149-ecd9-432f-bdc1-1dded58d0490",
+        "created_at": "2026-08-30 12:14:34",
+        "summary": {
+            "bank_transactions": 7,
+            "ledger_transactions": 8,
+            "exact_matches": 3,
+            "fuzzy_matches": 1,
+            "settlement_delays": 1,
+            "amount_mismatches": 1,
+            "possible_duplicates": 1,
+            "total_matches": 5,
+            "exceptions": 3
+        },
+        "result": {
+            "summary": {
+                "bank_transactions": 7,
+                "ledger_transactions": 8,
+                "exact_matches": 3,
+                "fuzzy_matches": 1,
+                "settlement_delays": 1,
+                "amount_mismatches": 1,
+                "possible_duplicates": 1,
+                "total_matches": 5,
+                "exceptions": 3
+            },
+            "matches": [
+                {
+                    "bank_index": 0,
+                    "ledger_index": 0,
+                    "bank_ref": "TXN100001",
+                    "ledger_ref": "TXN100001",
+                    "amount": 10000.0,
+                    "match_type": "EXACT",
+                    "confidence": 1.0,
+                    "reason": "Exact transaction ID and amount match"
+                },
+                {
+                    "bank_index": 1,
+                    "ledger_index": 1,
+                    "bank_ref": "TXN100002",
+                    "ledger_ref": "TXN100002",
+                    "amount": 25000.0,
+                    "match_type": "EXACT",
+                    "confidence": 1.0,
+                    "reason": "Exact transaction ID and amount match"
+                },
+                {
+                    "bank_index": 2,
+                    "ledger_index": 2,
+                    "bank_ref": "TXN100003",
+                    "ledger_ref": "TXN100003",
+                    "amount": 5000.0,
+                    "match_type": "EXACT",
+                    "confidence": 1.0,
+                    "reason": "Exact transaction ID and amount match"
+                },
+                {
+                    "bank_index": 3,
+                    "ledger_index": 3,
+                    "bank_ref": "None",
+                    "ledger_ref": "TXN100004",
+                    "amount": 15000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 6,
+                    "ledger_index": 7,
+                    "bank_ref": "None",
+                    "ledger_ref": "TXN100009",
+                    "amount": 8000.0,
+                    "match_type": "SETTLEMENT_DELAY",
+                    "confidence": 0.83,
+                    "reason": "Transaction matched successfully, but bank settlement occurred later than the ledger transaction date",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 2,
+                        "name_similarity": 100.0
+                    }
+                }
+            ],
+            "exceptions": [
+                {
+                    "source": "LEDGER",
+                    "ledger_index_1": 5,
+                    "ledger_index_2": 6,
+                    "txn_id_1": "TXN100007",
+                    "txn_id_2": "TXN100008",
+                    "date_1": "2026-08-16",
+                    "date_2": "2026-08-16",
+                    "amount_1": 12000.0,
+                    "amount_2": 12000.0,
+                    "merchant_1": "Smart Electronics",
+                    "merchant_2": "Smart Electronics",
+                    "exception_type": "POSSIBLE_DUPLICATE",
+                    "severity": "HIGH",
+                    "confidence": 1.0,
+                    "reason": "Two ledger transactions have very similar amount, date, and merchant details",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    },
+                    "risk_score": 90,
+                    "priority": "CRITICAL",
+                    "amount_at_risk": 12000.0,
+                    "recommended_action": "Investigate immediately and verify whether a duplicate transaction was processed."
+                },
+                {
+                    "source": "RECONCILIATION",
+                    "bank_index": 5,
+                    "ledger_index": 4,
+                    "bank_ref": "TXN100006",
+                    "ledger_ref": "TXN100006",
+                    "date": "2026-08-15",
+                    "bank_amount": 10000.0,
+                    "ledger_amount": 9500.0,
+                    "difference": 500.0,
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "severity": "MEDIUM",
+                    "reason": "Transaction details are similar, but the bank and ledger amounts differ",
+                    "details": {
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    },
+                    "risk_score": 55,
+                    "priority": "MEDIUM",
+                    "amount_at_risk": 500.0,
+                    "recommended_action": "Compare the bank and ledger amounts and verify whether the difference is due to fees, partial settlement, or an incorrect entry."
+                },
+                {
+                    "source": "BANK",
+                    "index": 4,
+                    "reference_id": "TXN100005",
+                    "date": "2026-08-14",
+                    "amount": 423.29,
+                    "narration": "BANK SERVICE CHARGE",
+                    "exception_type": "BANK_FEE",
+                    "severity": "LOW",
+                    "reason": "Bank fee or service charge with no matching ledger transaction",
+                    "risk_score": 20,
+                    "priority": "LOW",
+                    "amount_at_risk": 423.29,
+                    "recommended_action": "Verify the bank fee against the applicable bank fee schedule."
+                }
+            ],
+            "investigations": [
+                {
+                    "exception_type": "POSSIBLE_DUPLICATE",
+                    "priority": "CRITICAL",
+                    "risk_score": 90,
+                    "amount_at_risk": 12000.0,
+                    "analysis": "Two ledger transactions have highly similar transaction details. This may indicate that the same transaction was recorded more than once.",
+                    "possible_causes": [
+                        "Duplicate transaction entry",
+                        "Payment retry after a processing timeout",
+                        "Duplicate API or webhook event",
+                        "Manual accounting entry error"
+                    ],
+                    "investigation_steps": [
+                        "Compare the original transaction references",
+                        "Check payment gateway or bank settlement records",
+                        "Verify whether both transactions resulted in a payment",
+                        "Reverse or correct the duplicate entry if confirmed"
+                    ]
+                },
+                {
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "priority": "MEDIUM",
+                    "risk_score": 55,
+                    "amount_at_risk": 500.0,
+                    "analysis": "The bank transaction and internal ledger appear to represent related transactions, but their recorded amounts are different.",
+                    "possible_causes": [
+                        "Processing or settlement fee",
+                        "Partial settlement",
+                        "Incorrect ledger entry",
+                        "Incorrect bank transaction amount"
+                    ],
+                    "investigation_steps": [
+                        "Compare the original payment records",
+                        "Check whether fees were deducted during settlement",
+                        "Verify the expected settlement amount",
+                        "Correct the inaccurate record if an error is confirmed"
+                    ],
+                    "amount_difference": 500.0
+                },
+                {
+                    "exception_type": "BANK_FEE",
+                    "priority": "LOW",
+                    "risk_score": 20,
+                    "amount_at_risk": 423.29,
+                    "analysis": "A bank charge was detected without a corresponding internal ledger transaction.",
+                    "possible_causes": [
+                        "Scheduled bank service fee",
+                        "Transaction processing charge",
+                        "Account maintenance charge"
+                    ],
+                    "investigation_steps": [
+                        "Check the applicable bank fee schedule",
+                        "Verify the charge against the bank statement",
+                        "Confirm whether the fee should be recorded internally",
+                        "Create an accounting entry if required"
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "id": "40ddae06-dea0-4185-a993-cd3679947341",
+        "created_at": "2026-08-30 12:11:45",
+        "summary": {
+            "bank_transactions": 7,
+            "ledger_transactions": 8,
+            "exact_matches": 3,
+            "fuzzy_matches": 1,
+            "settlement_delays": 1,
+            "amount_mismatches": 1,
+            "possible_duplicates": 1,
+            "total_matches": 5,
+            "exceptions": 3
+        },
+        "result": {
+            "summary": {
+                "bank_transactions": 7,
+                "ledger_transactions": 8,
+                "exact_matches": 3,
+                "fuzzy_matches": 1,
+                "settlement_delays": 1,
+                "amount_mismatches": 1,
+                "possible_duplicates": 1,
+                "total_matches": 5,
+                "exceptions": 3
+            },
+            "matches": [
+                {
+                    "bank_index": 0,
+                    "ledger_index": 0,
+                    "bank_ref": "TXN100001",
+                    "ledger_ref": "TXN100001",
+                    "amount": 10000.0,
+                    "match_type": "EXACT",
+                    "confidence": 1.0,
+                    "reason": "Exact transaction ID and amount match"
+                },
+                {
+                    "bank_index": 1,
+                    "ledger_index": 1,
+                    "bank_ref": "TXN100002",
+                    "ledger_ref": "TXN100002",
+                    "amount": 25000.0,
+                    "match_type": "EXACT",
+                    "confidence": 1.0,
+                    "reason": "Exact transaction ID and amount match"
+                },
+                {
+                    "bank_index": 2,
+                    "ledger_index": 2,
+                    "bank_ref": "TXN100003",
+                    "ledger_ref": "TXN100003",
+                    "amount": 5000.0,
+                    "match_type": "EXACT",
+                    "confidence": 1.0,
+                    "reason": "Exact transaction ID and amount match"
+                },
+                {
+                    "bank_index": 3,
+                    "ledger_index": 3,
+                    "bank_ref": "None",
+                    "ledger_ref": "TXN100004",
+                    "amount": 15000.0,
+                    "match_type": "FUZZY",
+                    "confidence": 1.0,
+                    "reason": "Matched using amount, date and merchant similarity",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    }
+                },
+                {
+                    "bank_index": 6,
+                    "ledger_index": 7,
+                    "bank_ref": "None",
+                    "ledger_ref": "TXN100009",
+                    "amount": 8000.0,
+                    "match_type": "SETTLEMENT_DELAY",
+                    "confidence": 0.83,
+                    "reason": "Transaction matched successfully, but bank settlement occurred later than the ledger transaction date",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 2,
+                        "name_similarity": 100.0
+                    }
+                }
+            ],
+            "exceptions": [
+                {
+                    "source": "LEDGER",
+                    "ledger_index_1": 5,
+                    "ledger_index_2": 6,
+                    "txn_id_1": "TXN100007",
+                    "txn_id_2": "TXN100008",
+                    "date_1": "2026-08-16",
+                    "date_2": "2026-08-16",
+                    "amount_1": 12000.0,
+                    "amount_2": 12000.0,
+                    "merchant_1": "Smart Electronics",
+                    "merchant_2": "Smart Electronics",
+                    "exception_type": "POSSIBLE_DUPLICATE",
+                    "severity": "HIGH",
+                    "confidence": 1.0,
+                    "reason": "Two ledger transactions have very similar amount, date, and merchant details",
+                    "details": {
+                        "amount_difference": 0.0,
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    },
+                    "risk_score": 90,
+                    "priority": "CRITICAL",
+                    "amount_at_risk": 12000.0,
+                    "recommended_action": "Investigate immediately and verify whether a duplicate transaction was processed."
+                },
+                {
+                    "source": "RECONCILIATION",
+                    "bank_index": 5,
+                    "ledger_index": 4,
+                    "bank_ref": "TXN100006",
+                    "ledger_ref": "TXN100006",
+                    "date": "2026-08-15",
+                    "bank_amount": 10000.0,
+                    "ledger_amount": 9500.0,
+                    "difference": 500.0,
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "severity": "MEDIUM",
+                    "reason": "Transaction details are similar, but the bank and ledger amounts differ",
+                    "details": {
+                        "date_difference_days": 0,
+                        "name_similarity": 100.0
+                    },
+                    "risk_score": 55,
+                    "priority": "MEDIUM",
+                    "amount_at_risk": 500.0,
+                    "recommended_action": "Compare the bank and ledger amounts and verify whether the difference is due to fees, partial settlement, or an incorrect entry."
+                },
+                {
+                    "source": "BANK",
+                    "index": 4,
+                    "reference_id": "TXN100005",
+                    "date": "2026-08-14",
+                    "amount": 423.29,
+                    "narration": "BANK SERVICE CHARGE",
+                    "exception_type": "BANK_FEE",
+                    "severity": "LOW",
+                    "reason": "Bank fee or service charge with no matching ledger transaction",
+                    "risk_score": 20,
+                    "priority": "LOW",
+                    "amount_at_risk": 423.29,
+                    "recommended_action": "Verify the bank fee against the applicable bank fee schedule."
+                }
+            ],
+            "investigations": [
+                {
+                    "exception_type": "POSSIBLE_DUPLICATE",
+                    "priority": "CRITICAL",
+                    "risk_score": 90,
+                    "amount_at_risk": 12000.0,
+                    "analysis": "Two ledger transactions have highly similar transaction details. This may indicate that the same transaction was recorded more than once.",
+                    "possible_causes": [
+                        "Duplicate transaction entry",
+                        "Payment retry after a processing timeout",
+                        "Duplicate API or webhook event",
+                        "Manual accounting entry error"
+                    ],
+                    "investigation_steps": [
+                        "Compare the original transaction references",
+                        "Check payment gateway or bank settlement records",
+                        "Verify whether both transactions resulted in a payment",
+                        "Reverse or correct the duplicate entry if confirmed"
+                    ]
+                },
+                {
+                    "exception_type": "AMOUNT_MISMATCH",
+                    "priority": "MEDIUM",
+                    "risk_score": 55,
+                    "amount_at_risk": 500.0,
+                    "analysis": "The bank transaction and internal ledger appear to represent related transactions, but their recorded amounts are different.",
+                    "possible_causes": [
+                        "Processing or settlement fee",
+                        "Partial settlement",
+                        "Incorrect ledger entry",
+                        "Incorrect bank transaction amount"
+                    ],
+                    "investigation_steps": [
+                        "Compare the original payment records",
+                        "Check whether fees were deducted during settlement",
+                        "Verify the expected settlement amount",
+                        "Correct the inaccurate record if an error is confirmed"
+                    ],
+                    "amount_difference": 500.0
+                },
+                {
+                    "exception_type": "BANK_FEE",
+                    "priority": "LOW",
+                    "risk_score": 20,
+                    "amount_at_risk": 423.29,
+                    "analysis": "A bank charge was detected without a corresponding internal ledger transaction.",
+                    "possible_causes": [
+                        "Scheduled bank service fee",
+                        "Transaction processing charge",
+                        "Account maintenance charge"
+                    ],
+                    "investigation_steps": [
+                        "Check the applicable bank fee schedule",
+                        "Verify the charge against the bank statement",
+                        "Confirm whether the fee should be recorded internally",
+                        "Create an accounting entry if required"
+                    ]
+                }
+            ]
+        }
+    }
+]
