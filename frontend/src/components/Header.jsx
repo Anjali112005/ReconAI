@@ -1,65 +1,111 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, {
+  useState,
+} from "react";
 
 import {
-  Menu,
-  Search,
-  User,
-  LogOut,
-  ChevronDown,
-  Settings,
-} from 'lucide-react';
+  useNavigate,
+} from "react-router-dom";
 
-import { ThemeToggle } from './ThemeToggle';
-import { useAuth } from '../context/AuthContext';
+import {
+
+  Menu,
+
+  Search,
+
+  User,
+
+  LogOut,
+
+  ChevronDown,
+
+  Settings,
+
+} from "lucide-react";
+
+import { ThemeToggle } from "./ThemeToggle";
+
+import {
+  useAuth,
+} from "../context/AuthContext";
+
 
 export const Header = ({
   onOpenSidebar,
 }) => {
-  const navigate = useNavigate();
+
+  const navigate =
+    useNavigate();
+
 
   const {
+
     user,
+
     logout,
+
   } = useAuth();
 
-  const [isProfileOpen, setIsProfileOpen] =
-    useState(false);
 
-  /* =========================================
+  const [
+
+    isProfileOpen,
+
+    setIsProfileOpen,
+
+  ] = useState(false);
+
+
+  /* =======================================================
      LOGOUT
-  ========================================= */
+     ======================================================= */
 
   const handleLogout = () => {
+
     setIsProfileOpen(false);
 
     logout();
 
-    navigate('/login', {
-      replace: true,
-    });
+    navigate(
+      "/login",
+      {
+        replace: true,
+      }
+    );
+
   };
 
-  /* =========================================
+
+  /* =======================================================
      USER DISPLAY
-  ========================================= */
+     ======================================================= */
 
   const userName =
+
     user?.name ||
+
     user?.fullName ||
-    user?.email?.split('@')[0] ||
-    'User';
+
+    user?.email?.split("@")[0] ||
+
+    "User";
+
 
   const userEmail =
+
     user?.email ||
-    '';
+
+    "";
+
 
   const userInitial =
+
     userName
       .charAt(0)
       .toUpperCase();
 
+
   return (
+
     <header
       className="
         sticky
@@ -81,9 +127,10 @@ export const Header = ({
       "
     >
 
-      {/* =========================================
+
+      {/* ===================================================
           LEFT SECTION
-      ========================================= */}
+         =================================================== */}
 
       <div
         className="
@@ -93,10 +140,10 @@ export const Header = ({
         "
       >
 
-        {/* MOBILE SIDEBAR BUTTON */}
-
         <button
+
           onClick={onOpenSidebar}
+
           className="
             lg:hidden
             p-2
@@ -107,13 +154,19 @@ export const Header = ({
             dark:hover:bg-recon-dark-card
             transition-colors
           "
+
           aria-label="Open navigation menu"
         >
-          <Menu className="w-5 h-5" />
+
+          <Menu
+            className="
+              w-5
+              h-5
+            "
+          />
+
         </button>
 
-
-        {/* GLOBAL SEARCH */}
 
         <div
           className="
@@ -138,8 +191,11 @@ export const Header = ({
           />
 
           <input
+
             type="text"
+
             placeholder="Search transactions, references, cases..."
+
             className="
               w-full
               pl-9
@@ -163,6 +219,7 @@ export const Header = ({
               dark:focus:ring-recon-dark-accent/20
               transition-all
             "
+
           />
 
         </div>
@@ -170,9 +227,9 @@ export const Header = ({
       </div>
 
 
-      {/* =========================================
+      {/* ===================================================
           RIGHT SECTION
-      ========================================= */}
+         =================================================== */}
 
       <div
         className="
@@ -182,24 +239,27 @@ export const Header = ({
         "
       >
 
-        {/* THEME TOGGLE */}
-
         <ThemeToggle />
 
 
-        {/* =====================================
-            PROFILE MENU
-        ===================================== */}
-
         <div className="relative">
 
+
+          {/* ===============================================
+              PROFILE BUTTON
+             =============================================== */}
+
           <button
+
             onClick={() =>
+
               setIsProfileOpen(
-                (previous) =>
+                previous =>
                   !previous
               )
+
             }
+
             className="
               flex
               items-center
@@ -212,13 +272,15 @@ export const Header = ({
               dark:hover:bg-recon-dark-card
               transition-colors
             "
+
             aria-label="Open user profile menu"
+
             aria-expanded={
               isProfileOpen
             }
+
           >
 
-            {/* USER AVATAR */}
 
             <div
               className="
@@ -236,11 +298,11 @@ export const Header = ({
                 shadow-soft
               "
             >
+
               {userInitial}
+
             </div>
 
-
-            {/* USER INFO */}
 
             <div
               className="
@@ -260,8 +322,11 @@ export const Header = ({
                   truncate
                 "
               >
+
                 {userName}
+
               </p>
+
 
               <p
                 className="
@@ -272,7 +337,9 @@ export const Header = ({
                   truncate
                 "
               >
+
                 {userEmail}
+
               </p>
 
             </div>
@@ -287,10 +354,11 @@ export const Header = ({
                 text-recon-light-muted
                 dark:text-recon-dark-muted
                 transition-transform
+
                 ${
                   isProfileOpen
-                    ? 'rotate-180'
-                    : ''
+                    ? "rotate-180"
+                    : ""
                 }
               `}
             />
@@ -298,37 +366,41 @@ export const Header = ({
           </button>
 
 
-          {/* ===================================
+          {/* ===============================================
               DROPDOWN
-          =================================== */}
+             =============================================== */}
 
           {isProfileOpen && (
 
             <>
 
+
               {/* BACKDROP */}
 
               <button
+
                 className="
                   fixed
                   inset-0
                   z-[-1]
                   cursor-default
                 "
+
                 onClick={() =>
                   setIsProfileOpen(false)
                 }
+
                 aria-label="Close profile menu"
+
               />
 
-
-              {/* MENU */}
 
               <div
                 className="
                   absolute
                   right-0
                   top-12
+                  z-50
                   w-64
                   rounded-2xl
                   bg-white
@@ -338,12 +410,9 @@ export const Header = ({
                   dark:border-recon-dark-border
                   shadow-xl
                   overflow-hidden
-                  animate-in
-                  fade-in
-                  zoom-in-95
-                  duration-150
                 "
               >
+
 
                 {/* USER DETAILS */}
 
@@ -380,8 +449,11 @@ export const Header = ({
                         text-sm
                       "
                     >
+
                       {userInitial}
+
                     </div>
+
 
                     <div
                       className="
@@ -399,8 +471,11 @@ export const Header = ({
                           truncate
                         "
                       >
+
                         {userName}
+
                       </p>
+
 
                       <p
                         className="
@@ -411,7 +486,9 @@ export const Header = ({
                           truncate
                         "
                       >
+
                         {userEmail}
+
                       </p>
 
                     </div>
@@ -425,13 +502,21 @@ export const Header = ({
 
                 <div className="p-2">
 
-                  {/* PROFILE */}
+
+                  {/* MY PROFILE */}
 
                   <button
+
                     onClick={() => {
+
                       setIsProfileOpen(false);
-                      navigate('/profile');
+
+                      navigate(
+                        "/profile"
+                      );
+
                     }}
+
                     className="
                       w-full
                       flex
@@ -449,9 +534,15 @@ export const Header = ({
                       dark:hover:bg-recon-dark-cardHover
                       transition-colors
                     "
+
                   >
 
-                    <User className="w-4 h-4" />
+                    <User
+                      className="
+                        w-4
+                        h-4
+                      "
+                    />
 
                     <span>
                       My Profile
@@ -463,10 +554,17 @@ export const Header = ({
                   {/* SETTINGS */}
 
                   <button
+
                     onClick={() => {
+
                       setIsProfileOpen(false);
-                      navigate('/settings');
+
+                      navigate(
+                        "/settings"
+                      );
+
                     }}
+
                     className="
                       w-full
                       flex
@@ -484,9 +582,15 @@ export const Header = ({
                       dark:hover:bg-recon-dark-cardHover
                       transition-colors
                     "
+
                   >
 
-                    <Settings className="w-4 h-4" />
+                    <Settings
+                      className="
+                        w-4
+                        h-4
+                      "
+                    />
 
                     <span>
                       Settings
@@ -509,9 +613,11 @@ export const Header = ({
                 >
 
                   <button
+
                     onClick={
                       handleLogout
                     }
+
                     className="
                       w-full
                       flex
@@ -529,9 +635,15 @@ export const Header = ({
                       dark:hover:bg-rose-950/40
                       transition-colors
                     "
+
                   >
 
-                    <LogOut className="w-4 h-4" />
+                    <LogOut
+                      className="
+                        w-4
+                        h-4
+                      "
+                    />
 
                     <span>
                       Logout
@@ -544,6 +656,7 @@ export const Header = ({
               </div>
 
             </>
+
           )}
 
         </div>
@@ -551,5 +664,7 @@ export const Header = ({
       </div>
 
     </header>
+
   );
+
 };

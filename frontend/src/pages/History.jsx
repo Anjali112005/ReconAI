@@ -1,156 +1,146 @@
-import React, {
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
-
-import { useNavigate } from 'react-router-dom';
-
+import React, { useEffect, useState } from "react";
 import {
   History as HistoryIcon,
-  Eye,
-  Download,
+  RefreshCw,
   Trash2,
-  Calendar,
-} from 'lucide-react';
+  Eye,
+  AlertTriangle,
+  CheckCircle2,
+  Database,
+  ShieldCheck,
+  X,
+} from "lucide-react";
 
-import { PageHeader } from '../components/PageHeader';
-import { RiskBadge } from '../components/RiskBadge';
-import { formatCurrency } from '../utils/formatCurrency';
+import { PageHeader } from "../components/PageHeader";
 
-import { useAuth } from '../context/AuthContext';
+import {
+  getHistory,
+  getHistoryById,
+  deleteHistoryRecord,
+  clearHistory,
+} from "../services/api";
 
+
+/* =========================================================
+   HISTORY PAGE
+   ========================================================= */
 
 export const History = () => {
 
-  const navigate = useNavigate();
+  /* =======================================================
+     STATE
+  ======================================================= */
 
-  const {
-    user,
-  } = useAuth();
-
-
-  const [runs, setRuns] = useState([]);
+  const [history, setHistory] =
+    useState([]);
 
   const [isLoading, setIsLoading] =
     useState(true);
 
+  const [isRefreshing, setIsRefreshing] =
+    useState(false);
 
-  /* =========================================
-     GET CURRENT USER KEY
-  ========================================= */
+  const [error, setError] =
+    useState("");
 
-  const userKey = useMemo(() => {
+  const [selectedRecord, setSelectedRecord] =
+    useState(null);
 
-    if (!user) {
-      return null;
-    }
+  const [isLoadingRecord, setIsLoadingRecord] =
+    useState(false);
 
-    /*
-      Prefer a unique user ID when available.
-      Fall back to email for the current
-      frontend authentication implementation.
-    */
+  const [deletingId, setDeletingId] =
+    useState(null);
 
-    const identifier =
-      user.id ||
-      user.userId ||
-      user.email;
-
-    if (!identifier) {
-      return null;
-    }
-
-    return String(identifier)
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9@._-]/g, '_');
-
-  }, [user]);
+  const [isClearing, setIsClearing] =
+    useState(false);
 
 
-  /* =========================================
-     USER-SPECIFIC HISTORY STORAGE KEY
-  ========================================= */
+  /* =======================================================
+     LOAD HISTORY FROM MYSQL
+  ======================================================= */
 
-  const historyStorageKey = useMemo(() => {
-
-    if (!userKey) {
-      return null;
-    }
-
-    return `reconciliationHistory_${userKey}`;
-
-  }, [userKey]);
-
-
-  /* =========================================
-     LOAD USER HISTORY
-  ========================================= */
-
-  useEffect(() => {
-
-    setIsLoading(true);
-
-    /*
-      If no authenticated user exists,
-      there should be no history displayed.
-    */
-
-    if (!historyStorageKey) {
-
-      setRuns([]);
-
-      setIsLoading(false);
-
-      return;
-
-    }
-
+  const loadHistory = async (
+    showRefreshState = false
+  ) => {
 
     try {
 
-      const savedHistory =
-        localStorage.getItem(
-          historyStorageKey
-        );
+      setError("");
 
+      if (showRefreshState) {
 
-      if (!savedHistory) {
+        setIsRefreshing(true);
 
-        setRuns([]);
+      } else {
 
-        setIsLoading(false);
-
-        return;
+        setIsLoading(true);
 
       }
 
 
-      const parsedHistory =
-        JSON.parse(savedHistory);
+      /* -----------------------------------------------
+         GET HISTORY FROM BACKEND
+
+         services/api.js automatically attaches:
+
+         Authorization: Bearer <JWT>
+      ------------------------------------------------ */
+
+      const data =
+        await getHistory();
 
 
-      if (Array.isArray(parsedHistory)) {
+      console.log(
+        "MYSQL HISTORY:",
+        data
+      );
 
-        setRuns(parsedHistory);
+
+      /* -----------------------------------------------
+         BACKEND RESPONSE:
+
+         {
+           total_records: number,
+           history: [...]
+         }
+      ------------------------------------------------ */
+
+      if (Array.isArray(data)) {
+
+        setHistory(data);
+
+      } else if (
+        Array.isArray(data?.history)
+      ) {
+
+        setHistory(
+          data.history
+        );
 
       } else {
 
-        setRuns([]);
+        setHistory([]);
 
       }
 
     }
 
-    catch (error) {
+    catch (err) {
 
       console.error(
-        'Failed to load reconciliation history:',
-        error
+        "Failed to load history:",
+        err
       );
 
-      setRuns([]);
+
+      setError(
+
+        err?.message ||
+
+        "Failed to load reconciliation history."
+
+      );
 
     }
 
@@ -158,118 +148,103 @@ export const History = () => {
 
       setIsLoading(false);
 
+      setIsRefreshing(false);
+
     }
 
-  }, [historyStorageKey]);
+  };
 
 
-  /* =========================================
-     SAVE HISTORY
-  ========================================= */
+  /* =======================================================
+     LOAD HISTORY WHEN PAGE OPENS
+  ======================================================= */
 
-  const saveHistory = (
-    updatedRuns
+  useEffect(() => {
+
+    loadHistory();
+
+  }, []);
+
+
+  /* =======================================================
+     VIEW HISTORY RECORD
+  ======================================================= */
+
+  const handleViewRecord = async (
+    historyId
   ) => {
-
-    if (!historyStorageKey) {
-      return;
-    }
-
 
     try {
 
-      localStorage.setItem(
-        historyStorageKey,
-        JSON.stringify(
-          updatedRuns
-        )
+      setIsLoadingRecord(true);
+
+      setError("");
+
+
+      /*
+       * Get the complete record from MySQL.
+       */
+
+      const record =
+        await getHistoryById(
+          historyId
+        );
+
+
+      console.log(
+        "HISTORY RECORD:",
+        record
+      );
+
+
+      setSelectedRecord(
+        record
       );
 
     }
 
-    catch (error) {
+    catch (err) {
 
       console.error(
-        'Failed to save reconciliation history:',
-        error
+        "Failed to load history record:",
+        err
       );
+
+
+      setError(
+
+        err?.message ||
+
+        "Failed to load history record."
+
+      );
+
+    }
+
+    finally {
+
+      setIsLoadingRecord(false);
 
     }
 
   };
 
 
-  /* =========================================
-     DELETE SINGLE RUN
-  ========================================= */
+  /* =======================================================
+     DELETE SINGLE RECORD
+  ======================================================= */
 
-  const handleDelete = (
-    id
+  const handleDeleteRecord = async (
+    historyId
   ) => {
-
-    const updatedRuns =
-      runs.filter(
-        (run) =>
-          run.id !== id
-      );
-
-
-    setRuns(
-      updatedRuns
-    );
-
-
-    saveHistory(
-      updatedRuns
-    );
-
-  };
-
-
-  /* =========================================
-     CLEAR ALL HISTORY
-  ========================================= */
-
-  const handleClearAll = () => {
 
     const confirmed =
       window.confirm(
-        'Are you sure you want to clear all reconciliation run history?'
+        "Are you sure you want to delete this reconciliation record?"
       );
 
 
     if (!confirmed) {
-      return;
-    }
-
-
-    setRuns([]);
-
-
-    if (historyStorageKey) {
-
-      localStorage.removeItem(
-        historyStorageKey
-      );
-
-    }
-
-  };
-
-
-  /* =========================================
-     VIEW RUN
-  ========================================= */
-
-  const handleViewRun = (
-    run
-  ) => {
-
-    if (!run?.result) {
-
-      alert(
-        'No reconciliation result is available for this run.'
-      );
 
       return;
 
@@ -278,478 +253,393 @@ export const History = () => {
 
     try {
 
-      sessionStorage.setItem(
-        'reconciliationResult',
-        JSON.stringify(
-          run.result
-        )
+      setDeletingId(
+        historyId
+      );
+
+      setError("");
+
+
+      /*
+       * Delete from MySQL.
+       */
+
+      await deleteHistoryRecord(
+        historyId
       );
 
 
-      navigate(
-        '/reconciliation'
+      /*
+       * Remove the deleted record
+       * from the current screen.
+       *
+       * No localStorage is used.
+       */
+
+      setHistory(
+        previousHistory =>
+          previousHistory.filter(
+            record =>
+              getRecordId(record) !==
+              historyId
+          )
       );
+
+
+      /*
+       * Close modal if the deleted
+       * record was being viewed.
+       */
+
+      if (
+        selectedRecord &&
+        getRecordId(selectedRecord) ===
+          historyId
+      ) {
+
+        setSelectedRecord(
+          null
+        );
+
+      }
 
     }
 
-    catch (error) {
+    catch (err) {
 
       console.error(
-        'Failed to load historical run:',
-        error
+        "Failed to delete history record:",
+        err
       );
 
-      alert(
-        'Unable to open this reconciliation run.'
+
+      setError(
+
+        err?.message ||
+
+        "Failed to delete history record."
+
       );
+
+    }
+
+    finally {
+
+      setDeletingId(null);
 
     }
 
   };
 
 
-  /* =========================================
-     GET RUN STATUS
-  ========================================= */
+  /* =======================================================
+     CLEAR ALL HISTORY
+  ======================================================= */
 
-  const getStatus = (
-    run
-  ) => {
+  const handleClearHistory = async () => {
 
-    const exceptionCount =
-      Number(
-        run?.exceptionCount || 0
-      );
-
-
-    if (
-      exceptionCount === 0
-    ) {
-
-      return 'MATCHED';
-
-    }
-
-
-    if (
-      exceptionCount >= 5
-    ) {
-
-      return 'HIGH';
-
-    }
-
-
-    return 'REVIEW REQUIRED';
-
-  };
-
-
-  /* =========================================
-     DOWNLOAD CSV
-  ========================================= */
-
-  const handleDownload = (
-    run
-  ) => {
-
-    if (!run?.result) {
-
-      alert(
-        'No reconciliation data available for this run.'
-      );
+    if (history.length === 0) {
 
       return;
 
     }
 
 
-    const matches =
-      run.result.matches ||
-      run.result.matched_transactions ||
-      run.result.matchedTransactions ||
-      [];
-
-
-    const exceptions =
-      run.result.exceptions ||
-      run.result.unmatched_transactions ||
-      run.result.unmatchedTransactions ||
-      [];
-
-
-    const headers = [
-
-      'Transaction ID',
-
-      'Bank Reference',
-
-      'Ledger Reference',
-
-      'Amount',
-
-      'Status',
-
-      'Confidence',
-
-    ];
-
-
-    const rows = [];
-
-
-    /* =========================
-       MATCHES
-    ========================= */
-
-    matches.forEach(
-      (item, index) => {
-
-        rows.push([
-
-          `MATCH-${index + 1}`,
-
-          item.bank_ref ||
-          item.bank_reference ||
-          item.bankRef ||
-          'N/A',
-
-          item.ledger_ref ||
-          item.ledger_reference ||
-          item.ledgerRef ||
-          'N/A',
-
-          item.amount ||
-          0,
-
-          'MATCHED',
-
-          item.confidence !== undefined &&
-          item.confidence !== null
-            ? `${Math.round(
-                Number(
-                  item.confidence
-                ) * 100
-              )}%`
-            : '100%',
-
-        ]);
-
-      }
-    );
-
-
-    /* =========================
-       EXCEPTIONS
-    ========================= */
-
-    exceptions.forEach(
-      (item, index) => {
-
-        rows.push([
-
-          `EXCEPTION-${index + 1}`,
-
-          item.bank_ref ||
-          item.bank_reference ||
-          item.bankRef ||
-          'N/A',
-
-          item.ledger_ref ||
-          item.ledger_reference ||
-          item.ledgerRef ||
-          'N/A',
-
-          item.amount ||
-          item.bank_amount ||
-          item.difference ||
-          0,
-
-          item.exception_type ||
-          item.type ||
-          'REVIEW REQUIRED',
-
-          item.confidence !== undefined &&
-          item.confidence !== null
-            ? `${Math.round(
-                Number(
-                  item.confidence
-                ) * 100
-              )}%`
-            : 'N/A',
-
-        ]);
-
-      }
-    );
-
-
-    /* =========================================
-       CSV ESCAPING
-    ========================================= */
-
-    const escapeCsvValue = (
-      value
-    ) => {
-
-      const stringValue =
-        String(
-          value ?? ''
-        );
-
-
-      return `"${stringValue.replace(
-        /"/g,
-        '""'
-      )}"`;
-
-    };
-
-
-    const csvContent = [
-
-      headers,
-
-      ...rows,
-
-    ]
-
-      .map(
-        (row) =>
-          row
-            .map(
-              escapeCsvValue
-            )
-            .join(',')
-      )
-
-      .join('\n');
-
-
-    const blob =
-      new Blob(
-        [
-          csvContent
-        ],
-        {
-          type:
-            'text/csv;charset=utf-8;'
-        }
+    const confirmed =
+      window.confirm(
+        "Are you sure you want to delete ALL reconciliation history? This action cannot be undone."
       );
 
 
-    const url =
-      URL.createObjectURL(
-        blob
+    if (!confirmed) {
+
+      return;
+
+    }
+
+
+    try {
+
+      setIsClearing(true);
+
+      setError("");
+
+
+      /*
+       * Clear the logged-in user's history
+       * from MySQL.
+       */
+
+      await clearHistory();
+
+
+      /*
+       * Clear the screen.
+       */
+
+      setHistory([]);
+
+      setSelectedRecord(null);
+
+    }
+
+    catch (err) {
+
+      console.error(
+        "Failed to clear history:",
+        err
       );
 
 
-    const link =
-      document.createElement(
-        'a'
+      setError(
+
+        err?.message ||
+
+        "Failed to clear reconciliation history."
+
       );
 
+    }
 
-    link.href =
-      url;
+    finally {
 
+      setIsClearing(false);
 
-    link.setAttribute(
-      'download',
-      `ReconAI_${run.id}.csv`
-    );
+    }
 
-
-    document.body.appendChild(
-      link
-    );
+  };
 
 
-    link.click();
+  /* =======================================================
+     GET RECORD ID
+  ======================================================= */
 
+  const getRecordId = (
+    record
+  ) => {
 
-    document.body.removeChild(
-      link
-    );
+    return (
 
+      record?.id ??
 
-    URL.revokeObjectURL(
-      url
+      record?.history_id ??
+
+      record?.historyId
+
     );
 
   };
 
 
-  /* =========================================
-     NOT AUTHENTICATED
-  ========================================= */
+  /* =======================================================
+     GET MATCH COUNT
+  ======================================================= */
 
-  if (!user) {
+  const getMatchCount = (
+    record
+  ) => {
 
     return (
 
-      <div
-        className="
-          space-y-6
-          pb-12
-          animate-in
-          fade-in
-          duration-200
-        "
-      >
+      record?.match_count ??
 
-        <PageHeader
-          title="Reconciliation History"
-          subtitle="Your previous reconciliation execution runs and generated reports."
-        />
+      record?.matches_count ??
 
+      record?.summary?.matched ??
 
-        <div
-          className="
-            p-12
-            text-center
-            rounded-2xl
-            bg-white
-            dark:bg-recon-dark-card
-            border
-            border-recon-light-border
-            dark:border-recon-dark-border
-            shadow-soft
-            space-y-3
-          "
-        >
+      record?.summary?.total_matches ??
 
-          <HistoryIcon
-            className="
-              w-12
-              h-12
-              text-recon-light-muted
-              dark:text-recon-dark-muted
-              mx-auto
-            "
-          />
+      record?.result?.matches?.length ??
 
+      record?.result?.matched_transactions?.length ??
 
-          <h3
-            className="
-              text-base
-              font-extrabold
-              text-recon-light-text
-              dark:text-recon-dark-text
-            "
-          >
-            Login Required
-          </h3>
-
-
-          <p
-            className="
-              text-xs
-              text-recon-light-muted
-              dark:text-recon-dark-muted
-              max-w-sm
-              mx-auto
-              font-medium
-            "
-          >
-            Please sign in to view your
-            reconciliation history.
-          </p>
-
-
-          <button
-            onClick={() =>
-              navigate('/login')
-            }
-            className="
-              px-4
-              py-2
-              rounded-xl
-              bg-recon-forest
-              dark:bg-recon-dark-accent
-              text-white
-              font-extrabold
-              text-xs
-              shadow-soft
-              hover:bg-recon-forestHover
-              transition-colors
-            "
-          >
-            Sign In
-          </button>
-
-        </div>
-
-      </div>
+      0
 
     );
 
-  }
+  };
 
 
-  /* =========================================
-     LOADING
-  ========================================= */
+  /* =======================================================
+     GET EXCEPTION COUNT
+  ======================================================= */
+
+  const getExceptionCount = (
+    record
+  ) => {
+
+    return (
+
+      record?.exception_count ??
+
+      record?.exceptions_count ??
+
+      record?.summary?.exceptions ??
+
+      record?.summary?.total_exceptions ??
+
+      record?.result?.exceptions?.length ??
+
+      record?.result?.unmatched_transactions?.length ??
+
+      0
+
+    );
+
+  };
+
+
+  /* =======================================================
+     GET EXPOSURE
+  ======================================================= */
+
+  const getExposure = (
+    record
+  ) => {
+
+    const value =
+
+      record?.exposure ??
+
+      record?.total_exposure ??
+
+      record?.total_risk_exposure ??
+
+      record?.summary?.total_exposure ??
+
+      record?.summary?.exposure ??
+
+      record?.result?.summary?.total_exposure ??
+
+      record?.result?.summary?.exposure ??
+
+      0;
+
+
+    return Number(value) || 0;
+
+  };
+
+
+  /* =======================================================
+     GET BANK COUNT
+  ======================================================= */
+
+  const getBankCount = (
+    record
+  ) => {
+
+    return (
+
+      record?.bank_count ??
+
+      record?.bankCount ??
+
+      record?.result?.bank_count ??
+
+      0
+
+    );
+
+  };
+
+
+  /* =======================================================
+     GET LEDGER COUNT
+  ======================================================= */
+
+  const getLedgerCount = (
+    record
+  ) => {
+
+    return (
+
+      record?.ledger_count ??
+
+      record?.ledgerCount ??
+
+      record?.result?.ledger_count ??
+
+      0
+
+    );
+
+  };
+
+
+  /* =======================================================
+     GET DATE
+  ======================================================= */
+
+  const getDate = (
+    record
+  ) => {
+
+    return (
+
+      record?.created_at ??
+
+      record?.date_time ??
+
+      record?.dateTime ??
+
+      record?.createdAt ??
+
+      "Unknown date"
+
+    );
+
+  };
+
+
+  /* =======================================================
+     FORMAT CURRENCY
+  ======================================================= */
+
+  const formatCurrency = (
+    value
+  ) => {
+
+    return new Intl.NumberFormat(
+      "en-US",
+      {
+        style: "currency",
+        currency: "USD",
+      }
+    ).format(
+      Number(value) || 0
+    );
+
+  };
+
+
+  /* =======================================================
+     LOADING STATE
+  ======================================================= */
 
   if (isLoading) {
 
     return (
 
-      <div
-        className="
-          space-y-6
-          pb-12
-          animate-in
-          fade-in
-          duration-200
-        "
-      >
+      <div className="space-y-6">
 
         <PageHeader
+
           title="Reconciliation History"
-          subtitle="Your previous reconciliation execution runs and generated reports."
+
+          subtitle="Review your previous ReconAI reconciliation runs."
+
         />
 
 
-        <div
-          className="
-            p-12
-            text-center
-            rounded-2xl
-            bg-white
-            dark:bg-recon-dark-card
-            border
-            border-recon-light-border
-            dark:border-recon-dark-border
-            shadow-soft
-          "
-        >
+        <div className="p-12 rounded-2xl bg-white dark:bg-recon-dark-card border border-recon-light-border dark:border-recon-dark-border flex flex-col items-center justify-center">
 
-          <div
-            className="
-              w-8
-              h-8
-              mx-auto
-              rounded-full
-              border-2
-              border-recon-light-border
-              dark:border-recon-dark-border
-              border-t-recon-forest
-              dark:border-t-recon-dark-accent
-              animate-spin
-            "
-          />
+          <div className="w-10 h-10 border-4 border-recon-light-border dark:border-recon-dark-border border-t-recon-forest dark:border-t-recon-dark-accent rounded-full animate-spin" />
 
-          <p
-            className="
-              mt-4
-              text-xs
-              font-semibold
-              text-recon-light-muted
-              dark:text-recon-dark-muted
-            "
-          >
+          <p className="mt-4 text-sm font-bold text-recon-light-muted dark:text-recon-dark-muted">
+
             Loading reconciliation history...
+
           </p>
 
         </div>
@@ -761,596 +651,973 @@ export const History = () => {
   }
 
 
+  /* =======================================================
+     PAGE
+  ======================================================= */
+
   return (
 
-    <div
-      className="
-        space-y-6
-        pb-12
-        animate-in
-        fade-in
-        duration-200
-      "
-    >
-
-
-      {/* =========================================
-         PAGE HEADER
-      ========================================= */}
-
-      <PageHeader
-
-        title="Reconciliation History"
-
-        subtitle="Audit history of your previous reconciliation execution runs and generated reports."
-
-        actions={
-
-          runs.length > 0 && (
-
-            <button
-
-              onClick={
-                handleClearAll
-              }
-
-              className="
-                flex
-                items-center
-                gap-1.5
-                px-3
-                py-1.5
-                rounded-xl
-                bg-rose-50
-                dark:bg-rose-950/50
-                border
-                border-rose-200
-                dark:border-rose-800
-                text-rose-700
-                dark:text-rose-300
-                font-bold
-                text-xs
-                hover:bg-rose-100
-                dark:hover:bg-rose-950/70
-                transition-colors
-              "
-            >
-
-              <Trash2
-                className="
-                  w-3.5
-                  h-3.5
-                "
-              />
-
-              <span>
-                Clear All History
-              </span>
-
-            </button>
-
-          )
-
-        }
-
-      />
-
-
-      {/* =========================================
-         HISTORY LIST
-      ========================================= */}
-
-      {runs.length > 0 ? (
-
-        <div
-          className="
-            space-y-4
-          "
-        >
-
-          {runs.map(
-            (run) => (
-
-              <div
-                key={run.id}
-                className="
-                  p-5
-                  rounded-2xl
-                  bg-white
-                  dark:bg-recon-dark-card
-                  border
-                  border-recon-light-border
-                  dark:border-recon-dark-border
-                  shadow-soft
-                  flex
-                  flex-col
-                  md:flex-row
-                  md:items-center
-                  justify-between
-                  gap-4
-                  transition-colors
-                "
-              >
-
-                {/* =========================
-                   RUN INFO
-                ========================= */}
-
-                <div
-                  className="
-                    flex
-                    items-start
-                    gap-4
-                    min-w-0
-                  "
-                >
-
-                  <div
-                    className="
-                      w-10
-                      h-10
-                      rounded-xl
-                      bg-recon-light-soft
-                      dark:bg-recon-dark-cardHover
-                      flex
-                      items-center
-                      justify-center
-                      text-recon-forest
-                      dark:text-recon-dark-accent
-                      font-mono
-                      font-bold
-                      text-xs
-                      flex-shrink-0
-                    "
-                  >
-                    {run.id}
-                  </div>
-
-
-                  <div
-                    className="
-                      min-w-0
-                    "
-                  >
-
-                    <div
-                      className="
-                        flex
-                        items-center
-                        gap-2
-                        flex-wrap
-                      "
-                    >
-
-                      <h3
-                        className="
-                          text-sm
-                          font-extrabold
-                          text-recon-light-text
-                          dark:text-recon-dark-text
-                        "
-                      >
-
-                        Reconciliation Run #
-
-                        {run.runNumber ||
-                          run.id}
-
-                      </h3>
-
-
-                      <RiskBadge
-                        priority={
-                          getStatus(
-                            run
-                          )
-                        }
-                      />
-
-                    </div>
-
-
-                    <p
-                      className="
-                        text-xs
-                        text-recon-light-muted
-                        dark:text-recon-dark-muted
-                        mt-1
-                        font-medium
-                        flex
-                        items-center
-                        gap-1.5
-                      "
-                    >
-
-                      <Calendar
-                        className="
-                          w-3.5
-                          h-3.5
-                          flex-shrink-0
-                        "
-                      />
-
-                      <span>
-                        {run.dateTime ||
-                          run.createdAt ||
-                          'Unknown date'}
-                      </span>
-
-                    </p>
-
-                  </div>
-
-                </div>
-
-
-                {/* =========================
-                   RUN METRICS
-                ========================= */}
-
-                <div
-                  className="
-                    grid
-                    grid-cols-2
-                    sm:grid-cols-4
-                    gap-4
-                    text-xs
-                    flex-shrink-0
-                  "
-                >
-
-                  <div>
-
-                    <span
-                      className="
-                        text-[10px]
-                        text-recon-light-muted
-                        dark:text-recon-dark-muted
-                        uppercase
-                        font-bold
-                        block
-                      "
-                    >
-                      Bank / Ledger
-                    </span>
-
-
-                    <span
-                      className="
-                        font-bold
-                        text-recon-light-text
-                        dark:text-recon-dark-text
-                      "
-                    >
-
-                      {run.bankCount || 0}
-
-                      {' / '}
-
-                      {run.ledgerCount || 0}
-
-                    </span>
-
-                  </div>
-
-
-                  <div>
-
-                    <span
-                      className="
-                        text-[10px]
-                        text-recon-light-muted
-                        dark:text-recon-dark-muted
-                        uppercase
-                        font-bold
-                        block
-                      "
-                    >
-                      Matches
-                    </span>
-
-
-                    <span
-                      className="
-                        font-bold
-                        text-emerald-600
-                        dark:text-emerald-400
-                      "
-                    >
-                      {run.matchCount || 0}
-                    </span>
-
-                  </div>
-
-
-                  <div>
-
-                    <span
-                      className="
-                        text-[10px]
-                        text-recon-light-muted
-                        dark:text-recon-dark-muted
-                        uppercase
-                        font-bold
-                        block
-                      "
-                    >
-                      Exceptions
-                    </span>
-
-
-                    <span
-                      className="
-                        font-bold
-                        text-rose-600
-                        dark:text-rose-400
-                      "
-                    >
-                      {run.exceptionCount || 0}
-                    </span>
-
-                  </div>
-
-
-                  <div>
-
-                    <span
-                      className="
-                        text-[10px]
-                        text-recon-light-muted
-                        dark:text-recon-dark-muted
-                        uppercase
-                        font-bold
-                        block
-                      "
-                    >
-                      Exposure
-                    </span>
-
-
-                    <span
-                      className="
-                        font-bold
-                        text-recon-light-text
-                        dark:text-recon-dark-text
-                      "
-                    >
-                      {formatCurrency(
-                        run.exposure || 0
-                      )}
-                    </span>
-
-                  </div>
-
-                </div>
-
-
-                {/* =========================
-                   ACTION BUTTONS
-                ========================= */}
-
-                <div
-                  className="
-                    flex
-                    items-center
-                    gap-2
-                    pt-2
-                    md:pt-0
-                    border-t
-                    md:border-t-0
-                    border-recon-light-border/40
-                    dark:border-recon-dark-border/40
-                  "
-                >
-
-                  {/* VIEW */}
-
-                  <button
-
-                    onClick={() =>
-                      handleViewRun(
-                        run
-                      )
-                    }
-
-                    className="
-                      p-2
-                      rounded-xl
-                      text-recon-forest
-                      dark:text-recon-dark-accent
-                      hover:bg-recon-light-soft
-                      dark:hover:bg-recon-dark-cardHover
-                      transition-colors
-                      flex
-                      items-center
-                      gap-1
-                      text-xs
-                      font-bold
-                    "
-
-                    title="View Analysis"
-                  >
-
-                    <Eye
-                      className="
-                        w-4
-                        h-4
-                      "
-                    />
-
-                    <span
-                      className="
-                        hidden
-                        sm:inline
-                      "
-                    >
-                      View Analysis
-                    </span>
-
-                  </button>
-
-
-                  {/* DOWNLOAD */}
-
-                  <button
-
-                    onClick={() =>
-                      handleDownload(
-                        run
-                      )
-                    }
-
-                    className="
-                      p-2
-                      rounded-xl
-                      text-recon-light-muted
-                      dark:text-recon-dark-muted
-                      hover:text-recon-light-text
-                      dark:hover:text-recon-dark-text
-                      hover:bg-gray-100
-                      dark:hover:bg-recon-dark-cardHover
-                      transition-colors
-                    "
-
-                    title="Download CSV"
-                  >
-
-                    <Download
-                      className="
-                        w-4
-                        h-4
-                      "
-                    />
-
-                  </button>
-
-
-                  {/* DELETE */}
-
-                  <button
-
-                    onClick={() =>
-                      handleDelete(
-                        run.id
-                      )
-                    }
-
-                    className="
-                      p-2
-                      rounded-xl
-                      text-rose-500
-                      hover:bg-rose-50
-                      dark:hover:bg-rose-950/50
-                      transition-colors
-                    "
-
-                    title="Delete Run Record"
-                  >
-
-                    <Trash2
-                      className="
-                        w-4
-                        h-4
-                      "
-                    />
-
-                  </button>
-
-                </div>
-
-              </div>
-
-            )
-          )}
+    <div className="space-y-6 pb-12">
+
+
+      {/* ===================================================
+          HEADER
+      =================================================== */}
+
+      <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+
+        <PageHeader
+
+          title="Reconciliation History"
+
+          subtitle="Review reconciliation runs stored securely in your account."
+
+        />
+
+
+        <div className="flex items-center gap-2">
+
+          {/* REFRESH */}
+
+          <button
+
+            type="button"
+
+            onClick={() =>
+              loadHistory(true)
+            }
+
+            disabled={isRefreshing}
+
+            className="px-4 py-2.5 rounded-xl bg-white dark:bg-recon-dark-card border border-recon-light-border dark:border-recon-dark-border text-recon-light-text dark:text-recon-dark-text text-xs font-extrabold hover:bg-recon-light-bg dark:hover:bg-recon-dark-cardHover transition-colors disabled:opacity-50 flex items-center gap-2"
+
+          >
+
+            <RefreshCw
+              className={`w-4 h-4 ${
+                isRefreshing
+                  ? "animate-spin"
+                  : ""
+              }`}
+            />
+
+            Refresh
+
+          </button>
+
+
+          {/* CLEAR */}
+
+          <button
+
+            type="button"
+
+            onClick={handleClearHistory}
+
+            disabled={
+              isClearing ||
+              history.length === 0
+            }
+
+            className="px-4 py-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50 text-rose-600 dark:text-rose-400 text-xs font-extrabold hover:bg-rose-100 dark:hover:bg-rose-950/50 transition-colors disabled:opacity-40 flex items-center gap-2"
+
+          >
+
+            {isClearing ? (
+
+              <div className="w-4 h-4 border-2 border-rose-300 border-t-rose-600 rounded-full animate-spin" />
+
+            ) : (
+
+              <Trash2 className="w-4 h-4" />
+
+            )}
+
+            Clear All
+
+          </button>
+
+        </div>
+
+      </div>
+
+
+      {/* ===================================================
+          ERROR
+      =================================================== */}
+
+      {error && (
+
+        <div className="p-4 rounded-xl border border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/30 flex items-start gap-3">
+
+          <AlertTriangle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0" />
+
+          <div className="flex-1">
+
+            <h4 className="text-sm font-bold text-rose-700 dark:text-rose-300">
+
+              Unable to load history
+
+            </h4>
+
+            <p className="text-xs text-rose-600 dark:text-rose-400 mt-1">
+
+              {error}
+
+            </p>
+
+          </div>
+
+        </div>
+
+      )}
+
+
+      {/* ===================================================
+          SUMMARY
+      =================================================== */}
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+
+
+        {/* TOTAL RUNS */}
+
+        <div className="p-5 rounded-2xl bg-white dark:bg-recon-dark-card border border-recon-light-border dark:border-recon-dark-border">
+
+          <div className="flex items-center justify-between">
+
+            <div>
+
+              <p className="text-[10px] uppercase tracking-widest font-extrabold text-recon-light-muted dark:text-recon-dark-muted">
+
+                Total Runs
+
+              </p>
+
+              <p className="mt-2 text-2xl font-black text-recon-light-text dark:text-recon-dark-text">
+
+                {history.length}
+
+              </p>
+
+            </div>
+
+
+            <div className="w-10 h-10 rounded-xl bg-recon-light-soft dark:bg-recon-dark-cardHover flex items-center justify-center">
+
+              <HistoryIcon className="w-5 h-5 text-recon-forest dark:text-recon-dark-accent" />
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        {/* MATCHES */}
+
+        <div className="p-5 rounded-2xl bg-white dark:bg-recon-dark-card border border-recon-light-border dark:border-recon-dark-border">
+
+          <div className="flex items-center justify-between">
+
+            <div>
+
+              <p className="text-[10px] uppercase tracking-widest font-extrabold text-recon-light-muted dark:text-recon-dark-muted">
+
+                Total Matches
+
+              </p>
+
+              <p className="mt-2 text-2xl font-black text-recon-light-text dark:text-recon-dark-text">
+
+                {history.reduce(
+
+                  (total, record) =>
+
+                    total +
+                    Number(
+                      getMatchCount(record)
+                    ),
+
+                  0
+
+                )}
+
+              </p>
+
+            </div>
+
+
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center">
+
+              <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        {/* EXCEPTIONS */}
+
+        <div className="p-5 rounded-2xl bg-white dark:bg-recon-dark-card border border-recon-light-border dark:border-recon-dark-border">
+
+          <div className="flex items-center justify-between">
+
+            <div>
+
+              <p className="text-[10px] uppercase tracking-widest font-extrabold text-recon-light-muted dark:text-recon-dark-muted">
+
+                Total Exceptions
+
+              </p>
+
+              <p className="mt-2 text-2xl font-black text-recon-light-text dark:text-recon-dark-text">
+
+                {history.reduce(
+
+                  (total, record) =>
+
+                    total +
+                    Number(
+                      getExceptionCount(record)
+                    ),
+
+                  0
+
+                )}
+
+              </p>
+
+            </div>
+
+
+            <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950/30 flex items-center justify-center">
+
+              <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      {/* ===================================================
+          EMPTY STATE
+      =================================================== */}
+
+      {history.length === 0 ? (
+
+        <div className="p-12 rounded-2xl bg-white dark:bg-recon-dark-card border border-recon-light-border dark:border-recon-dark-border text-center">
+
+          <div className="w-14 h-14 rounded-2xl bg-recon-light-soft dark:bg-recon-dark-cardHover flex items-center justify-center mx-auto">
+
+            <Database className="w-7 h-7 text-recon-forest dark:text-recon-dark-accent" />
+
+          </div>
+
+
+          <h3 className="mt-5 text-base font-extrabold text-recon-light-text dark:text-recon-dark-text">
+
+            No reconciliation history
+
+          </h3>
+
+
+          <p className="mt-2 text-xs text-recon-light-muted dark:text-recon-dark-muted max-w-md mx-auto">
+
+            Your completed reconciliation runs will appear here after you analyze financial data.
+
+          </p>
 
         </div>
 
       ) : (
 
-        /* =====================================
-           EMPTY STATE
-        ===================================== */
 
-        <div
-          className="
-            p-12
-            text-center
-            rounded-2xl
-            bg-white
-            dark:bg-recon-dark-card
-            border
-            border-recon-light-border
-            dark:border-recon-dark-border
-            shadow-soft
-            space-y-3
-          "
-        >
+        /* =================================================
+           HISTORY TABLE
+        ================================================= */
 
-          <HistoryIcon
-            className="
-              w-12
-              h-12
-              text-recon-light-muted
-              dark:text-recon-dark-muted
-              mx-auto
-            "
-          />
+        <div className="rounded-2xl bg-white dark:bg-recon-dark-card border border-recon-light-border dark:border-recon-dark-border overflow-hidden">
 
 
-          <h3
-            className="
-              text-base
-              font-extrabold
-              text-recon-light-text
-              dark:text-recon-dark-text
-            "
-          >
-            No Reconciliation History
-          </h3>
+          {/* TABLE HEADER */}
+
+          <div className="px-5 py-4 border-b border-recon-light-border dark:border-recon-dark-border">
+
+            <div className="flex items-center gap-2">
+
+              <ShieldCheck className="w-4 h-4 text-recon-forest dark:text-recon-dark-accent" />
+
+              <h3 className="text-sm font-extrabold text-recon-light-text dark:text-recon-dark-text">
+
+                Your Reconciliation Runs
+
+              </h3>
+
+            </div>
+
+          </div>
 
 
-          <p
-            className="
-              text-xs
-              text-recon-light-muted
-              dark:text-recon-dark-muted
-              max-w-sm
-              mx-auto
-              font-medium
-            "
-          >
-            You have not executed any
-            reconciliation runs yet or
-            your history was cleared.
-          </p>
+          {/* DESKTOP TABLE */}
+
+          <div className="hidden md:block overflow-x-auto">
+
+            <table className="w-full">
+
+              <thead>
+
+                <tr className="border-b border-recon-light-border dark:border-recon-dark-border">
+
+                  <th className="px-5 py-3 text-left text-[10px] uppercase tracking-widest font-extrabold text-recon-light-muted dark:text-recon-dark-muted">
+
+                    Run
+
+                  </th>
+
+                  <th className="px-5 py-3 text-left text-[10px] uppercase tracking-widest font-extrabold text-recon-light-muted dark:text-recon-dark-muted">
+
+                    Date
+
+                  </th>
+
+                  <th className="px-5 py-3 text-center text-[10px] uppercase tracking-widest font-extrabold text-recon-light-muted dark:text-recon-dark-muted">
+
+                    Bank
+
+                  </th>
+
+                  <th className="px-5 py-3 text-center text-[10px] uppercase tracking-widest font-extrabold text-recon-light-muted dark:text-recon-dark-muted">
+
+                    Ledger
+
+                  </th>
+
+                  <th className="px-5 py-3 text-center text-[10px] uppercase tracking-widest font-extrabold text-recon-light-muted dark:text-recon-dark-muted">
+
+                    Matches
+
+                  </th>
+
+                  <th className="px-5 py-3 text-center text-[10px] uppercase tracking-widest font-extrabold text-recon-light-muted dark:text-recon-dark-muted">
+
+                    Exceptions
+
+                  </th>
+
+                  <th className="px-5 py-3 text-right text-[10px] uppercase tracking-widest font-extrabold text-recon-light-muted dark:text-recon-dark-muted">
+
+                    Exposure
+
+                  </th>
+
+                  <th className="px-5 py-3 text-right text-[10px] uppercase tracking-widest font-extrabold text-recon-light-muted dark:text-recon-dark-muted">
+
+                    Actions
+
+                  </th>
+
+                </tr>
+
+              </thead>
 
 
-          <button
+              <tbody>
 
-            onClick={() =>
-              navigate('/upload')
-            }
+                {history.map(
+                  (record, index) => {
 
-            className="
-              px-4
-              py-2
-              rounded-xl
-              bg-recon-forest
-              dark:bg-recon-dark-accent
-              text-white
-              font-extrabold
-              text-xs
-              shadow-soft
-              hover:bg-recon-forestHover
-              transition-colors
-            "
-          >
-            Upload Data & Run Audit
-          </button>
+                    const id =
+                      getRecordId(
+                        record
+                      );
+
+
+                    return (
+
+                      <tr
+
+                        key={
+                          id ??
+                          index
+                        }
+
+                        className="border-b border-recon-light-border dark:border-recon-dark-border last:border-b-0 hover:bg-recon-light-bg/50 dark:hover:bg-recon-dark-cardHover/50 transition-colors"
+
+                      >
+
+                        {/* RUN */}
+
+                        <td className="px-5 py-4">
+
+                          <span className="text-xs font-extrabold text-recon-light-text dark:text-recon-dark-text">
+
+                            {record?.run_number ??
+                              record?.runNumber ??
+                              `RUN-${id ?? index + 1}`}
+
+                          </span>
+
+                        </td>
+
+
+                        {/* DATE */}
+
+                        <td className="px-5 py-4">
+
+                          <span className="text-xs text-recon-light-muted dark:text-recon-dark-muted">
+
+                            {getDate(record)}
+
+                          </span>
+
+                        </td>
+
+
+                        {/* BANK */}
+
+                        <td className="px-5 py-4 text-center">
+
+                          <span className="text-xs font-bold text-recon-light-text dark:text-recon-dark-text">
+
+                            {getBankCount(record)}
+
+                          </span>
+
+                        </td>
+
+
+                        {/* LEDGER */}
+
+                        <td className="px-5 py-4 text-center">
+
+                          <span className="text-xs font-bold text-recon-light-text dark:text-recon-dark-text">
+
+                            {getLedgerCount(record)}
+
+                          </span>
+
+                        </td>
+
+
+                        {/* MATCHES */}
+
+                        <td className="px-5 py-4 text-center">
+
+                          <span className="inline-flex items-center justify-center min-w-8 px-2 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 text-xs font-extrabold">
+
+                            {getMatchCount(record)}
+
+                          </span>
+
+                        </td>
+
+
+                        {/* EXCEPTIONS */}
+
+                        <td className="px-5 py-4 text-center">
+
+                          <span className="inline-flex items-center justify-center min-w-8 px-2 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 text-xs font-extrabold">
+
+                            {getExceptionCount(record)}
+
+                          </span>
+
+                        </td>
+
+
+                        {/* EXPOSURE */}
+
+                        <td className="px-5 py-4 text-right">
+
+                          <span className="text-xs font-extrabold text-recon-light-text dark:text-recon-dark-text">
+
+                            {formatCurrency(
+                              getExposure(record)
+                            )}
+
+                          </span>
+
+                        </td>
+
+
+                        {/* ACTIONS */}
+
+                        <td className="px-5 py-4">
+
+                          <div className="flex justify-end gap-2">
+
+                            <button
+
+                              type="button"
+
+                              onClick={() =>
+                                handleViewRecord(
+                                  id
+                                )
+                              }
+
+                              disabled={
+                                isLoadingRecord
+                              }
+
+                              className="p-2 rounded-lg bg-recon-light-soft dark:bg-recon-dark-cardHover text-recon-light-text dark:text-recon-dark-text hover:text-recon-forest dark:hover:text-recon-dark-accent transition-colors"
+
+                              title="View record"
+
+                            >
+
+                              <Eye className="w-4 h-4" />
+
+                            </button>
+
+
+                            <button
+
+                              type="button"
+
+                              onClick={() =>
+                                handleDeleteRecord(
+                                  id
+                                )
+                              }
+
+                              disabled={
+                                deletingId ===
+                                id
+                              }
+
+                              className="p-2 rounded-lg bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-950/50 transition-colors disabled:opacity-40"
+
+                              title="Delete record"
+
+                            >
+
+                              {deletingId ===
+                              id ? (
+
+                                <div className="w-4 h-4 border-2 border-rose-300 border-t-rose-600 rounded-full animate-spin" />
+
+                              ) : (
+
+                                <Trash2 className="w-4 h-4" />
+
+                              )}
+
+                            </button>
+
+                          </div>
+
+                        </td>
+
+                      </tr>
+
+                    );
+
+                  }
+
+                )}
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+
+          {/* MOBILE CARDS */}
+
+          <div className="md:hidden divide-y divide-recon-light-border dark:divide-recon-dark-border">
+
+            {history.map(
+              (record, index) => {
+
+                const id =
+                  getRecordId(
+                    record
+                  );
+
+
+                return (
+
+                  <div
+                    key={
+                      id ??
+                      index
+                    }
+                    className="p-5"
+                  >
+
+                    <div className="flex items-start justify-between gap-4">
+
+                      <div>
+
+                        <p className="text-xs font-extrabold text-recon-light-text dark:text-recon-dark-text">
+
+                          {record?.run_number ??
+                            record?.runNumber ??
+                            `RUN-${id ?? index + 1}`}
+
+                        </p>
+
+                        <p className="mt-1 text-[11px] text-recon-light-muted dark:text-recon-dark-muted">
+
+                          {getDate(record)}
+
+                        </p>
+
+                      </div>
+
+
+                      <div className="flex gap-2">
+
+                        <button
+
+                          type="button"
+
+                          onClick={() =>
+                            handleViewRecord(
+                              id
+                            )
+                          }
+
+                          className="p-2 rounded-lg bg-recon-light-soft dark:bg-recon-dark-cardHover"
+
+                        >
+
+                          <Eye className="w-4 h-4" />
+
+                        </button>
+
+
+                        <button
+
+                          type="button"
+
+                          onClick={() =>
+                            handleDeleteRecord(
+                              id
+                            )
+                          }
+
+                          disabled={
+                            deletingId ===
+                            id
+                          }
+
+                          className="p-2 rounded-lg bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400"
+
+                        >
+
+                          <Trash2 className="w-4 h-4" />
+
+                        </button>
+
+                      </div>
+
+                    </div>
+
+
+                    <div className="grid grid-cols-2 gap-3 mt-4">
+
+                      <HistoryStat
+
+                        label="Bank"
+
+                        value={
+                          getBankCount(
+                            record
+                          )
+                        }
+
+                      />
+
+                      <HistoryStat
+
+                        label="Ledger"
+
+                        value={
+                          getLedgerCount(
+                            record
+                          )
+                        }
+
+                      />
+
+                      <HistoryStat
+
+                        label="Matches"
+
+                        value={
+                          getMatchCount(
+                            record
+                          )
+                        }
+
+                      />
+
+                      <HistoryStat
+
+                        label="Exceptions"
+
+                        value={
+                          getExceptionCount(
+                            record
+                          )
+                        }
+
+                      />
+
+                    </div>
+
+
+                    <div className="mt-3 px-3 py-2.5 rounded-lg bg-recon-light-bg dark:bg-recon-dark-bg">
+
+                      <p className="text-[10px] uppercase tracking-widest font-extrabold text-recon-light-muted dark:text-recon-dark-muted">
+
+                        Risk Exposure
+
+                      </p>
+
+                      <p className="mt-1 text-sm font-black text-recon-light-text dark:text-recon-dark-text">
+
+                        {formatCurrency(
+                          getExposure(
+                            record
+                          )
+                        )}
+
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                );
+
+              }
+
+            )}
+
+          </div>
 
         </div>
 
       )}
+
+
+      {/* ===================================================
+          DETAIL MODAL
+      =================================================== */}
+
+      {selectedRecord && (
+
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+
+          <div className="w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-2xl bg-white dark:bg-recon-dark-card border border-recon-light-border dark:border-recon-dark-border shadow-2xl">
+
+
+            {/* MODAL HEADER */}
+
+            <div className="flex items-center justify-between px-6 py-4 border-b border-recon-light-border dark:border-recon-dark-border">
+
+              <div>
+
+                <p className="text-[10px] uppercase tracking-widest text-recon-dark-accent font-extrabold">
+
+                  Reconciliation Record
+
+                </p>
+
+                <h3 className="mt-1 text-lg font-black text-recon-light-text dark:text-recon-dark-text">
+
+                  {selectedRecord?.run_number ??
+                    selectedRecord?.runNumber ??
+                    `RUN-${getRecordId(selectedRecord)}`}
+
+                </h3>
+
+              </div>
+
+
+              <button
+
+                type="button"
+
+                onClick={() =>
+                  setSelectedRecord(null)
+                }
+
+                className="p-2 rounded-lg hover:bg-recon-light-bg dark:hover:bg-recon-dark-cardHover transition-colors"
+
+              >
+
+                <X className="w-5 h-5" />
+
+              </button>
+
+            </div>
+
+
+            {/* MODAL CONTENT */}
+
+            <div className="p-6 overflow-y-auto max-h-[75vh]">
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+
+
+                <HistoryStat
+
+                  label="Bank"
+
+                  value={
+                    getBankCount(
+                      selectedRecord
+                    )
+                  }
+
+                />
+
+
+                <HistoryStat
+
+                  label="Ledger"
+
+                  value={
+                    getLedgerCount(
+                      selectedRecord
+                    )
+                  }
+
+                />
+
+
+                <HistoryStat
+
+                  label="Matches"
+
+                  value={
+                    getMatchCount(
+                      selectedRecord
+                    )
+                  }
+
+                />
+
+
+                <HistoryStat
+
+                  label="Exceptions"
+
+                  value={
+                    getExceptionCount(
+                      selectedRecord
+                    )
+                  }
+
+                />
+
+              </div>
+
+
+              {/* EXPOSURE */}
+
+              <div className="mb-6 p-4 rounded-xl bg-recon-light-bg dark:bg-recon-dark-bg">
+
+                <p className="text-[10px] uppercase tracking-widest font-extrabold text-recon-light-muted dark:text-recon-dark-muted">
+
+                  Risk Exposure
+
+                </p>
+
+                <p className="mt-1 text-xl font-black text-recon-light-text dark:text-recon-dark-text">
+
+                  {formatCurrency(
+                    getExposure(
+                      selectedRecord
+                    )
+                  )}
+
+                </p>
+
+              </div>
+
+
+              {/* RAW RESULT */}
+
+              <div>
+
+                <div className="flex items-center gap-2 mb-3">
+
+                  <Database className="w-4 h-4 text-recon-dark-accent" />
+
+                  <h4 className="text-sm font-extrabold">
+
+                    Reconciliation Data
+
+                  </h4>
+
+                </div>
+
+
+                <pre className="p-4 rounded-xl bg-slate-950 text-slate-200 text-xs overflow-x-auto whitespace-pre-wrap break-words">
+
+                  {JSON.stringify(
+                    selectedRecord?.result ??
+                    selectedRecord,
+                    null,
+                    2
+                  )}
+
+                </pre>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      )}
+
+    </div>
+
+  );
+
+};
+
+
+/* =========================================================
+   HISTORY STAT
+   ========================================================= */
+
+const HistoryStat = ({
+  label,
+  value,
+}) => {
+
+  return (
+
+    <div className="p-3 rounded-xl bg-recon-light-bg dark:bg-recon-dark-bg">
+
+      <p className="text-[9px] uppercase tracking-widest font-extrabold text-recon-light-muted dark:text-recon-dark-muted">
+
+        {label}
+
+      </p>
+
+      <p className="mt-1 text-base font-black text-recon-light-text dark:text-recon-dark-text">
+
+        {value}
+
+      </p>
 
     </div>
 

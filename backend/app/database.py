@@ -5,11 +5,17 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 
-# Load environment variables from .env
+# ============================================================
+# LOAD ENVIRONMENT VARIABLES
+# ============================================================
+
 load_dotenv()
 
 
-# Get database URL
+# ============================================================
+# DATABASE URL
+# ============================================================
+
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 
@@ -20,14 +26,20 @@ if not DATABASE_URL:
     )
 
 
-# Create SQLAlchemy engine
+# ============================================================
+# SQLALCHEMY ENGINE
+# ============================================================
+
 engine = create_engine(
     DATABASE_URL,
     pool_pre_ping=True,
 )
 
 
-# Create database session
+# ============================================================
+# DATABASE SESSION
+# ============================================================
+
 SessionLocal = sessionmaker(
     autocommit=False,
     autoflush=False,
@@ -35,16 +47,25 @@ SessionLocal = sessionmaker(
 )
 
 
-# Base class for database models
+# ============================================================
+# BASE MODEL
+# ============================================================
+
 Base = declarative_base()
 
 
-# FastAPI database dependency
+# ============================================================
+# FASTAPI DATABASE DEPENDENCY
+# ============================================================
+
 def get_db():
+
     db = SessionLocal()
 
     try:
+
         yield db
 
     finally:
+
         db.close()

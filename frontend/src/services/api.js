@@ -2,20 +2,45 @@ const API_BASE_URL = "http://127.0.0.1:8000";
 
 
 /* =========================================
+   GET JWT TOKEN
+========================================= */
+
+function getAuthToken() {
+
+  return localStorage.getItem(
+    "reconai_token"
+  );
+
+}
+
+
+/* =========================================
    GENERIC API HELPER
 ========================================= */
 
-async function apiRequest(endpoint, options = {}) {
+async function apiRequest(
+  endpoint,
+  options = {}
+) {
 
   try {
 
+    const token =
+      getAuthToken();
+
+
+    /* =====================================
+       CREATE HEADERS
+    ===================================== */
+
     const headers = {
-      ...options.headers,
+      ...(options.headers || {}),
     };
 
 
     /* =====================================
-       ADD JSON HEADER ONLY WHEN BODY EXISTS
+       ADD JSON HEADER
+       ONLY WHEN BODY EXISTS
     ===================================== */
 
     if (options.body) {
@@ -26,18 +51,57 @@ async function apiRequest(endpoint, options = {}) {
     }
 
 
-    const response = await fetch(
+    /* =====================================
+       AUTOMATICALLY ATTACH JWT
+    ===================================== */
 
-      `${API_BASE_URL}${endpoint}`,
+    if (token) {
 
-      {
-        ...options,
+      headers["Authorization"] =
+        `Bearer ${token}`;
 
-        headers,
+    }
 
-      }
 
-    );
+    /* =====================================
+       SEND REQUEST
+    ===================================== */
+
+    const response =
+      await fetch(
+
+        `${API_BASE_URL}${endpoint}`,
+
+        {
+          ...options,
+
+          headers,
+
+        }
+
+      );
+
+
+    /* =====================================
+       HANDLE UNAUTHORIZED
+    ===================================== */
+
+    if (response.status === 401) {
+
+      /*
+       * Remove invalid/expired token.
+       */
+
+      localStorage.removeItem(
+        "reconai_token"
+      );
+
+
+      throw new Error(
+        "Your session has expired. Please login again."
+      );
+
+    }
 
 
     /* =====================================
@@ -64,7 +128,6 @@ async function apiRequest(endpoint, options = {}) {
 
           errorMessage;
 
-
       }
 
       catch {
@@ -82,6 +145,10 @@ async function apiRequest(endpoint, options = {}) {
 
     }
 
+
+    /* =====================================
+       RETURN RESPONSE
+    ===================================== */
 
     return response;
 
@@ -186,12 +253,9 @@ export async function askCopilot(
         body: JSON.stringify({
 
           question:
-
             question,
 
-
           reconciliation_result:
-
             reconciliationResult,
 
         }),

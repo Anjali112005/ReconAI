@@ -8,7 +8,7 @@ import {
   CheckCircle2,
   ArrowRight,
   ShieldCheck,
-  AlertTriangle
+  AlertTriangle,
 } from 'lucide-react';
 
 import { PageHeader } from '../components/PageHeader';
@@ -28,7 +28,7 @@ export const UploadData = () => {
   ========================================= */
 
   const {
-    setReconciliationResult
+    setReconciliationResult,
   } = useRecon();
 
 
@@ -71,7 +71,8 @@ export const UploadData = () => {
             .trim()
             .split('\n')
             .filter(
-              line => line.trim() !== ''
+              (line) =>
+                line.trim() !== ''
             );
 
 
@@ -95,7 +96,7 @@ export const UploadData = () => {
           const headers = lines[0]
             .split(',')
             .map(
-              header =>
+              (header) =>
                 header
                   .trim()
                   .replace(/^"|"$/g, '')
@@ -109,12 +110,12 @@ export const UploadData = () => {
           const transactions = lines
             .slice(1)
             .map(
-              line => {
+              (line) => {
 
                 const values = line
                   .split(',')
                   .map(
-                    value =>
+                    (value) =>
                       value
                         .trim()
                         .replace(/^"|"$/g, '')
@@ -233,6 +234,17 @@ export const UploadData = () => {
 
       /* =========================================
          SEND DATA TO BACKEND
+         
+         IMPORTANT:
+         runReconciliation() should send the
+         logged-in user's JWT automatically.
+         
+         Backend:
+         
+         POST /reconcile
+         
+         identifies the current user and
+         saves the history to MySQL.
       ========================================= */
 
       const result =
@@ -253,7 +265,12 @@ export const UploadData = () => {
 
 
       /* =========================================
-         SAVE LOCAL RESULT
+         SAVE CURRENT RESULT
+         
+         This is NOT reconciliation history.
+         
+         It is only the current reconciliation
+         result used by the Reconciliation page.
       ========================================= */
 
       setAnalysisResult(result);
@@ -268,6 +285,12 @@ export const UploadData = () => {
 
       /* =========================================
          SAVE CURRENT RESULT TO SESSION STORAGE
+         
+         We keep this because the current result
+         may be needed when navigating to the
+         Reconciliation page.
+         
+         This is NOT permanent history.
       ========================================= */
 
       sessionStorage.setItem(
@@ -277,7 +300,7 @@ export const UploadData = () => {
 
 
       /* =========================================
-         CALCULATE MATCH COUNT
+         GET COUNTS FROM BACKEND RESPONSE
       ========================================= */
 
       const matchCount =
@@ -295,10 +318,6 @@ export const UploadData = () => {
         0;
 
 
-      /* =========================================
-         CALCULATE EXCEPTION COUNT
-      ========================================= */
-
       const exceptionCount =
 
         result.exceptions?.length ||
@@ -315,133 +334,24 @@ export const UploadData = () => {
 
 
       /* =========================================
-         CALCULATE TOTAL EXPOSURE
+         LOG BACKEND HISTORY ID
+         
+         Your backend currently adds:
+         
+         result["history_id"]
+         
+         after saving the record to MySQL.
       ========================================= */
 
-      const exposure =
-
-        result.summary?.total_exposure ||
-
-        result.summary?.exposure ||
-
-        result.total_exposure ||
-
-        result.total_risk_exposure ||
-
-        0;
-
-
-      /* =========================================
-         LOAD EXISTING HISTORY
-      ========================================= */
-
-      let existingHistory = [];
-
-
-      try {
-
-        const savedHistory =
-          localStorage.getItem(
-            'reconciliationHistory'
-          );
-
-
-        if (savedHistory) {
-
-          existingHistory =
-            JSON.parse(savedHistory);
-
-        }
-
-      }
-
-      catch (historyError) {
-
-        console.error(
-          'Failed to load reconciliation history:',
-          historyError
-        );
-
-        existingHistory = [];
-
-      }
-
-
-      /* =========================================
-         CREATE NEW HISTORY RUN
-      ========================================= */
-
-      const newRun = {
-
-        id:
-          `RUN-${Date.now()}`,
-
-
-        runNumber:
-          existingHistory.length + 1,
-
-
-        dateTime:
-          new Date().toLocaleString(),
-
-
-        bankCount:
-          bankTransactions.length,
-
-
-        ledgerCount:
-          ledgerTransactions.length,
-
-
-        matchCount:
-          matchCount,
-
-
-        exceptionCount:
-          exceptionCount,
-
-
-        exposure:
-          Number(exposure) || 0,
-
-
-        result:
-          result,
-
-      };
-
-
-      /* =========================================
-         ADD NEW RUN TO HISTORY
-      ========================================= */
-
-      const updatedHistory = [
-
-        newRun,
-
-        ...existingHistory,
-
-      ];
-
-
-      /* =========================================
-         SAVE HISTORY
-      ========================================= */
-
-      localStorage.setItem(
-
-        'reconciliationHistory',
-
-        JSON.stringify(
-          updatedHistory
-        )
-
+      console.log(
+        'History ID:',
+        result.history_id
       );
 
 
       console.log(
-        'RECONCILIATION HISTORY SAVED:',
-        updatedHistory
+        'Created At:',
+        result.created_at
       );
 
 
@@ -450,6 +360,16 @@ export const UploadData = () => {
       ========================================= */
 
       setIsSuccess(true);
+
+
+      console.log(
+        'Reconciliation completed successfully.'
+      );
+
+
+      console.log(
+        `${matchCount} matches and ${exceptionCount} exceptions detected.`
+      );
 
 
     }
@@ -464,7 +384,7 @@ export const UploadData = () => {
 
       setError(
 
-        error.message ||
+        error?.message ||
 
         'Reconciliation failed. Please try again.'
 
@@ -545,6 +465,42 @@ export const UploadData = () => {
   };
 
 
+  /* =========================================
+     RESET UPLOAD
+  ========================================= */
+
+  const handleUploadNewData = () => {
+
+    setIsSuccess(false);
+
+    setBankFile(null);
+
+    setLedgerFile(null);
+
+    setAnalysisResult(null);
+
+    setReconciliationResult(null);
+
+    setError(null);
+
+
+    /*
+     * Remove only the current temporary result.
+     *
+     * We do NOT touch backend history.
+     */
+
+    sessionStorage.removeItem(
+      'reconciliationResult'
+    );
+
+  };
+
+
+  /* =========================================
+     RENDER
+  ========================================= */
+
   return (
 
     <div className="space-y-6 pb-12 animate-in fade-in duration-200">
@@ -570,7 +526,9 @@ export const UploadData = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
 
-        {/* BANK FILE */}
+        {/* =====================================
+           BANK FILE
+        ===================================== */}
 
         <UploadCard
 
@@ -603,7 +561,9 @@ export const UploadData = () => {
         />
 
 
-        {/* LEDGER FILE */}
+        {/* =====================================
+           LEDGER FILE
+        ===================================== */}
 
         <UploadCard
 
@@ -635,7 +595,6 @@ export const UploadData = () => {
 
         />
 
-
       </div>
 
 
@@ -657,7 +616,6 @@ export const UploadData = () => {
 
           <div>
 
-
             <h4 className="text-sm font-bold text-rose-700 dark:text-rose-300">
 
               Reconciliation Failed
@@ -671,9 +629,7 @@ export const UploadData = () => {
 
             </p>
 
-
           </div>
-
 
         </div>
 
@@ -696,6 +652,8 @@ export const UploadData = () => {
           <div className="py-4 space-y-4 animate-in zoom-in-95 duration-200">
 
 
+            {/* SUCCESS ICON */}
+
             <div className="w-14 h-14 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto">
 
               <CheckCircle2 className="w-8 h-8" />
@@ -703,8 +661,9 @@ export const UploadData = () => {
             </div>
 
 
-            <div>
+            {/* SUCCESS TEXT */}
 
+            <div>
 
               <h3 className="text-lg font-extrabold text-recon-light-text dark:text-recon-dark-text">
 
@@ -739,12 +698,31 @@ export const UploadData = () => {
             </div>
 
 
-            {/* ACTION BUTTONS */}
+            {/* =====================================
+               HISTORY SAVED MESSAGE
+            ===================================== */}
 
-            <div className="flex items-center justify-center gap-3 pt-2">
+            {analysisResult?.history_id && (
+
+              <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">
+
+                This reconciliation has been saved to your history.
+
+              </div>
+
+            )}
+
+
+            {/* =====================================
+               ACTION BUTTONS
+            ===================================== */}
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
 
 
               <button
+
+                type="button"
 
                 onClick={() =>
                   navigate('/reconciliation')
@@ -763,32 +741,14 @@ export const UploadData = () => {
 
                 <ArrowRight className="w-4 h-4" />
 
-
               </button>
 
 
               <button
 
-                onClick={() => {
+                type="button"
 
-                  setIsSuccess(false);
-
-                  setBankFile(null);
-
-                  setLedgerFile(null);
-
-                  setAnalysisResult(null);
-
-                  setReconciliationResult(null);
-
-                  setError(null);
-
-
-                  sessionStorage.removeItem(
-                    'reconciliationResult'
-                  );
-
-                }}
+                onClick={handleUploadNewData}
 
                 className="px-4 py-2.5 rounded-xl bg-recon-light-bg dark:bg-recon-dark-cardHover text-recon-light-text dark:text-recon-dark-text font-bold text-xs hover:bg-recon-light-border dark:hover:bg-recon-dark-border transition-colors"
 
@@ -839,6 +799,8 @@ export const UploadData = () => {
 
             <button
 
+              type="button"
+
               onClick={handleRunAnalysis}
 
               disabled={
@@ -859,14 +821,11 @@ export const UploadData = () => {
 
             >
 
-
               {isAnalyzing ? (
 
                 <>
 
-
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-
 
                   <span>
 
@@ -874,16 +833,13 @@ export const UploadData = () => {
 
                   </span>
 
-
                 </>
 
               ) : (
 
                 <>
 
-
                   <Sparkles className="w-4 h-4" />
-
 
                   <span>
 
@@ -891,11 +847,9 @@ export const UploadData = () => {
 
                   </span>
 
-
                 </>
 
               )}
-
 
             </button>
 
@@ -903,7 +857,6 @@ export const UploadData = () => {
           </div>
 
         )}
-
 
       </div>
 

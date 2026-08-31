@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta, timezone
-
 import os
 import smtplib
 
@@ -20,7 +19,10 @@ from jose import JWTError, jwt
 
 from passlib.context import CryptContext
 
-from pydantic import BaseModel, EmailStr
+from pydantic import (
+    BaseModel,
+    EmailStr,
+)
 
 from sqlalchemy.orm import Session
 
@@ -58,16 +60,11 @@ pwd_context = CryptContext(
 
 
 def hash_password(password: str) -> str:
-    """
-    Hash a password using bcrypt.
-
-    bcrypt has a maximum input size of 72 bytes.
-    Validate before hashing so the application does not crash.
-    """
 
     password_bytes = password.encode("utf-8")
 
     if len(password_bytes) > 72:
+
         raise HTTPException(
             status_code=400,
             detail=(
@@ -76,33 +73,38 @@ def hash_password(password: str) -> str:
             ),
         )
 
-    return pwd_context.hash(password)
+    return pwd_context.hash(
+        password
+    )
 
 
 def verify_password(
     plain_password: str,
     hashed_password: str,
 ) -> bool:
-    """
-    Verify a plain password against the stored bcrypt hash.
-    """
 
-    password_bytes = plain_password.encode("utf-8")
+    password_bytes = (
+        plain_password.encode("utf-8")
+    )
 
     if len(password_bytes) > 72:
+
         return False
 
     try:
+
         return pwd_context.verify(
             plain_password,
             hashed_password,
         )
 
     except Exception as error:
+
         print(
             "PASSWORD VERIFICATION ERROR:",
             str(error),
         )
+
         return False
 
 
@@ -123,16 +125,23 @@ def create_access_token(
 ) -> str:
 
     expire = (
+
         datetime.now(timezone.utc)
+
         + timedelta(
             minutes=ACCESS_TOKEN_EXPIRE_MINUTES
         )
+
     )
 
     payload = {
+
         "sub": str(user_id),
+
         "email": email,
+
         "exp": expire,
+
     }
 
     return jwt.encode(
@@ -152,15 +161,23 @@ def create_verification_token(
 ) -> str:
 
     expire = (
+
         datetime.now(timezone.utc)
+
         + timedelta(hours=24)
+
     )
 
     payload = {
+
         "sub": str(user_id),
+
         "email": email,
+
         "type": "email_verification",
+
         "exp": expire,
+
     }
 
     return jwt.encode(
@@ -171,7 +188,7 @@ def create_verification_token(
 
 
 # ============================================================
-# EMAIL SENDING
+# SEND VERIFICATION EMAIL
 # ============================================================
 
 def send_verification_email(
@@ -179,19 +196,10 @@ def send_verification_email(
     name: str,
     verification_token: str,
 ):
-    """
-    Send the email verification message.
 
-    SMTP configuration comes from environment variables:
-
-        SMTP_HOST
-        SMTP_PORT
-        SMTP_USERNAME
-        SMTP_PASSWORD
-        FRONTEND_URL
-    """
-
-    smtp_host = os.getenv("SMTP_HOST")
+    smtp_host = os.getenv(
+        "SMTP_HOST"
+    )
 
     smtp_port = int(
         os.getenv(
@@ -214,7 +222,7 @@ def send_verification_email(
     )
 
     # --------------------------------------------------------
-    # CHECK SMTP CONFIGURATION
+    # SMTP NOT CONFIGURED
     # --------------------------------------------------------
 
     if not all(
@@ -224,6 +232,7 @@ def send_verification_email(
             smtp_password,
         ]
     ):
+
         print(
             "WARNING: SMTP is not configured."
         )
@@ -239,19 +248,21 @@ def send_verification_email(
         return
 
     # --------------------------------------------------------
-    # REMOVE TRAILING SLASH FROM FRONTEND URL
+    # CREATE VERIFICATION URL
     # --------------------------------------------------------
 
-    frontend_url = frontend_url.rstrip("/")
-
-    # --------------------------------------------------------
-    # VERIFICATION URL
-    # --------------------------------------------------------
+    frontend_url = (
+        frontend_url.rstrip("/")
+    )
 
     verification_url = (
+
         f"{frontend_url}"
+
         f"/verify-email?token="
+
         f"{verification_token}"
+
     )
 
     # --------------------------------------------------------
@@ -274,13 +285,15 @@ Hello {name},
 
 Welcome to ReconAI.
 
-Please verify your email address by clicking the link below:
+Please verify your email address by clicking
+the link below:
 
 {verification_url}
 
 This verification link will expire in 24 hours.
 
-If you did not create a ReconAI account, you can safely ignore this email.
+If you did not create a ReconAI account,
+you can safely ignore this email.
 
 Regards,
 ReconAI Team
@@ -333,6 +346,18 @@ class LoginRequest(BaseModel):
     password: str
 
 
+class UpdateProfileRequest(BaseModel):
+
+    name: str
+
+
+class ChangePasswordRequest(BaseModel):
+
+    current_password: str
+
+    new_password: str
+
+
 # ============================================================
 # RESPONSE SCHEMAS
 # ============================================================
@@ -380,23 +405,32 @@ router = APIRouter(
     response_model=AuthResponse,
 )
 def signup(
+
     request: SignupRequest,
-    db: Session = Depends(get_db),
+
+    db: Session = Depends(
+        get_db
+    ),
+
 ):
 
-    # --------------------------------------------------------
-    # NORMALIZE INPUT
-    # --------------------------------------------------------
-
     email = (
+
         str(request.email)
+
         .lower()
+
         .strip()
+
     )
 
-    name = request.name.strip()
+    name = (
+        request.name.strip()
+    )
 
-    password = request.password
+    password = (
+        request.password
+    )
 
     # --------------------------------------------------------
     # VALIDATE NAME
@@ -410,7 +444,7 @@ def signup(
         )
 
     # --------------------------------------------------------
-    # VALIDATE PASSWORD LENGTH
+    # VALIDATE PASSWORD
     # --------------------------------------------------------
 
     if len(password) < 8:
@@ -423,15 +457,16 @@ def signup(
             ),
         )
 
-    # bcrypt maximum = 72 bytes
-
-    if len(password.encode("utf-8")) > 72:
+    if len(
+        password.encode("utf-8")
+    ) > 72:
 
         raise HTTPException(
             status_code=400,
             detail=(
                 "Password is too long. "
-                "Please use a password of 72 bytes or fewer."
+                "Please use a password "
+                "of 72 bytes or fewer."
             ),
         )
 
@@ -440,11 +475,15 @@ def signup(
     # --------------------------------------------------------
 
     existing_user = (
+
         db.query(User)
+
         .filter(
             User.email == email
         )
+
         .first()
+
     )
 
     if existing_user:
@@ -461,8 +500,8 @@ def signup(
     # HASH PASSWORD
     # --------------------------------------------------------
 
-    password_hash = hash_password(
-        password
+    hashed_password = (
+        hash_password(password)
     )
 
     # --------------------------------------------------------
@@ -470,10 +509,15 @@ def signup(
     # --------------------------------------------------------
 
     user = User(
+
         name=name,
+
         email=email,
-        password_hash=password_hash,
+
+        hashed_password=hashed_password,
+
         is_verified=False,
+
     )
 
     db.add(user)
@@ -499,14 +543,16 @@ def signup(
         )
 
     # --------------------------------------------------------
-    # CREATE EMAIL VERIFICATION TOKEN
+    # CREATE VERIFICATION TOKEN
     # --------------------------------------------------------
 
     verification_token = (
+
         create_verification_token(
             user.id,
             user.email,
         )
+
     )
 
     # --------------------------------------------------------
@@ -528,11 +574,11 @@ def signup(
     except Exception as error:
 
         print(
-            "Failed to send verification email:"
+            "FAILED TO SEND VERIFICATION EMAIL:"
         )
 
         print(
-            error
+            str(error)
         )
 
         email_status = (
@@ -547,9 +593,13 @@ def signup(
     return AuthResponse(
 
         message=(
+
             "Account created successfully. "
+
             "Please verify your email. "
+
             f"{email_status}"
+
         ),
 
         user=UserResponse(
@@ -565,6 +615,7 @@ def signup(
             created_at=user.created_at,
 
         ),
+
     )
 
 
@@ -576,44 +627,52 @@ def signup(
     "/verify-email"
 )
 def verify_email(
-    token: str,
-    db: Session = Depends(get_db),
-):
 
-    # --------------------------------------------------------
-    # DECODE TOKEN
-    # --------------------------------------------------------
+    token: str,
+
+    db: Session = Depends(
+        get_db
+    ),
+
+):
 
     try:
 
         payload = jwt.decode(
+
             token,
+
             SECRET_KEY,
-            algorithms=[ALGORITHM],
+
+            algorithms=[
+                ALGORITHM
+            ],
+
         )
 
-        # ----------------------------------------------------
-        # CHECK TOKEN TYPE
-        # ----------------------------------------------------
-
-        if payload.get("type") != "email_verification":
+        if (
+            payload.get("type")
+            != "email_verification"
+        ):
 
             raise HTTPException(
                 status_code=400,
-                detail="Invalid verification token.",
+                detail=(
+                    "Invalid verification token."
+                ),
             )
 
-        # ----------------------------------------------------
-        # GET USER ID
-        # ----------------------------------------------------
-
-        user_id = payload.get("sub")
+        user_id = (
+            payload.get("sub")
+        )
 
         if not user_id:
 
             raise HTTPException(
                 status_code=400,
-                detail="Invalid verification token.",
+                detail=(
+                    "Invalid verification token."
+                ),
             )
 
     except HTTPException:
@@ -630,35 +689,17 @@ def verify_email(
             ),
         )
 
-    # --------------------------------------------------------
-    # FIND USER
-    # --------------------------------------------------------
+    user = (
 
-    try:
+        db.query(User)
 
-        user = (
-            db.query(User)
-            .filter(
-                User.id == int(user_id)
-            )
-            .first()
+        .filter(
+            User.id == int(user_id)
         )
 
-    except Exception as error:
+        .first()
 
-        print(
-            "VERIFY USER DATABASE ERROR:",
-            str(error),
-        )
-
-        raise HTTPException(
-            status_code=500,
-            detail="Failed to verify user.",
-        )
-
-    # --------------------------------------------------------
-    # USER NOT FOUND
-    # --------------------------------------------------------
+    )
 
     if not user:
 
@@ -667,22 +708,17 @@ def verify_email(
             detail="User not found.",
         )
 
-    # --------------------------------------------------------
-    # ALREADY VERIFIED
-    # --------------------------------------------------------
-
     if user.is_verified:
 
         return {
+
             "message": (
                 "Email is already verified."
             ),
-            "email": user.email,
-        }
 
-    # --------------------------------------------------------
-    # VERIFY USER
-    # --------------------------------------------------------
+            "email": user.email,
+
+        }
 
     user.is_verified = True
 
@@ -697,7 +733,7 @@ def verify_email(
         db.rollback()
 
         print(
-            "EMAIL VERIFICATION DATABASE ERROR:",
+            "EMAIL VERIFICATION ERROR:",
             str(error),
         )
 
@@ -705,10 +741,6 @@ def verify_email(
             status_code=500,
             detail="Failed to verify email.",
         )
-
-    # --------------------------------------------------------
-    # RESPONSE
-    # --------------------------------------------------------
 
     return {
 
@@ -731,35 +763,36 @@ def verify_email(
     response_model=AuthResponse,
 )
 def login(
+
     request: LoginRequest,
-    db: Session = Depends(get_db),
+
+    db: Session = Depends(
+        get_db
+    ),
+
 ):
 
-    # --------------------------------------------------------
-    # NORMALIZE EMAIL
-    # --------------------------------------------------------
-
     email = (
+
         str(request.email)
+
         .lower()
+
         .strip()
+
     )
 
-    # --------------------------------------------------------
-    # FIND USER
-    # --------------------------------------------------------
-
     user = (
+
         db.query(User)
+
         .filter(
             User.email == email
         )
-        .first()
-    )
 
-    # --------------------------------------------------------
-    # USER NOT FOUND
-    # --------------------------------------------------------
+        .first()
+
+    )
 
     if not user:
 
@@ -770,13 +803,12 @@ def login(
             ),
         )
 
-    # --------------------------------------------------------
-    # CHECK PASSWORD
-    # --------------------------------------------------------
-
     if not verify_password(
+
         request.password,
-        user.password_hash,
+
+        user.hashed_password,
+
     ):
 
         raise HTTPException(
@@ -785,10 +817,6 @@ def login(
                 "Invalid email or password."
             ),
         )
-
-    # --------------------------------------------------------
-    # CHECK EMAIL VERIFICATION
-    # --------------------------------------------------------
 
     if not user.is_verified:
 
@@ -800,20 +828,14 @@ def login(
             ),
         )
 
-    # --------------------------------------------------------
-    # CREATE JWT
-    # --------------------------------------------------------
-
     access_token = (
+
         create_access_token(
             user.id,
             user.email,
         )
-    )
 
-    # --------------------------------------------------------
-    # RESPONSE
-    # --------------------------------------------------------
+    )
 
     return AuthResponse(
 
@@ -836,6 +858,7 @@ def login(
             created_at=user.created_at,
 
         ),
+
     )
 
 
@@ -844,31 +867,38 @@ def login(
 # ============================================================
 
 def get_current_user(
+
     credentials: HTTPAuthorizationCredentials = Depends(
         security
     ),
-    db: Session = Depends(get_db),
+
+    db: Session = Depends(
+        get_db
+    ),
+
 ):
 
-    # --------------------------------------------------------
-    # GET TOKEN
-    # --------------------------------------------------------
-
-    token = credentials.credentials
-
-    # --------------------------------------------------------
-    # DECODE JWT
-    # --------------------------------------------------------
+    token = (
+        credentials.credentials
+    )
 
     try:
 
         payload = jwt.decode(
+
             token,
+
             SECRET_KEY,
-            algorithms=[ALGORITHM],
+
+            algorithms=[
+                ALGORITHM
+            ],
+
         )
 
-        user_id = payload.get("sub")
+        user_id = (
+            payload.get("sub")
+        )
 
         if not user_id:
 
@@ -893,35 +923,17 @@ def get_current_user(
             ),
         )
 
-    # --------------------------------------------------------
-    # FIND USER
-    # --------------------------------------------------------
+    user = (
 
-    try:
+        db.query(User)
 
-        user = (
-            db.query(User)
-            .filter(
-                User.id == int(user_id)
-            )
-            .first()
+        .filter(
+            User.id == int(user_id)
         )
 
-    except Exception as error:
+        .first()
 
-        print(
-            "CURRENT USER DATABASE ERROR:",
-            str(error),
-        )
-
-        raise HTTPException(
-            status_code=500,
-            detail="Failed to authenticate user.",
-        )
-
-    # --------------------------------------------------------
-    # USER DOES NOT EXIST
-    # --------------------------------------------------------
+    )
 
     if not user:
 
@@ -944,9 +956,11 @@ def get_current_user(
     response_model=UserResponse,
 )
 def get_me(
+
     current_user: User = Depends(
         get_current_user
     ),
+
 ):
 
     return UserResponse(
@@ -962,3 +976,187 @@ def get_me(
         created_at=current_user.created_at,
 
     )
+
+
+# ============================================================
+# UPDATE PROFILE
+# ============================================================
+
+@router.put(
+    "/profile",
+    response_model=UserResponse,
+)
+def update_profile(
+
+    request: UpdateProfileRequest,
+
+    current_user: User = Depends(
+        get_current_user
+    ),
+
+    db: Session = Depends(
+        get_db
+    ),
+
+):
+
+    name = (
+        request.name.strip()
+    )
+
+    if not name:
+
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Name cannot be empty."
+            ),
+        )
+
+    current_user.name = name
+
+    try:
+
+        db.commit()
+
+        db.refresh(
+            current_user
+        )
+
+    except Exception as error:
+
+        db.rollback()
+
+        print(
+            "UPDATE PROFILE ERROR:",
+            str(error),
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail=(
+                "Failed to update profile."
+            ),
+        )
+
+    return UserResponse(
+
+        id=current_user.id,
+
+        name=current_user.name,
+
+        email=current_user.email,
+
+        is_verified=current_user.is_verified,
+
+        created_at=current_user.created_at,
+
+    )
+
+
+# ============================================================
+# CHANGE PASSWORD
+# ============================================================
+
+@router.put(
+    "/change-password"
+)
+def change_password(
+
+    request: ChangePasswordRequest,
+
+    current_user: User = Depends(
+        get_current_user
+    ),
+
+    db: Session = Depends(
+        get_db
+    ),
+
+):
+
+    # --------------------------------------------------------
+    # VALIDATE CURRENT PASSWORD
+    # --------------------------------------------------------
+
+    if not verify_password(
+
+        request.current_password,
+
+        current_user.hashed_password,
+
+    ):
+
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Current password is incorrect."
+            ),
+        )
+
+    # --------------------------------------------------------
+    # VALIDATE NEW PASSWORD
+    # --------------------------------------------------------
+
+    if len(
+        request.new_password
+    ) < 8:
+
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "New password must be at least "
+                "8 characters long."
+            ),
+        )
+
+    if len(
+        request.new_password.encode(
+            "utf-8"
+        )
+    ) > 72:
+
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Password is too long."
+            ),
+        )
+
+    # --------------------------------------------------------
+    # UPDATE PASSWORD
+    # --------------------------------------------------------
+
+    current_user.hashed_password = (
+        hash_password(
+            request.new_password
+        )
+    )
+
+    try:
+
+        db.commit()
+
+    except Exception as error:
+
+        db.rollback()
+
+        print(
+            "CHANGE PASSWORD ERROR:",
+            str(error),
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail=(
+                "Failed to change password."
+            ),
+        )
+
+    return {
+
+        "message": (
+            "Password changed successfully."
+        )
+
+    }

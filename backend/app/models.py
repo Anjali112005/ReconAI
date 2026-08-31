@@ -1,128 +1,155 @@
 from datetime import datetime
 
 from sqlalchemy import (
+    Column,
+    Integer,
+    String,
     Boolean,
     DateTime,
-    Float,
     ForeignKey,
-    Integer,
     JSON,
-    String,
-    Text,
 )
-from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from .database import Base
+from sqlalchemy.orm import relationship
 
+from app.database import Base
+
+
+# ============================================================
+# USER MODEL
+# ============================================================
 
 class User(Base):
+
     __tablename__ = "users"
 
-    id: Mapped[int] = mapped_column(
+    # --------------------------------------------------------
+    # PRIMARY KEY
+    # --------------------------------------------------------
+
+    id = Column(
         Integer,
         primary_key=True,
         index=True,
     )
 
-    name: Mapped[str] = mapped_column(
-        String(100),
+    # --------------------------------------------------------
+    # USER INFORMATION
+    # --------------------------------------------------------
+
+    name = Column(
+        String(255),
         nullable=False,
     )
 
-    email: Mapped[str] = mapped_column(
+    email = Column(
         String(255),
         unique=True,
         index=True,
         nullable=False,
     )
 
-    password_hash: Mapped[str] = mapped_column(
+    hashed_password = Column(
         String(255),
         nullable=False,
     )
 
-    is_verified: Mapped[bool] = mapped_column(
+    # --------------------------------------------------------
+    # EMAIL VERIFICATION
+    # --------------------------------------------------------
+
+    is_verified = Column(
         Boolean,
         default=False,
         nullable=False,
     )
 
-    created_at: Mapped[datetime] = mapped_column(
+    # --------------------------------------------------------
+    # ACCOUNT CREATION
+    # --------------------------------------------------------
+
+    created_at = Column(
         DateTime,
         default=datetime.utcnow,
         nullable=False,
     )
 
-    reconciliation_runs = relationship(
-        "ReconciliationRun",
+    # --------------------------------------------------------
+    # RELATIONSHIP
+    # --------------------------------------------------------
+
+    reconciliation_history = relationship(
+        "ReconciliationHistory",
         back_populates="user",
         cascade="all, delete-orphan",
     )
 
 
-class ReconciliationRun(Base):
-    __tablename__ = "reconciliation_runs"
+# ============================================================
+# RECONCILIATION HISTORY MODEL
+# ============================================================
 
-    id: Mapped[int] = mapped_column(
+class ReconciliationHistory(Base):
+
+    __tablename__ = "reconciliation_history"
+
+    # --------------------------------------------------------
+    # PRIMARY KEY
+    # --------------------------------------------------------
+
+    id = Column(
         Integer,
         primary_key=True,
         index=True,
     )
 
-    user_id: Mapped[int] = mapped_column(
+    # --------------------------------------------------------
+    # USER ID
+    # --------------------------------------------------------
+
+    user_id = Column(
         Integer,
-        ForeignKey("users.id"),
+        ForeignKey(
+            "users.id",
+            ondelete="CASCADE",
+        ),
         nullable=False,
         index=True,
     )
 
-    run_number: Mapped[int] = mapped_column(
-        Integer,
-        nullable=False,
-    )
+    # --------------------------------------------------------
+    # CREATED TIME
+    # --------------------------------------------------------
 
-    date_time: Mapped[datetime] = mapped_column(
+    created_at = Column(
         DateTime,
         default=datetime.utcnow,
         nullable=False,
     )
 
-    bank_count: Mapped[int] = mapped_column(
-        Integer,
-        default=0,
-        nullable=False,
+    # --------------------------------------------------------
+    # RECONCILIATION SUMMARY
+    # --------------------------------------------------------
+
+    summary = Column(
+        JSON,
+        nullable=True,
     )
 
-    ledger_count: Mapped[int] = mapped_column(
-        Integer,
-        default=0,
-        nullable=False,
-    )
+    # --------------------------------------------------------
+    # COMPLETE RECONCILIATION RESULT
+    # --------------------------------------------------------
 
-    match_count: Mapped[int] = mapped_column(
-        Integer,
-        default=0,
-        nullable=False,
-    )
-
-    exception_count: Mapped[int] = mapped_column(
-        Integer,
-        default=0,
-        nullable=False,
-    )
-
-    exposure: Mapped[float] = mapped_column(
-        Float,
-        default=0,
-        nullable=False,
-    )
-
-    result_data: Mapped[dict] = mapped_column(
+    result = Column(
         JSON,
         nullable=False,
     )
 
+    # --------------------------------------------------------
+    # RELATIONSHIP BACK TO USER
+    # --------------------------------------------------------
+
     user = relationship(
         "User",
-        back_populates="reconciliation_runs",
+        back_populates="reconciliation_history",
     )

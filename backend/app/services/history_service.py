@@ -1,210 +1,320 @@
-import json
-import os
-from datetime import datetime
-from uuid import uuid4
+from app.models import ReconciliationHistory
 
 
-# =====================================
-# HISTORY FILE CONFIGURATION
-# =====================================
+# ============================================================
+# SERIALIZE HISTORY RECORD
+# ============================================================
 
-BASE_DIR = os.path.dirname(
-    os.path.dirname(
-        os.path.dirname(
-            os.path.abspath(__file__)
+def _serialize_history_record(record):
+    """
+    Convert SQLAlchemy ReconciliationHistory object
+    into a normal dictionary for the API.
+    """
+
+    return {
+        "id": record.id,
+
+        "user_id": record.user_id,
+
+        "created_at": record.created_at,
+
+        "summary": record.summary,
+
+        "result": record.result,
+    }
+
+
+# ============================================================
+# ADD RECONCILIATION HISTORY
+# ============================================================
+
+def add_reconciliation_history(
+    db,
+    user_id,
+    reconciliation_result,
+):
+    """
+    Save a reconciliation result to MySQL.
+
+    The record is permanently associated with the
+    authenticated user's user_id.
+    """
+
+    if user_id is None:
+        raise ValueError(
+            "user_id is required when saving reconciliation history."
         )
-    )
-)
 
-HISTORY_DIR = os.path.join(
-    BASE_DIR,
-    "data"
-)
-
-HISTORY_FILE = os.path.join(
-    HISTORY_DIR,
-    "reconciliation_history.json"
-)
-
-
-# =====================================
-# CREATE HISTORY DIRECTORY
-# =====================================
-
-os.makedirs(
-    HISTORY_DIR,
-    exist_ok=True
-)
-
-
-# =====================================
-# LOAD HISTORY
-# =====================================
-
-def load_history():
-
-    if not os.path.exists(
-        HISTORY_FILE
+    if not isinstance(
+        reconciliation_result,
+        dict,
     ):
+        raise ValueError(
+            "reconciliation_result must be a dictionary."
+        )
 
-        return []
+    record = ReconciliationHistory(
+
+        user_id=int(user_id),
+
+        summary=reconciliation_result.get(
+            "summary",
+            {},
+        ),
+
+        result=reconciliation_result,
+
+    )
 
     try:
 
-        with open(
-            HISTORY_FILE,
-            "r",
-            encoding="utf-8"
-        ) as file:
+        db.add(record)
 
-            history = json.load(
-                file
-            )
+        db.commit()
 
-            return history
+        db.refresh(record)
 
-    except (
-        json.JSONDecodeError,
-        IOError
-    ):
+    except Exception:
 
-        return []
+        db.rollback()
+
+        raise
 
 
-# =====================================
-# SAVE HISTORY TO FILE
-# =====================================
+    # --------------------------------------------------------
+    # RETURN DICTIONARY
+    # --------------------------------------------------------
 
-def save_history(
-    history
+    return _serialize_history_record(
+        record
+    )
+
+
+# ============================================================
+# GET ALL HISTORY FOR CURRENT USER
+# ============================================================
+
+def get_reconciliation_history(
+    db,
+    user_id,
 ):
+    """
+    Get ONLY reconciliation history belonging
+    to the authenticated user.
+    """
 
-    with open(
-        HISTORY_FILE,
-        "w",
-        encoding="utf-8"
-    ) as file:
-
-        json.dump(
-            history,
-            file,
-            indent=4,
-            default=str
+    if user_id is None:
+        raise ValueError(
+            "user_id is required when retrieving history."
         )
 
 
-# =====================================
-# ADD RECONCILIATION RESULT
-# =====================================
+    records = (
 
-def add_reconciliation_history(
-    reconciliation_result
-):
+        db.query(
+            ReconciliationHistory
+        )
 
-    history = load_history()
+        .filter(
 
-    record = {
+            ReconciliationHistory.user_id
+            == int(user_id)
 
-        "id": str(
-            uuid4()
-        ),
+        )
 
-        "created_at": datetime.now().strftime(
-            "%Y-%m-%d %H:%M:%S"
-        ),
+        .order_by(
 
-        "summary": reconciliation_result.get(
-            "summary",
-            {}
-        ),
+            ReconciliationHistory.created_at.desc()
 
-        "result": reconciliation_result
-    }
+        )
 
-    history.insert(
-        0,
-        record
+        .all()
+
     )
 
-    save_history(
-        history
-    )
 
-    return record
+    return [
 
+        _serialize_history_record(
+            record
+        )
 
-# =====================================
-# GET ALL HISTORY
-# =====================================
+        for record in records
 
-def get_reconciliation_history():
-
-    return load_history()
-
-
-# =====================================
-# GET SINGLE HISTORY RECORD
-# =====================================
-
-def get_history_by_id(
-    history_id
-):
-
-    history = load_history()
-
-    for record in history:
-
-        if record.get(
-            "id"
-        ) == history_id:
-
-            return record
-
-    return None
-
-
-# =====================================
-# DELETE HISTORY RECORD
-# =====================================
-
-def delete_history_record(
-    history_id
-):
-
-    history = load_history()
-
-    updated_history = [
-
-        record
-        for record in history
-        if record.get(
-            "id"
-        ) != history_id
     ]
 
-    if len(
-        updated_history
-    ) == len(
-        history
-    ):
+
+# ============================================================
+# GET SINGLE HISTORY RECORD
+# ============================================================
+
+def get_history_by_id(
+    db,
+    history_id,
+    user_id,
+):
+    """
+    Get one history record.
+
+    IMPORTANT:
+    Both history_id AND user_id are checked.
+
+    This prevents User B from accessing User A's
+    record even if User B knows the history ID.
+    """
+
+    if user_id is None:
+        raise ValueError(
+            "user_id is required when retrieving history."
+        )
+
+
+    record = (
+
+        db.query(
+            ReconciliationHistory
+        )
+
+        .filter(
+
+            ReconciliationHistory.id
+            == int(history_id),
+
+            ReconciliationHistory.user_id
+            == int(user_id),
+
+        )
+
+        .first()
+
+    )
+
+
+    if record is None:
+
+        return None
+
+
+    return _serialize_history_record(
+        record
+    )
+
+
+# ============================================================
+# DELETE SINGLE HISTORY RECORD
+# ============================================================
+
+def delete_history_record(
+    db,
+    history_id,
+    user_id,
+):
+    """
+    Delete one history record belonging
+    to the authenticated user.
+
+    A user cannot delete another user's record.
+    """
+
+    if user_id is None:
+        raise ValueError(
+            "user_id is required when deleting history."
+        )
+
+
+    record = (
+
+        db.query(
+            ReconciliationHistory
+        )
+
+        .filter(
+
+            ReconciliationHistory.id
+            == int(history_id),
+
+            ReconciliationHistory.user_id
+            == int(user_id),
+
+        )
+
+        .first()
+
+    )
+
+
+    if record is None:
 
         return False
 
-    save_history(
-        updated_history
-    )
+
+    try:
+
+        db.delete(record)
+
+        db.commit()
+
+    except Exception:
+
+        db.rollback()
+
+        raise
+
 
     return True
 
 
-# =====================================
-# CLEAR ALL HISTORY
-# =====================================
+# ============================================================
+# CLEAR ALL HISTORY FOR CURRENT USER
+# ============================================================
 
-def clear_reconciliation_history():
+def clear_reconciliation_history(
+    db,
+    user_id,
+):
+    """
+    Delete ALL reconciliation history belonging
+    to the authenticated user.
 
-    save_history(
-        []
-    )
+    Other users' history is NOT affected.
+    """
 
-    return True
+    if user_id is None:
+        raise ValueError(
+            "user_id is required when clearing history."
+        )
+
+
+    try:
+
+        deleted_count = (
+
+            db.query(
+                ReconciliationHistory
+            )
+
+            .filter(
+
+                ReconciliationHistory.user_id
+                == int(user_id)
+
+            )
+
+            .delete(
+
+                synchronize_session=False
+
+            )
+
+        )
+
+        db.commit()
+
+    except Exception:
+
+        db.rollback()
+
+        raise
+
+
+    return deleted_count

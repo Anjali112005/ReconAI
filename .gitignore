@@ -1,29 +1,124 @@
-# Python
+# ============================================================
+# ENVIRONMENT VARIABLES / SECRETS
+# ============================================================
+
+.env
+.env.*
+!.env.example
+
+backend/.env
+frontend/.env
+frontend/.env.*
+!.env.example
+
+# Streamlit secrets
+.streamlit/secrets.toml
+
+
+# ============================================================
+# PYTHON
+# ============================================================
+
 __pycache__/
 *.py[cod]
+*.pyo
+*.pyd
 
-# Virtual Environment
+*.egg
+*.egg-info/
+dist/
+build/
+
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+
+# ============================================================
+# VIRTUAL ENVIRONMENTS
+# ============================================================
+
 venv/
 .venv/
+env/
+ENV/
 
-# Environment variables and secrets
-.env
+backend/venv/
+backend/.venv/
 
-# Node.js
+
+# ============================================================
+# NODE / REACT
+# ============================================================
+
 node_modules/
 
-# IDE
-.vscode/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
-# OS files
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+
+
+# ============================================================
+# IDE / EDITORS
+# ============================================================
+
+.vscode/
+.idea/
+
+*.swp
+*.swo
+
 .DS_Store
 Thumbs.db
 
-*.pyc
-.env
-.streamlit/secrets.toml
 
-backend/.env
-backend/venv/
-__pycache__/
-*.pyc
+# ============================================================
+# DATABASE / LOCAL DATA
+# ============================================================
+
+*.db
+*.sqlite
+*.sqlite3
+
+# Local MySQL dumps
+*.sql
+
+# If you have a local database backup, don't commit it
+backup/
+backups/
+
+
+# ============================================================
+# LOGS
+# ============================================================
+
+*.log
+logs/
+
+
+# ============================================================
+# TEMPORARY FILES
+# ============================================================
+
+*.tmp
+*.temp
+*.bak
+
+
+# ============================================================
+# PYCHARM
+# ============================================================
+
+*.iml
+
+
+# ============================================================
+# WINDOWS
+# ============================================================
+
+Desktop.ini

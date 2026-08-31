@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+
 import {
   BrowserRouter,
   Routes,
@@ -22,6 +23,9 @@ import { AIInvestigation } from "./pages/AIInvestigation";
 import { Reports } from "./pages/Reports";
 import { History } from "./pages/History";
 
+import { Profile } from "./pages/Profile";
+import { SettingsPage } from "./pages/Settings";
+
 import { Home } from "./pages/Home";
 import { Login } from "./pages/Login";
 import { Signup } from "./pages/Signup";
@@ -34,46 +38,79 @@ import { VerifyEmail } from "./pages/VerifyEmail";
 
 const PublicRoute = () => {
 
-  const { isAuthenticated, loading } = useAuth();
+  const {
+    isAuthenticated,
+    loading,
+  } = useAuth();
 
-
-  /*
-   * Wait until authentication state has been checked.
-   */
 
   if (loading) {
 
     return (
-      <div className="min-h-screen flex items-center justify-center bg-recon-light-bg dark:bg-recon-dark-bg">
 
-        <div className="flex flex-col items-center gap-3">
+      <div
+        className="
+          min-h-screen
+          flex
+          items-center
+          justify-center
+          bg-recon-light-bg
+          dark:bg-recon-dark-bg
+        "
+      >
 
-          <div className="w-8 h-8 border-4 border-recon-light-border dark:border-recon-dark-border border-t-recon-forest dark:border-t-recon-dark-accent rounded-full animate-spin" />
+        <div
+          className="
+            flex
+            flex-col
+            items-center
+            gap-3
+          "
+        >
 
-          <p className="text-xs font-bold text-recon-light-muted dark:text-recon-dark-muted">
+          <div
+            className="
+              w-8
+              h-8
+              border-4
+              border-recon-light-border
+              dark:border-recon-dark-border
+              border-t-recon-forest
+              dark:border-t-recon-dark-accent
+              rounded-full
+              animate-spin
+            "
+          />
+
+          <p
+            className="
+              text-xs
+              font-bold
+              text-recon-light-muted
+              dark:text-recon-dark-muted
+            "
+          >
             Loading...
           </p>
 
         </div>
 
       </div>
+
     );
 
   }
 
 
-  /*
-   * If already logged in, don't allow the user
-   * to go back to Login / Signup.
-   */
-
   if (isAuthenticated) {
 
     return (
+
       <Navigate
         to="/dashboard"
         replace
       />
+
     );
 
   }
@@ -91,48 +128,81 @@ const PublicRoute = () => {
 const ProtectedRoute = () => {
 
   const {
+
     isAuthenticated,
+
     loading,
+
   } = useAuth();
 
-
-  /*
-   * Authentication state is still loading.
-   */
 
   if (loading) {
 
     return (
-      <div className="min-h-screen flex items-center justify-center bg-recon-light-bg dark:bg-recon-dark-bg">
 
-        <div className="flex flex-col items-center gap-3">
+      <div
+        className="
+          min-h-screen
+          flex
+          items-center
+          justify-center
+          bg-recon-light-bg
+          dark:bg-recon-dark-bg
+        "
+      >
 
-          <div className="w-8 h-8 border-4 border-recon-light-border dark:border-recon-dark-border border-t-recon-forest dark:border-t-recon-dark-accent rounded-full animate-spin" />
+        <div
+          className="
+            flex
+            flex-col
+            items-center
+            gap-3
+          "
+        >
 
-          <p className="text-xs font-bold text-recon-light-muted dark:text-recon-dark-muted">
+          <div
+            className="
+              w-8
+              h-8
+              border-4
+              border-recon-light-border
+              dark:border-recon-dark-border
+              border-t-recon-forest
+              dark:border-t-recon-dark-accent
+              rounded-full
+              animate-spin
+            "
+          />
+
+          <p
+            className="
+              text-xs
+              font-bold
+              text-recon-light-muted
+              dark:text-recon-dark-muted
+            "
+          >
             Checking authentication...
           </p>
 
         </div>
 
       </div>
+
     );
 
   }
 
 
-  /*
-   * User is not logged in.
-   * Send them to Login.
-   */
-
   if (!isAuthenticated) {
 
     return (
+
       <Navigate
         to="/login"
         replace
       />
+
     );
 
   }
@@ -149,18 +219,30 @@ const ProtectedRoute = () => {
 
 const DashboardLayout = () => {
 
-  const [isSidebarOpen, setIsSidebarOpen] =
-    useState(false);
+  const [
+
+    isSidebarOpen,
+
+    setIsSidebarOpen,
+
+  ] = useState(false);
 
 
   return (
 
-    <div className="min-h-screen bg-recon-light-bg dark:bg-recon-dark-bg text-recon-light-text dark:text-recon-dark-text transition-colors duration-200 flex relative">
-
-
-      {/* ===================================================
-          RESPONSIVE SIDEBAR
-          =================================================== */}
+    <div
+      className="
+        min-h-screen
+        bg-recon-light-bg
+        dark:bg-recon-dark-bg
+        text-recon-light-text
+        dark:text-recon-dark-text
+        transition-colors
+        duration-200
+        flex
+        relative
+      "
+    >
 
       <Sidebar
 
@@ -175,16 +257,15 @@ const DashboardLayout = () => {
       />
 
 
-      {/* ===================================================
-          MAIN APPLICATION AREA
-          =================================================== */}
-
-      <div className="flex-1 flex flex-col min-w-0 lg:pl-64">
-
-
-        {/* =================================================
-            HEADER
-            ================================================= */}
+      <div
+        className="
+          flex-1
+          flex
+          flex-col
+          min-w-0
+          lg:pl-64
+        "
+      >
 
         <Header
 
@@ -195,26 +276,26 @@ const DashboardLayout = () => {
         />
 
 
-        {/* =================================================
-            PAGE CONTENT
-            ================================================= */}
-
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+        <main
+          className="
+            flex-1
+            p-4
+            sm:p-6
+            lg:p-8
+            max-w-7xl
+            w-full
+            mx-auto
+          "
+        >
 
           <Outlet />
 
         </main>
 
-
       </div>
 
 
-      {/* ===================================================
-          FLOATING AI COPILOT
-          =================================================== */}
-
       <FloatingCopilot />
-
 
     </div>
 
@@ -238,37 +319,28 @@ export default function App() {
         <Routes>
 
 
-          {/* =================================================
-              PUBLIC PAGES
-              ================================================= */}
+          {/* ===============================================
+              PUBLIC ROUTES
+             =============================================== */}
 
-          <Route element={<PublicRoute />}>
-
-            {/* HOME / LANDING PAGE */}
+          <Route
+            element={<PublicRoute />}
+          >
 
             <Route
               path="/"
               element={<Home />}
             />
 
-
-            {/* LOGIN */}
-
             <Route
               path="/login"
               element={<Login />}
             />
 
-
-            {/* SIGN UP */}
-
             <Route
               path="/signup"
               element={<Signup />}
             />
-
-
-            {/* EMAIL VERIFICATION */}
 
             <Route
               path="/verify-email"
@@ -278,18 +350,18 @@ export default function App() {
           </Route>
 
 
-          {/* =================================================
-              PROTECTED APPLICATION
-              ================================================= */}
+          {/* ===============================================
+              PROTECTED ROUTES
+             =============================================== */}
 
-          <Route element={<ProtectedRoute />}>
+          <Route
+            element={<ProtectedRoute />}
+          >
 
-            <Route element={<DashboardLayout />}>
+            <Route
+              element={<DashboardLayout />}
+            >
 
-
-              {/* =================================================
-                  DASHBOARD
-                  ================================================= */}
 
               <Route
                 path="/dashboard"
@@ -297,19 +369,11 @@ export default function App() {
               />
 
 
-              {/* =================================================
-                  UPLOAD DATA
-                  ================================================= */}
-
               <Route
                 path="/upload"
                 element={<UploadData />}
               />
 
-
-              {/* =================================================
-                  RECONCILIATION
-                  ================================================= */}
 
               <Route
                 path="/reconciliation"
@@ -317,19 +381,11 @@ export default function App() {
               />
 
 
-              {/* =================================================
-                  RISK CENTER
-                  ================================================= */}
-
               <Route
                 path="/risk-center"
                 element={<RiskCenter />}
               />
 
-
-              {/* =================================================
-                  AI INVESTIGATION
-                  ================================================= */}
 
               <Route
                 path="/investigation"
@@ -337,19 +393,11 @@ export default function App() {
               />
 
 
-              {/* =================================================
-                  REPORTS
-                  ================================================= */}
-
               <Route
                 path="/reports"
                 element={<Reports />}
               />
 
-
-              {/* =================================================
-                  HISTORY
-                  ================================================= */}
 
               <Route
                 path="/history"
@@ -357,9 +405,29 @@ export default function App() {
               />
 
 
-              {/* =================================================
+              {/* ===========================================
+                  MY PROFILE
+                 =========================================== */}
+
+              <Route
+                path="/profile"
+                element={<Profile />}
+              />
+
+
+              {/* ===========================================
+                  SETTINGS
+                 =========================================== */}
+
+              <Route
+                path="/settings"
+                element={<SettingsPage />}
+              />
+
+
+              {/* ===========================================
                   DEFAULT PROTECTED ROUTE
-                  ================================================= */}
+                 =========================================== */}
 
               <Route
                 path="*"
@@ -377,9 +445,9 @@ export default function App() {
           </Route>
 
 
-          {/* =================================================
+          {/* ===============================================
               GLOBAL FALLBACK
-              ================================================= */}
+             =============================================== */}
 
           <Route
             path="*"
