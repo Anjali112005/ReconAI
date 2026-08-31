@@ -1,52 +1,403 @@
-import React, { useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { ThemeProvider } from './context/ThemeContext';
-import { Sidebar } from './components/Sidebar';
-import { Header } from './components/Header';
-import { FloatingCopilot } from './components/FloatingCopilot';
-import { Dashboard } from './pages/Dashboard';
-import { UploadData } from './pages/UploadData';
-import { Reconciliation } from './pages/Reconciliation';
-import { RiskCenter } from './pages/RiskCenter';
-import { AIInvestigation } from './pages/AIInvestigation';
-import { Reports } from './pages/Reports';
-import { History } from './pages/History';
+import React, { useState } from "react";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  Outlet,
+} from "react-router-dom";
 
-export default function App() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+import { ThemeProvider } from "./context/ThemeContext";
+import { useAuth } from "./context/AuthContext";
+
+import { Sidebar } from "./components/Sidebar";
+import { Header } from "./components/Header";
+import { FloatingCopilot } from "./components/FloatingCopilot";
+
+import { Dashboard } from "./pages/Dashboard";
+import { UploadData } from "./pages/UploadData";
+import { Reconciliation } from "./pages/Reconciliation";
+import { RiskCenter } from "./pages/RiskCenter";
+import { AIInvestigation } from "./pages/AIInvestigation";
+import { Reports } from "./pages/Reports";
+import { History } from "./pages/History";
+
+import { Home } from "./pages/Home";
+import { Login } from "./pages/Login";
+import { Signup } from "./pages/Signup";
+import { VerifyEmail } from "./pages/VerifyEmail";
+
+
+/* =========================================================
+   PUBLIC ROUTE
+   ========================================================= */
+
+const PublicRoute = () => {
+
+  const { isAuthenticated, loading } = useAuth();
+
+
+  /*
+   * Wait until authentication state has been checked.
+   */
+
+  if (loading) {
+
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-recon-light-bg dark:bg-recon-dark-bg">
+
+        <div className="flex flex-col items-center gap-3">
+
+          <div className="w-8 h-8 border-4 border-recon-light-border dark:border-recon-dark-border border-t-recon-forest dark:border-t-recon-dark-accent rounded-full animate-spin" />
+
+          <p className="text-xs font-bold text-recon-light-muted dark:text-recon-dark-muted">
+            Loading...
+          </p>
+
+        </div>
+
+      </div>
+    );
+
+  }
+
+
+  /*
+   * If already logged in, don't allow the user
+   * to go back to Login / Signup.
+   */
+
+  if (isAuthenticated) {
+
+    return (
+      <Navigate
+        to="/dashboard"
+        replace
+      />
+    );
+
+  }
+
+
+  return <Outlet />;
+
+};
+
+
+/* =========================================================
+   PROTECTED ROUTE
+   ========================================================= */
+
+const ProtectedRoute = () => {
+
+  const {
+    isAuthenticated,
+    loading,
+  } = useAuth();
+
+
+  /*
+   * Authentication state is still loading.
+   */
+
+  if (loading) {
+
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-recon-light-bg dark:bg-recon-dark-bg">
+
+        <div className="flex flex-col items-center gap-3">
+
+          <div className="w-8 h-8 border-4 border-recon-light-border dark:border-recon-dark-border border-t-recon-forest dark:border-t-recon-dark-accent rounded-full animate-spin" />
+
+          <p className="text-xs font-bold text-recon-light-muted dark:text-recon-dark-muted">
+            Checking authentication...
+          </p>
+
+        </div>
+
+      </div>
+    );
+
+  }
+
+
+  /*
+   * User is not logged in.
+   * Send them to Login.
+   */
+
+  if (!isAuthenticated) {
+
+    return (
+      <Navigate
+        to="/login"
+        replace
+      />
+    );
+
+  }
+
+
+  return <Outlet />;
+
+};
+
+
+/* =========================================================
+   APPLICATION LAYOUT
+   ========================================================= */
+
+const DashboardLayout = () => {
+
+  const [isSidebarOpen, setIsSidebarOpen] =
+    useState(false);
+
 
   return (
+
+    <div className="min-h-screen bg-recon-light-bg dark:bg-recon-dark-bg text-recon-light-text dark:text-recon-dark-text transition-colors duration-200 flex relative">
+
+
+      {/* ===================================================
+          RESPONSIVE SIDEBAR
+          =================================================== */}
+
+      <Sidebar
+
+        isOpen={
+          isSidebarOpen
+        }
+
+        onClose={() =>
+          setIsSidebarOpen(false)
+        }
+
+      />
+
+
+      {/* ===================================================
+          MAIN APPLICATION AREA
+          =================================================== */}
+
+      <div className="flex-1 flex flex-col min-w-0 lg:pl-64">
+
+
+        {/* =================================================
+            HEADER
+            ================================================= */}
+
+        <Header
+
+          onOpenSidebar={() =>
+            setIsSidebarOpen(true)
+          }
+
+        />
+
+
+        {/* =================================================
+            PAGE CONTENT
+            ================================================= */}
+
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+
+          <Outlet />
+
+        </main>
+
+
+      </div>
+
+
+      {/* ===================================================
+          FLOATING AI COPILOT
+          =================================================== */}
+
+      <FloatingCopilot />
+
+
+    </div>
+
+  );
+
+};
+
+
+/* =========================================================
+   APP
+   ========================================================= */
+
+export default function App() {
+
+  return (
+
     <ThemeProvider>
+
       <BrowserRouter>
-        <div className="min-h-screen bg-recon-light-bg dark:bg-recon-dark-bg text-recon-light-text dark:text-recon-dark-text transition-colors duration-200 flex relative">
-          {/* Responsive Sidebar */}
-          <Sidebar
-            isOpen={isSidebarOpen}
-            onClose={() => setIsSidebarOpen(false)}
+
+        <Routes>
+
+
+          {/* =================================================
+              PUBLIC PAGES
+              ================================================= */}
+
+          <Route element={<PublicRoute />}>
+
+            {/* HOME / LANDING PAGE */}
+
+            <Route
+              path="/"
+              element={<Home />}
+            />
+
+
+            {/* LOGIN */}
+
+            <Route
+              path="/login"
+              element={<Login />}
+            />
+
+
+            {/* SIGN UP */}
+
+            <Route
+              path="/signup"
+              element={<Signup />}
+            />
+
+
+            {/* EMAIL VERIFICATION */}
+
+            <Route
+              path="/verify-email"
+              element={<VerifyEmail />}
+            />
+
+          </Route>
+
+
+          {/* =================================================
+              PROTECTED APPLICATION
+              ================================================= */}
+
+          <Route element={<ProtectedRoute />}>
+
+            <Route element={<DashboardLayout />}>
+
+
+              {/* =================================================
+                  DASHBOARD
+                  ================================================= */}
+
+              <Route
+                path="/dashboard"
+                element={<Dashboard />}
+              />
+
+
+              {/* =================================================
+                  UPLOAD DATA
+                  ================================================= */}
+
+              <Route
+                path="/upload"
+                element={<UploadData />}
+              />
+
+
+              {/* =================================================
+                  RECONCILIATION
+                  ================================================= */}
+
+              <Route
+                path="/reconciliation"
+                element={<Reconciliation />}
+              />
+
+
+              {/* =================================================
+                  RISK CENTER
+                  ================================================= */}
+
+              <Route
+                path="/risk-center"
+                element={<RiskCenter />}
+              />
+
+
+              {/* =================================================
+                  AI INVESTIGATION
+                  ================================================= */}
+
+              <Route
+                path="/investigation"
+                element={<AIInvestigation />}
+              />
+
+
+              {/* =================================================
+                  REPORTS
+                  ================================================= */}
+
+              <Route
+                path="/reports"
+                element={<Reports />}
+              />
+
+
+              {/* =================================================
+                  HISTORY
+                  ================================================= */}
+
+              <Route
+                path="/history"
+                element={<History />}
+              />
+
+
+              {/* =================================================
+                  DEFAULT PROTECTED ROUTE
+                  ================================================= */}
+
+              <Route
+                path="*"
+                element={
+                  <Navigate
+                    to="/dashboard"
+                    replace
+                  />
+                }
+              />
+
+
+            </Route>
+
+          </Route>
+
+
+          {/* =================================================
+              GLOBAL FALLBACK
+              ================================================= */}
+
+          <Route
+            path="*"
+            element={
+              <Navigate
+                to="/"
+                replace
+              />
+            }
           />
 
-          {/* Main Layout Container */}
-          <div className="flex-1 flex flex-col min-w-0 lg:pl-64">
-            <Header onOpenSidebar={() => setIsSidebarOpen(true)} />
 
-            <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
-              <Routes>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/upload" element={<UploadData />} />
-                <Route path="/reconciliation" element={<Reconciliation />} />
-                <Route path="/risk-center" element={<RiskCenter />} />
-                <Route path="/investigation" element={<AIInvestigation />} />
-                <Route path="/reports" element={<Reports />} />
-                <Route path="/history" element={<History />} />
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </main>
-          </div>
+        </Routes>
 
-          {/* Persistent Floating AI Copilot Chatbot */}
-          <FloatingCopilot />
-        </div>
       </BrowserRouter>
+
     </ThemeProvider>
+
   );
+
 }

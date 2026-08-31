@@ -5,20 +5,22 @@ import App from "./App";
 import "./index.css";
 
 import { ReconProvider } from "./context/ReconContext";
-
+import { AuthProvider } from "./context/AuthContext";
 
 ReactDOM.createRoot(
   document.getElementById("root")
 ).render(
-
   <React.StrictMode>
 
-    <ReconProvider>
+    <AuthProvider>
 
-      <App />
+      <ReconProvider>
 
-    </ReconProvider>
+        <App />
+
+      </ReconProvider>
+
+    </AuthProvider>
 
   </React.StrictMode>
-
 );

@@ -1,9 +1,16 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 import pandas as pd
+
+from app.auth import (
+    router as auth_router,
+    get_current_user,
+)
+
+from app.models import User
 
 from app.reconciliation.engine import reconcile
 from app.copilot import generate_copilot_response
@@ -14,7 +21,7 @@ from app.services.history_service import (
     get_reconciliation_history,
     get_history_by_id,
     delete_history_record,
-    clear_reconciliation_history
+    clear_reconciliation_history,
 )
 
 
@@ -28,13 +35,16 @@ app = FastAPI(
         "AI-Powered Financial Reconciliation, "
         "Investigation and Reporting API"
     ),
-    version="1.0.0"
+    version="1.0.0",
 )
 
 
 # =====================================
-# CORS CONFIGURATION
+# AUTHENTICATION ROUTER
 # =====================================
+
+app.include_router(auth_router)
+
 
 # =====================================
 # CORS CONFIGURATION
@@ -42,10 +52,30 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
+
+    allow_origins=[
+        # Local development
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+
+        # Current LAN frontend
+        "http://192.168.56.1:3000",
+
+        # Also allow the previous Vite port
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://192.168.56.1:5173",
+    ],
+
+    allow_credentials=True,
+
     allow_methods=["*"],
-    allow_headers=["*"],
+
+    allow_headers=[
+        "Content-Type",
+        "Authorization",
+        "Accept",
+    ],
 )
 
 
@@ -56,6 +86,7 @@ app.add_middleware(
 class ReconciliationRequest(BaseModel):
 
     bank_transactions: list
+
     ledger_transactions: list
 
 
@@ -66,6 +97,7 @@ class ReconciliationRequest(BaseModel):
 class CopilotRequest(BaseModel):
 
     question: str
+
     reconciliation_result: dict
 
 
@@ -80,11 +112,12 @@ def home():
         "message": "ReconAI Backend is Running Successfully",
 
         "features": [
+            "Authentication",
             "Financial Reconciliation",
             "AI Finance Copilot",
             "PDF Financial Reports",
-            "Reconciliation History"
-        ]
+            "Reconciliation History",
+        ],
     }
 
 
@@ -94,7 +127,11 @@ def home():
 
 @app.post("/reconcile")
 def reconcile_data(
-    request: ReconciliationRequest
+    request: ReconciliationRequest,
+
+    current_user: User = Depends(
+        get_current_user
+    ),
 ):
 
     try:
@@ -109,9 +146,8 @@ def reconcile_data(
                 status_code=400,
                 detail=(
                     "Bank transactions cannot be empty."
-                )
+                ),
             )
-
 
         if not request.ledger_transactions:
 
@@ -119,9 +155,8 @@ def reconcile_data(
                 status_code=400,
                 detail=(
                     "Ledger transactions cannot be empty."
-                )
+                ),
             )
-
 
         # ---------------------------------
         # CONVERT BANK DATA TO DATAFRAME
@@ -131,7 +166,6 @@ def reconcile_data(
             request.bank_transactions
         )
 
-
         # ---------------------------------
         # CONVERT LEDGER DATA TO DATAFRAME
         # ---------------------------------
@@ -140,16 +174,14 @@ def reconcile_data(
             request.ledger_transactions
         )
 
-
         # ---------------------------------
         # RUN RECONCILIATION ENGINE
         # ---------------------------------
 
         result = reconcile(
             bank_df,
-            ledger_df
+            ledger_df,
         )
-
 
         # ---------------------------------
         # SAVE RECONCILIATION TO HISTORY
@@ -157,10 +189,10 @@ def reconcile_data(
 
         history_record = (
             add_reconciliation_history(
-                result
+                result,
+                user_id=current_user.id,
             )
         )
-
 
         # ---------------------------------
         # ADD HISTORY INFORMATION
@@ -168,7 +200,7 @@ def reconcile_data(
 
         if isinstance(
             history_record,
-            dict
+            dict,
         ):
 
             result["history_id"] = (
@@ -179,24 +211,21 @@ def reconcile_data(
                 history_record.get("created_at")
             )
 
-
         # ---------------------------------
         # RETURN RESULT
         # ---------------------------------
 
         return result
 
-
     except HTTPException:
 
         raise
-
 
     except Exception as error:
 
         print(
             "RECONCILIATION ERROR:",
-            str(error)
+            str(error),
         )
 
         raise HTTPException(
@@ -204,7 +233,7 @@ def reconcile_data(
             detail=(
                 "Reconciliation failed: "
                 f"{str(error)}"
-            )
+            ),
         )
 
 
@@ -214,7 +243,11 @@ def reconcile_data(
 
 @app.post("/copilot")
 def copilot(
-    request: CopilotRequest
+    request: CopilotRequest,
+
+    current_user: User = Depends(
+        get_current_user
+    ),
 ):
 
     try:
@@ -225,31 +258,27 @@ def copilot(
                 status_code=400,
                 detail=(
                     "Question cannot be empty."
-                )
+                ),
             )
-
 
         result = (
             generate_copilot_response(
                 request.question,
-                request.reconciliation_result
+                request.reconciliation_result,
             )
         )
 
-
         return result
-
 
     except HTTPException:
 
         raise
 
-
     except Exception as error:
 
         print(
             "COPILOT ERROR:",
-            str(error)
+            str(error),
         )
 
         raise HTTPException(
@@ -257,7 +286,7 @@ def copilot(
             detail=(
                 "Copilot failed: "
                 f"{str(error)}"
-            )
+            ),
         )
 
 
@@ -267,7 +296,11 @@ def copilot(
 
 @app.post("/report/pdf")
 def generate_report(
-    reconciliation_result: dict
+    reconciliation_result: dict,
+
+    current_user: User = Depends(
+        get_current_user
+    ),
 ):
 
     try:
@@ -278,9 +311,8 @@ def generate_report(
                 status_code=400,
                 detail=(
                     "Reconciliation result is required."
-                )
+                ),
             )
-
 
         # ---------------------------------
         # GENERATE PDF
@@ -291,7 +323,6 @@ def generate_report(
                 reconciliation_result
             )
         )
-
 
         # ---------------------------------
         # RETURN PDF FILE
@@ -310,21 +341,18 @@ def generate_report(
                     "filename=ReconAI_Financial_Report.pdf"
                 )
 
-            }
-
+            },
         )
-
 
     except HTTPException:
 
         raise
 
-
     except Exception as error:
 
         print(
             "PDF REPORT ERROR:",
-            str(error)
+            str(error),
         )
 
         raise HTTPException(
@@ -332,7 +360,7 @@ def generate_report(
             detail=(
                 "PDF report generation failed: "
                 f"{str(error)}"
-            )
+            ),
         )
 
 
@@ -341,14 +369,19 @@ def generate_report(
 # =====================================
 
 @app.get("/history")
-def get_history():
+def get_history(
+    current_user: User = Depends(
+        get_current_user
+    ),
+):
 
     try:
 
         history = (
-            get_reconciliation_history()
+            get_reconciliation_history(
+                user_id=current_user.id
+            )
         )
-
 
         return {
 
@@ -356,16 +389,15 @@ def get_history():
                 len(history),
 
             "history":
-                history
+                history,
 
         }
-
 
     except Exception as error:
 
         print(
             "GET HISTORY ERROR:",
-            str(error)
+            str(error),
         )
 
         raise HTTPException(
@@ -373,7 +405,7 @@ def get_history():
             detail=(
                 "Failed to retrieve history: "
                 f"{str(error)}"
-            )
+            ),
         )
 
 
@@ -383,17 +415,21 @@ def get_history():
 
 @app.get("/history/{history_id}")
 def get_history_record(
-    history_id: str
+    history_id: int,
+
+    current_user: User = Depends(
+        get_current_user
+    ),
 ):
 
     try:
 
         record = (
             get_history_by_id(
-                history_id
+                history_id,
+                user_id=current_user.id,
             )
         )
-
 
         if record is None:
 
@@ -402,23 +438,20 @@ def get_history_record(
                 detail=(
                     "Reconciliation history "
                     "record not found."
-                )
+                ),
             )
 
-
         return record
-
 
     except HTTPException:
 
         raise
 
-
     except Exception as error:
 
         print(
             "GET HISTORY RECORD ERROR:",
-            str(error)
+            str(error),
         )
 
         raise HTTPException(
@@ -426,7 +459,7 @@ def get_history_record(
             detail=(
                 "Failed to retrieve history record: "
                 f"{str(error)}"
-            )
+            ),
         )
 
 
@@ -436,17 +469,21 @@ def get_history_record(
 
 @app.delete("/history/{history_id}")
 def delete_history(
-    history_id: str
+    history_id: int,
+
+    current_user: User = Depends(
+        get_current_user
+    ),
 ):
 
     try:
 
         deleted = (
             delete_history_record(
-                history_id
+                history_id,
+                user_id=current_user.id,
             )
         )
-
 
         if not deleted:
 
@@ -455,9 +492,8 @@ def delete_history(
                 detail=(
                     "Reconciliation history "
                     "record not found."
-                )
+                ),
             )
-
 
         return {
 
@@ -467,21 +503,19 @@ def delete_history(
             ),
 
             "history_id":
-                history_id
+                history_id,
 
         }
-
 
     except HTTPException:
 
         raise
 
-
     except Exception as error:
 
         print(
             "DELETE HISTORY ERROR:",
-            str(error)
+            str(error),
         )
 
         raise HTTPException(
@@ -489,7 +523,7 @@ def delete_history(
             detail=(
                 "Failed to delete history record: "
                 f"{str(error)}"
-            )
+            ),
         )
 
 
@@ -498,12 +532,17 @@ def delete_history(
 # =====================================
 
 @app.delete("/history")
-def clear_history():
+def clear_history(
+    current_user: User = Depends(
+        get_current_user
+    ),
+):
 
     try:
 
-        clear_reconciliation_history()
-
+        clear_reconciliation_history(
+            user_id=current_user.id
+        )
 
         return {
 
@@ -514,12 +553,11 @@ def clear_history():
 
         }
 
-
     except Exception as error:
 
         print(
             "CLEAR HISTORY ERROR:",
-            str(error)
+            str(error),
         )
 
         raise HTTPException(
@@ -527,5 +565,5 @@ def clear_history():
             detail=(
                 "Failed to clear history: "
                 f"{str(error)}"
-            )
+            ),
         )

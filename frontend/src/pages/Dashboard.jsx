@@ -1100,10 +1100,11 @@ export const Dashboard = () => {
       ========================================= */}
 
       <ActionQueue
-        onInvestigateItem={() =>
-          navigate('/investigation')
-        }
-      />
+  items={exceptions}
+  onInvestigateItem={(item) =>
+    navigate('/investigation')
+  }
+/>
 
     </div>
   );
