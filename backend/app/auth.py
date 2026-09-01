@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta, timezone
+import json
 import os
-import smtplib
-
-from email.message import EmailMessage
+import urllib.error
+import urllib.request
 
 from fastapi import (
     APIRouter,
@@ -55,45 +55,26 @@ FRONTEND_URL = os.getenv(
 
 
 # ============================================================
-# HOSTINGER SMTP CONFIGURATION
+# RESEND EMAIL CONFIGURATION
 # ============================================================
 
-SMTP_HOST = os.getenv(
-    "SMTP_HOST",
-    "smtp.hostinger.com",
-)
-
-SMTP_PORT = int(
-    os.getenv(
-        "SMTP_PORT",
-        "587",
-    )
-)
-
-SMTP_USERNAME = os.getenv(
-    "SMTP_USERNAME"
-)
-
-SMTP_PASSWORD = os.getenv(
-    "SMTP_PASSWORD"
+RESEND_API_KEY = os.getenv(
+    "RESEND_API_KEY"
 )
 
 EMAIL_FROM = os.getenv(
     "EMAIL_FROM",
-    SMTP_USERNAME or "",
+    "ReconAI <anjali@theonestop.in>",
 )
 
 
-if SMTP_USERNAME and SMTP_PASSWORD:
-
+if RESEND_API_KEY:
     print(
-        "Hostinger SMTP email client configured successfully."
+        "Resend email client configured successfully."
     )
-
 else:
-
     print(
-        "WARNING: SMTP is not configured."
+        "WARNING: RESEND_API_KEY is not configured."
     )
 
 
@@ -107,14 +88,13 @@ pwd_context = CryptContext(
 )
 
 
-def hash_password(password: str) -> str:
-    """
-    Hash password using bcrypt.
+def validate_password_length(
+    password: str,
+) -> None:
 
-    bcrypt has a 72-byte password limit.
-    """
-
-    password_bytes = password.encode("utf-8")
+    password_bytes = password.encode(
+        "utf-8"
+    )
 
     if len(password_bytes) > 72:
 
@@ -122,24 +102,37 @@ def hash_password(password: str) -> str:
             status_code=400,
             detail=(
                 "Password is too long. "
-                "Please use a password of 72 bytes or fewer."
+                "Please use a password of "
+                "72 bytes or fewer."
             ),
         )
 
-    return pwd_context.hash(password)
+
+def hash_password(
+    password: str,
+) -> str:
+
+    validate_password_length(
+        password
+    )
+
+    return pwd_context.hash(
+        password
+    )
 
 
 def verify_password(
     plain_password: str,
     hashed_password: str,
 ) -> bool:
-    """
-    Verify a password against its bcrypt hash.
-    """
 
-    password_bytes = plain_password.encode("utf-8")
+    try:
 
-    if len(password_bytes) > 72:
+        validate_password_length(
+            plain_password
+        )
+
+    except HTTPException:
 
         return False
 
@@ -186,6 +179,7 @@ def create_access_token(
     payload = {
         "sub": str(user_id),
         "email": email,
+        "type": "access",
         "exp": expire,
     }
 
@@ -207,7 +201,9 @@ def create_verification_token(
 
     expire = (
         datetime.now(timezone.utc)
-        + timedelta(hours=24)
+        + timedelta(
+            hours=24
+        )
     )
 
     payload = {
@@ -225,48 +221,33 @@ def create_verification_token(
 
 
 # ============================================================
-# SEND VERIFICATION EMAIL USING HOSTINGER SMTP
+# SEND EMAIL USING RESEND API
 # ============================================================
 
 def send_verification_email(
     email: str,
     name: str,
     verification_token: str,
-):
+) -> None:
+
     """
-    Send email verification using Hostinger SMTP.
+    Send email verification using Resend API.
 
-    Railway variables required:
+    Required environment variables:
 
-        SMTP_HOST
-        SMTP_PORT
-        SMTP_USERNAME
-        SMTP_PASSWORD
+        RESEND_API_KEY
         EMAIL_FROM
         FRONTEND_URL
-
-    Recommended SMTP settings:
-
-        SMTP_HOST=smtp.hostinger.com
-        SMTP_PORT=587
-
-    Port 587 uses STARTTLS.
     """
 
     # --------------------------------------------------------
-    # CHECK SMTP CONFIGURATION
+    # CHECK RESEND CONFIGURATION
     # --------------------------------------------------------
 
-    if not SMTP_USERNAME:
+    if not RESEND_API_KEY:
 
         raise RuntimeError(
-            "SMTP_USERNAME is not configured."
-        )
-
-    if not SMTP_PASSWORD:
-
-        raise RuntimeError(
-            "SMTP_PASSWORD is not configured."
+            "RESEND_API_KEY is not configured."
         )
 
     if not EMAIL_FROM:
@@ -279,7 +260,9 @@ def send_verification_email(
     # CREATE VERIFICATION URL
     # --------------------------------------------------------
 
-    frontend_url = FRONTEND_URL.rstrip("/")
+    frontend_url = (
+        FRONTEND_URL.rstrip("/")
+    )
 
     verification_url = (
         f"{frontend_url}"
@@ -288,125 +271,252 @@ def send_verification_email(
     )
 
     # --------------------------------------------------------
-    # CREATE EMAIL
+    # EMAIL HTML
     # --------------------------------------------------------
 
-    message = EmailMessage()
+    html_content = f"""
+<!DOCTYPE html>
 
-    message["Subject"] = (
-        "Verify your ReconAI account"
-    )
+<html>
 
-    message["From"] = EMAIL_FROM
+<head>
 
-    message["To"] = email
+    <meta charset="UTF-8">
 
-    message.set_content(
-        f"""
-Hello {name},
+    <title>
+        Verify your ReconAI account
+    </title>
 
-Welcome to ReconAI!
+</head>
 
-Thank you for creating your ReconAI account.
+<body
+    style="
+        margin: 0;
+        padding: 0;
+        background-color: #f5f5f5;
+        font-family: Arial, Helvetica, sans-serif;
+    "
+>
 
-Please verify your email address by clicking
-the link below:
+    <div
+        style="
+            max-width: 600px;
+            margin: 40px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+        "
+    >
 
-{verification_url}
+        <h1
+            style="
+                margin-top: 0;
+                color: #111827;
+            "
+        >
+            Welcome to ReconAI
+        </h1>
 
-This verification link will expire in 24 hours.
+        <p
+            style="
+                font-size: 16px;
+                color: #374151;
+            "
+        >
+            Hello {name},
+        </p>
 
-If you did not create a ReconAI account,
-you can safely ignore this email.
+        <p
+            style="
+                font-size: 16px;
+                color: #374151;
+                line-height: 1.6;
+            "
+        >
+            Thank you for creating your
+            ReconAI account.
+        </p>
 
-Regards,
-ReconAI Team
+        <p
+            style="
+                font-size: 16px;
+                color: #374151;
+                line-height: 1.6;
+            "
+        >
+            Please click the button below
+            to verify your email address.
+        </p>
+
+        <div
+            style="
+                margin: 30px 0;
+                text-align: center;
+            "
+        >
+
+            <a
+                href="{verification_url}"
+                style="
+                    display: inline-block;
+                    padding: 14px 28px;
+                    background-color: #7c3aed;
+                    color: white;
+                    text-decoration: none;
+                    border-radius: 8px;
+                    font-size: 16px;
+                    font-weight: bold;
+                "
+            >
+                Verify Email Address
+            </a>
+
+        </div>
+
+        <p
+            style="
+                font-size: 14px;
+                color: #6b7280;
+                line-height: 1.6;
+            "
+        >
+            This verification link will
+            expire in 24 hours.
+        </p>
+
+        <p
+            style="
+                font-size: 14px;
+                color: #6b7280;
+                line-height: 1.6;
+            "
+        >
+            If you did not create a ReconAI
+            account, you can safely ignore
+            this email.
+        </p>
+
+        <hr
+            style="
+                margin: 30px 0;
+                border: none;
+                border-top: 1px solid #e5e7eb;
+            "
+        >
+
+        <p
+            style="
+                font-size: 13px;
+                color: #9ca3af;
+            "
+        >
+            ReconAI Team
+        </p>
+
+    </div>
+
+</body>
+
+</html>
 """
+
+    # --------------------------------------------------------
+    # RESEND API REQUEST
+    # --------------------------------------------------------
+
+    payload = {
+        "from": EMAIL_FROM,
+        "to": [email],
+        "subject": "Verify your ReconAI account",
+        "html": html_content,
+    }
+
+    request_data = json.dumps(
+        payload
+    ).encode("utf-8")
+
+    request = urllib.request.Request(
+        "https://api.resend.com/emails",
+        data=request_data,
+        method="POST",
+        headers={
+            "Authorization": (
+                f"Bearer {RESEND_API_KEY}"
+            ),
+            "Content-Type": "application/json",
+        },
     )
 
     # --------------------------------------------------------
-    # SEND EMAIL USING HOSTINGER SMTP
+    # SEND EMAIL
     # --------------------------------------------------------
 
     try:
 
-        if SMTP_PORT == 465:
+        with urllib.request.urlopen(
+            request,
+            timeout=20,
+        ) as response:
 
-            # SSL connection
-            import ssl
+            response_body = (
+                response.read()
+                .decode("utf-8")
+            )
 
-            context = ssl.create_default_context()
+            print(
+                "VERIFICATION EMAIL SENT SUCCESSFULLY"
+            )
 
-            with smtplib.SMTP_SSL(
-                SMTP_HOST,
-                SMTP_PORT,
-                timeout=30,
-                context=context,
-            ) as server:
+            print(
+                "Recipient:",
+                email,
+            )
 
-                server.ehlo()
+            print(
+                "Resend response:",
+                response_body,
+            )
 
-                server.login(
-                    SMTP_USERNAME,
-                    SMTP_PASSWORD,
-                )
+    except urllib.error.HTTPError as error:
 
-                server.send_message(
-                    message
-                )
+        error_body = ""
 
-        else:
+        try:
 
-            # STARTTLS connection
-            with smtplib.SMTP(
-                SMTP_HOST,
-                SMTP_PORT,
-                timeout=30,
-            ) as server:
+            error_body = (
+                error.read()
+                .decode("utf-8")
+            )
 
-                server.ehlo()
+        except Exception:
 
-                server.starttls()
-
-                server.ehlo()
-
-                server.login(
-                    SMTP_USERNAME,
-                    SMTP_PASSWORD,
-                )
-
-                server.send_message(
-                    message
-                )
+            pass
 
         print(
-            "VERIFICATION EMAIL SENT SUCCESSFULLY"
+            "RESEND API ERROR:",
+            error.code,
+            error_body,
         )
 
-        print(
-            "SMTP Host:",
-            SMTP_HOST,
+        raise RuntimeError(
+            "Resend failed to send email."
         )
 
-        print(
-            "SMTP Port:",
-            SMTP_PORT,
-        )
+    except urllib.error.URLError as error:
 
         print(
-            "Sender:",
-            EMAIL_FROM,
+            "RESEND NETWORK ERROR:",
+            str(error),
         )
 
-        print(
-            "Recipient:",
-            email,
+        raise RuntimeError(
+            "Could not connect to Resend."
         )
 
     except Exception as error:
 
         print(
-            "SMTP EMAIL ERROR:",
+            "RESEND EMAIL ERROR:",
             str(error),
         )
 
@@ -443,6 +553,11 @@ class ChangePasswordRequest(BaseModel):
     current_password: str
 
     new_password: str
+
+
+class ResendVerificationRequest(BaseModel):
+
+    email: EmailStr
 
 
 # ============================================================
@@ -531,18 +646,9 @@ def signup(
             ),
         )
 
-    if len(
-        password.encode("utf-8")
-    ) > 72:
-
-        raise HTTPException(
-            status_code=400,
-            detail=(
-                "Password is too long. "
-                "Please use a password "
-                "of 72 bytes or fewer."
-            ),
-        )
+    validate_password_length(
+        password
+    )
 
     # --------------------------------------------------------
     # CHECK EXISTING USER
@@ -646,7 +752,9 @@ def signup(
 
         email_status = (
             "Account created, but the "
-            "verification email could not be sent."
+            "verification email could not "
+            "be sent. Please use the "
+            "resend verification option."
         )
 
     # --------------------------------------------------------
@@ -676,6 +784,104 @@ def signup(
         ),
 
     )
+
+
+# ============================================================
+# RESEND VERIFICATION EMAIL
+# ============================================================
+
+@router.post(
+    "/resend-verification"
+)
+def resend_verification(
+    request: ResendVerificationRequest,
+    db: Session = Depends(get_db),
+):
+
+    email = (
+        str(request.email)
+        .lower()
+        .strip()
+    )
+
+    user = (
+        db.query(User)
+        .filter(
+            User.email == email
+        )
+        .first()
+    )
+
+    # --------------------------------------------------------
+    # DO NOT REVEAL WHETHER ACCOUNT EXISTS
+    # --------------------------------------------------------
+
+    if not user:
+
+        return {
+            "message": (
+                "If an account exists with "
+                "this email, a verification "
+                "email has been sent."
+            )
+        }
+
+    # --------------------------------------------------------
+    # ALREADY VERIFIED
+    # --------------------------------------------------------
+
+    if user.is_verified:
+
+        return {
+            "message": (
+                "This email address is "
+                "already verified."
+            )
+        }
+
+    # --------------------------------------------------------
+    # CREATE NEW TOKEN
+    # --------------------------------------------------------
+
+    verification_token = (
+        create_verification_token(
+            user.id,
+            user.email,
+        )
+    )
+
+    # --------------------------------------------------------
+    # SEND EMAIL
+    # --------------------------------------------------------
+
+    try:
+
+        send_verification_email(
+            user.email,
+            user.name,
+            verification_token,
+        )
+
+    except Exception as error:
+
+        print(
+            "RESEND VERIFICATION ERROR:",
+            str(error),
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail=(
+                "Unable to send verification "
+                "email right now."
+            ),
+        )
+
+    return {
+        "message": (
+            "Verification email sent successfully."
+        )
+    }
 
 
 # ============================================================
@@ -714,6 +920,10 @@ def verify_email(
 
         user_id = payload.get("sub")
 
+        token_email = payload.get(
+            "email"
+        )
+
         if not user_id:
 
             raise HTTPException(
@@ -737,9 +947,15 @@ def verify_email(
             ),
         )
 
+    # --------------------------------------------------------
+    # FIND USER
+    # --------------------------------------------------------
+
     try:
 
-        user_id_int = int(user_id)
+        user_id_int = int(
+            user_id
+        )
 
     except (TypeError, ValueError):
 
@@ -765,6 +981,27 @@ def verify_email(
             detail="User not found.",
         )
 
+    # --------------------------------------------------------
+    # MAKE SURE TOKEN EMAIL MATCHES USER
+    # --------------------------------------------------------
+
+    if (
+        token_email
+        and token_email.lower()
+        != user.email.lower()
+    ):
+
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Invalid verification token."
+            ),
+        )
+
+    # --------------------------------------------------------
+    # ALREADY VERIFIED
+    # --------------------------------------------------------
+
     if user.is_verified:
 
         return {
@@ -773,6 +1010,10 @@ def verify_email(
             ),
             "email": user.email,
         }
+
+    # --------------------------------------------------------
+    # VERIFY USER
+    # --------------------------------------------------------
 
     user.is_verified = True
 
@@ -824,6 +1065,10 @@ def login(
         .strip()
     )
 
+    # --------------------------------------------------------
+    # FIND USER
+    # --------------------------------------------------------
+
     user = (
         db.query(User)
         .filter(
@@ -841,6 +1086,10 @@ def login(
             ),
         )
 
+    # --------------------------------------------------------
+    # CHECK PASSWORD
+    # --------------------------------------------------------
+
     if not verify_password(
         request.password,
         user.hashed_password,
@@ -853,6 +1102,10 @@ def login(
             ),
         )
 
+    # --------------------------------------------------------
+    # CHECK EMAIL VERIFICATION
+    # --------------------------------------------------------
+
     if not user.is_verified:
 
         raise HTTPException(
@@ -863,12 +1116,20 @@ def login(
             ),
         )
 
+    # --------------------------------------------------------
+    # CREATE ACCESS TOKEN
+    # --------------------------------------------------------
+
     access_token = (
         create_access_token(
             user.id,
             user.email,
         )
     )
+
+    # --------------------------------------------------------
+    # RESPONSE
+    # --------------------------------------------------------
 
     return AuthResponse(
 
@@ -920,7 +1181,25 @@ def get_current_user(
             ],
         )
 
-        user_id = payload.get("sub")
+        # ----------------------------------------------------
+        # ONLY ACCEPT ACCESS TOKENS
+        # ----------------------------------------------------
+
+        if (
+            payload.get("type")
+            != "access"
+        ):
+
+            raise HTTPException(
+                status_code=401,
+                detail=(
+                    "Invalid authentication token."
+                ),
+            )
+
+        user_id = payload.get(
+            "sub"
+        )
 
         if not user_id:
 
@@ -945,9 +1224,15 @@ def get_current_user(
             ),
         )
 
+    # --------------------------------------------------------
+    # CONVERT USER ID
+    # --------------------------------------------------------
+
     try:
 
-        user_id_int = int(user_id)
+        user_id_int = int(
+            user_id
+        )
 
     except (TypeError, ValueError):
 
@@ -957,6 +1242,10 @@ def get_current_user(
                 "Invalid authentication token."
             ),
         )
+
+    # --------------------------------------------------------
+    # FIND USER
+    # --------------------------------------------------------
 
     user = (
         db.query(User)
@@ -1126,18 +1415,9 @@ def change_password(
             ),
         )
 
-    if len(
-        request.new_password.encode(
-            "utf-8"
-        )
-    ) > 72:
-
-        raise HTTPException(
-            status_code=400,
-            detail=(
-                "Password is too long."
-            ),
-        )
+    validate_password_length(
+        request.new_password
+    )
 
     # --------------------------------------------------------
     # UPDATE PASSWORD
