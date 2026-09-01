@@ -83,9 +83,7 @@ def hash_password(password: str) -> str:
             ),
         )
 
-    return pwd_context.hash(
-        password
-    )
+    return pwd_context.hash(password)
 
 
 def verify_password(
@@ -93,9 +91,7 @@ def verify_password(
     hashed_password: str,
 ) -> bool:
 
-    password_bytes = (
-        plain_password.encode("utf-8")
-    )
+    password_bytes = plain_password.encode("utf-8")
 
     if len(password_bytes) > 72:
 
@@ -135,23 +131,16 @@ def create_access_token(
 ) -> str:
 
     expire = (
-
         datetime.now(timezone.utc)
-
         + timedelta(
             minutes=ACCESS_TOKEN_EXPIRE_MINUTES
         )
-
     )
 
     payload = {
-
         "sub": str(user_id),
-
         "email": email,
-
         "exp": expire,
-
     }
 
     return jwt.encode(
@@ -171,23 +160,15 @@ def create_verification_token(
 ) -> str:
 
     expire = (
-
         datetime.now(timezone.utc)
-
         + timedelta(hours=24)
-
     )
 
     payload = {
-
         "sub": str(user_id),
-
         "email": email,
-
         "type": "email_verification",
-
         "exp": expire,
-
     }
 
     return jwt.encode(
@@ -261,18 +242,12 @@ def send_verification_email(
     # CREATE VERIFICATION URL
     # --------------------------------------------------------
 
-    frontend_url = (
-        frontend_url.rstrip("/")
-    )
+    frontend_url = frontend_url.rstrip("/")
 
     verification_url = (
-
         f"{frontend_url}"
-
         f"/verify-email?token="
-
         f"{verification_token}"
-
     )
 
     # --------------------------------------------------------
@@ -418,29 +393,19 @@ def signup(
 
     request: SignupRequest,
 
-    db: Session = Depends(
-        get_db
-    ),
+    db: Session = Depends(get_db),
 
 ):
 
     email = (
-
         str(request.email)
-
         .lower()
-
         .strip()
-
     )
 
-    name = (
-        request.name.strip()
-    )
+    name = request.name.strip()
 
-    password = (
-        request.password
-    )
+    password = request.password
 
     # --------------------------------------------------------
     # VALIDATE NAME
@@ -485,15 +450,11 @@ def signup(
     # --------------------------------------------------------
 
     existing_user = (
-
         db.query(User)
-
         .filter(
             User.email == email
         )
-
         .first()
-
     )
 
     if existing_user:
@@ -510,8 +471,8 @@ def signup(
     # HASH PASSWORD
     # --------------------------------------------------------
 
-    hashed_password = (
-        hash_password(password)
+    hashed_password = hash_password(
+        password
     )
 
     # --------------------------------------------------------
@@ -557,12 +518,10 @@ def signup(
     # --------------------------------------------------------
 
     verification_token = (
-
         create_verification_token(
             user.id,
             user.email,
         )
-
     )
 
     # --------------------------------------------------------
@@ -603,13 +562,9 @@ def signup(
     return AuthResponse(
 
         message=(
-
             "Account created successfully. "
-
             "Please verify your email. "
-
             f"{email_status}"
-
         ),
 
         user=UserResponse(
@@ -640,9 +595,7 @@ def verify_email(
 
     token: str,
 
-    db: Session = Depends(
-        get_db
-    ),
+    db: Session = Depends(get_db),
 
 ):
 
@@ -700,15 +653,11 @@ def verify_email(
         )
 
     user = (
-
         db.query(User)
-
         .filter(
             User.id == int(user_id)
         )
-
         .first()
-
     )
 
     if not user:
@@ -776,32 +725,22 @@ def login(
 
     request: LoginRequest,
 
-    db: Session = Depends(
-        get_db
-    ),
+    db: Session = Depends(get_db),
 
 ):
 
     email = (
-
         str(request.email)
-
         .lower()
-
         .strip()
-
     )
 
     user = (
-
         db.query(User)
-
         .filter(
             User.email == email
         )
-
         .first()
-
     )
 
     if not user:
@@ -839,12 +778,10 @@ def login(
         )
 
     access_token = (
-
         create_access_token(
             user.id,
             user.email,
         )
-
     )
 
     return AuthResponse(
@@ -888,9 +825,7 @@ def get_current_user(
 
 ):
 
-    token = (
-        credentials.credentials
-    )
+    token = credentials.credentials
 
     try:
 
@@ -934,15 +869,11 @@ def get_current_user(
         )
 
     user = (
-
         db.query(User)
-
         .filter(
             User.id == int(user_id)
         )
-
         .first()
-
     )
 
     if not user:
@@ -1010,9 +941,7 @@ def update_profile(
 
 ):
 
-    name = (
-        request.name.strip()
-    )
+    name = request.name.strip()
 
     if not name:
 
@@ -1146,6 +1075,8 @@ def change_password(
     try:
 
         db.commit()
+
+        db.refresh(current_user)
 
     except Exception as error:
 
