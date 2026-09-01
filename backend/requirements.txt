@@ -29,4 +29,3 @@ email-validator==2.3.0
 reportlab==4.4.9
 google-genai==1.55.0
 pymysql==1.1.2
-PyMySQL==1.1.1
