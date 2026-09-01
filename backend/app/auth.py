@@ -1,7 +1,8 @@
 from datetime import datetime, timedelta, timezone
 import os
+import smtplib
 
-import resend
+from email.message import EmailMessage
 
 from fastapi import (
     APIRouter,
@@ -52,25 +53,45 @@ FRONTEND_URL = os.getenv(
     "http://localhost:3000",
 )
 
-RESEND_API_KEY = os.getenv(
-    "RESEND_API_KEY"
+
+# ============================================================
+# GMAIL SMTP CONFIGURATION
+# ============================================================
+
+GMAIL_SMTP_HOST = "smtp.gmail.com"
+
+GMAIL_SMTP_PORT = int(
+    os.getenv(
+        "GMAIL_SMTP_PORT",
+        "587",
+    )
+)
+
+GMAIL_USERNAME = os.getenv(
+    "GMAIL_USERNAME"
+)
+
+GMAIL_APP_PASSWORD = os.getenv(
+    "GMAIL_APP_PASSWORD"
 )
 
 EMAIL_FROM = os.getenv(
     "EMAIL_FROM",
-    "onboarding@resend.dev",
+    GMAIL_USERNAME or "",
 )
 
 
-# ============================================================
-# RESEND CONFIGURATION
-# ============================================================
+if GMAIL_USERNAME and GMAIL_APP_PASSWORD:
 
-if RESEND_API_KEY:
-    resend.api_key = RESEND_API_KEY
-    print("Resend email client initialized successfully.")
+    print(
+        "Gmail SMTP email client configured successfully."
+    )
+
 else:
-    print("WARNING: RESEND_API_KEY is not configured.")
+
+    print(
+        "WARNING: Gmail SMTP is not configured."
+    )
 
 
 # ============================================================
@@ -84,15 +105,11 @@ pwd_context = CryptContext(
 
 
 def hash_password(password: str) -> str:
-    """
-    Hash password using bcrypt.
-
-    bcrypt has a 72-byte password limit.
-    """
 
     password_bytes = password.encode("utf-8")
 
     if len(password_bytes) > 72:
+
         raise HTTPException(
             status_code=400,
             detail=(
@@ -108,22 +125,22 @@ def verify_password(
     plain_password: str,
     hashed_password: str,
 ) -> bool:
-    """
-    Verify a password against its bcrypt hash.
-    """
 
     password_bytes = plain_password.encode("utf-8")
 
     if len(password_bytes) > 72:
+
         return False
 
     try:
+
         return pwd_context.verify(
             plain_password,
             hashed_password,
         )
 
     except Exception as error:
+
         print(
             "PASSWORD VERIFICATION ERROR:",
             str(error),
@@ -197,7 +214,7 @@ def create_verification_token(
 
 
 # ============================================================
-# SEND VERIFICATION EMAIL
+# SEND VERIFICATION EMAIL USING GMAIL
 # ============================================================
 
 def send_verification_email(
@@ -205,16 +222,35 @@ def send_verification_email(
     name: str,
     verification_token: str,
 ):
-    """
-    Send email verification using Resend.
 
-    No SMTP is used.
+    """
+    Send email verification using Gmail SMTP.
+
+    Uses:
+        GMAIL_USERNAME
+        GMAIL_APP_PASSWORD
+        FRONTEND_URL
     """
 
-    if not RESEND_API_KEY:
+    # --------------------------------------------------------
+    # CHECK GMAIL CONFIGURATION
+    # --------------------------------------------------------
+
+    if not GMAIL_USERNAME:
+
         raise RuntimeError(
-            "RESEND_API_KEY is not configured."
+            "GMAIL_USERNAME is not configured."
         )
+
+    if not GMAIL_APP_PASSWORD:
+
+        raise RuntimeError(
+            "GMAIL_APP_PASSWORD is not configured."
+        )
+
+    # --------------------------------------------------------
+    # CREATE VERIFICATION URL
+    # --------------------------------------------------------
 
     frontend_url = FRONTEND_URL.rstrip("/")
 
@@ -224,95 +260,83 @@ def send_verification_email(
         f"?token={verification_token}"
     )
 
-    message = {
-        "from": EMAIL_FROM,
-        "to": [email],
-        "subject": "Verify your ReconAI account",
-        "html": f"""
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Verify your ReconAI account</title>
-</head>
+    # --------------------------------------------------------
+    # CREATE EMAIL
+    # --------------------------------------------------------
 
-<body>
+    message = EmailMessage()
 
-    <h2>Welcome to ReconAI, {name}!</h2>
+    message["Subject"] = (
+        "Verify your ReconAI account"
+    )
 
-    <p>
-        Thank you for creating your ReconAI account.
-    </p>
+    message["From"] = EMAIL_FROM
 
-    <p>
-        Please click the button below to verify
-        your email address:
-    </p>
+    message["To"] = email
 
-    <p>
-        <a
-            href="{verification_url}"
-            style="
-                display:inline-block;
-                padding:12px 20px;
-                background:#6d28d9;
-                color:white;
-                text-decoration:none;
-                border-radius:6px;
-            "
-        >
-            Verify Email
-        </a>
-    </p>
+    message.set_content(
+        f"""
+Hello {name},
 
-    <p>
-        Or copy and paste this link into your browser:
-    </p>
+Welcome to ReconAI!
 
-    <p>
-        {verification_url}
-    </p>
+Thank you for creating your ReconAI account.
 
-    <p>
-        This verification link will expire in 24 hours.
-    </p>
+Please verify your email address by clicking
+the link below:
 
-    <p>
-        If you did not create a ReconAI account,
-        you can safely ignore this email.
-    </p>
+{verification_url}
 
-    <p>
-        Regards,<br>
-        ReconAI Team
-    </p>
+This verification link will expire in 24 hours.
 
-</body>
-</html>
-""",
-    }
+If you did not create a ReconAI account,
+you can safely ignore this email.
+
+Regards,
+ReconAI Team
+"""
+    )
+
+    # --------------------------------------------------------
+    # SEND EMAIL USING GMAIL SMTP
+    # --------------------------------------------------------
 
     try:
 
-        response = resend.Emails.send(
-            message
-        )
+        with smtplib.SMTP(
+            GMAIL_SMTP_HOST,
+            GMAIL_SMTP_PORT,
+            timeout=20,
+        ) as server:
+
+            server.ehlo()
+
+            server.starttls()
+
+            server.ehlo()
+
+            server.login(
+                GMAIL_USERNAME,
+                GMAIL_APP_PASSWORD,
+            )
+
+            server.send_message(
+                message
+            )
 
         print(
             "VERIFICATION EMAIL SENT SUCCESSFULLY"
         )
 
         print(
-            "Resend response:",
-            response,
+            "Recipient:",
+            email,
         )
-
-        return response
 
     except Exception as error:
 
         print(
-            "RESEND EMAIL ERROR:",
+            "GMAIL SMTP ERROR:",
             str(error),
         )
 

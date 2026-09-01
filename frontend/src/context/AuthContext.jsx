@@ -7,7 +7,9 @@ import React, {
 
 const AuthContext = createContext(null);
 
-const API_URL = "http://192.168.56.1:8000";
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:8000";
 
 // ============================================================
 // AUTH PROVIDER
