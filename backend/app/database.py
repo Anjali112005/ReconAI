@@ -27,6 +27,18 @@ if not DATABASE_URL:
 
 
 # ============================================================
+# CONVERT MYSQL URL TO PYMYSQL DRIVER
+# ============================================================
+
+if DATABASE_URL.startswith("mysql://"):
+    DATABASE_URL = DATABASE_URL.replace(
+        "mysql://",
+        "mysql+pymysql://",
+        1
+    )
+
+
+# ============================================================
 # SQLALCHEMY ENGINE
 # ============================================================
 
