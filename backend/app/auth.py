@@ -1,8 +1,7 @@
 from datetime import datetime, timedelta, timezone
 import os
-import smtplib
 
-from email.message import EmailMessage
+import resend
 
 from fastapi import (
     APIRouter,
@@ -48,6 +47,31 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(
     )
 )
 
+FRONTEND_URL = os.getenv(
+    "FRONTEND_URL",
+    "http://localhost:3000",
+)
+
+RESEND_API_KEY = os.getenv(
+    "RESEND_API_KEY"
+)
+
+EMAIL_FROM = os.getenv(
+    "EMAIL_FROM",
+    "onboarding@resend.dev",
+)
+
+
+# ============================================================
+# RESEND CONFIGURATION
+# ============================================================
+
+if RESEND_API_KEY:
+    resend.api_key = RESEND_API_KEY
+    print("Resend email client initialized successfully.")
+else:
+    print("WARNING: RESEND_API_KEY is not configured.")
+
 
 # ============================================================
 # PASSWORD HASHING
@@ -55,26 +79,20 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(
 
 pwd_context = CryptContext(
     schemes=["bcrypt"],
-    deprecated="auto"
+    deprecated="auto",
 )
 
-def hash_password(password: str) -> str:
-    return pwd_context.hash(password[:72])
-
-
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(
-        plain_password[:72],
-        hashed_password
-    )
-
 
 def hash_password(password: str) -> str:
+    """
+    Hash password using bcrypt.
+
+    bcrypt has a 72-byte password limit.
+    """
 
     password_bytes = password.encode("utf-8")
 
     if len(password_bytes) > 72:
-
         raise HTTPException(
             status_code=400,
             detail=(
@@ -90,22 +108,22 @@ def verify_password(
     plain_password: str,
     hashed_password: str,
 ) -> bool:
+    """
+    Verify a password against its bcrypt hash.
+    """
 
     password_bytes = plain_password.encode("utf-8")
 
     if len(password_bytes) > 72:
-
         return False
 
     try:
-
         return pwd_context.verify(
             plain_password,
             hashed_password,
         )
 
     except Exception as error:
-
         print(
             "PASSWORD VERIFICATION ERROR:",
             str(error),
@@ -151,7 +169,7 @@ def create_access_token(
 
 
 # ============================================================
-# EMAIL VERIFICATION TOKEN
+# CREATE EMAIL VERIFICATION TOKEN
 # ============================================================
 
 def create_verification_token(
@@ -187,128 +205,118 @@ def send_verification_email(
     name: str,
     verification_token: str,
 ):
+    """
+    Send email verification using Resend.
 
-    smtp_host = os.getenv(
-        "SMTP_HOST"
-    )
+    No SMTP is used.
+    """
 
-    smtp_port = int(
-        os.getenv(
-            "SMTP_PORT",
-            "587",
-        )
-    )
-
-    smtp_username = os.getenv(
-        "SMTP_USERNAME"
-    )
-
-    smtp_password = os.getenv(
-        "SMTP_PASSWORD"
-    )
-
-    frontend_url = os.getenv(
-        "FRONTEND_URL",
-        "http://localhost:5173",
-    )
-
-    # --------------------------------------------------------
-    # SMTP NOT CONFIGURED
-    # --------------------------------------------------------
-
-    if not all(
-        [
-            smtp_host,
-            smtp_username,
-            smtp_password,
-        ]
-    ):
-
-        print(
-            "WARNING: SMTP is not configured."
+    if not RESEND_API_KEY:
+        raise RuntimeError(
+            "RESEND_API_KEY is not configured."
         )
 
-        print(
-            "Verification token:"
-        )
-
-        print(
-            verification_token
-        )
-
-        return
-
-    # --------------------------------------------------------
-    # CREATE VERIFICATION URL
-    # --------------------------------------------------------
-
-    frontend_url = frontend_url.rstrip("/")
+    frontend_url = FRONTEND_URL.rstrip("/")
 
     verification_url = (
         f"{frontend_url}"
-        f"/verify-email?token="
-        f"{verification_token}"
+        f"/verify-email"
+        f"?token={verification_token}"
     )
 
-    # --------------------------------------------------------
-    # CREATE EMAIL
-    # --------------------------------------------------------
+    message = {
+        "from": EMAIL_FROM,
+        "to": [email],
+        "subject": "Verify your ReconAI account",
+        "html": f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Verify your ReconAI account</title>
+</head>
 
-    message = EmailMessage()
+<body>
 
-    message["Subject"] = (
-        "Verify your ReconAI account"
-    )
+    <h2>Welcome to ReconAI, {name}!</h2>
 
-    message["From"] = smtp_username
+    <p>
+        Thank you for creating your ReconAI account.
+    </p>
 
-    message["To"] = email
+    <p>
+        Please click the button below to verify
+        your email address:
+    </p>
 
-    message.set_content(
-        f"""
-Hello {name},
+    <p>
+        <a
+            href="{verification_url}"
+            style="
+                display:inline-block;
+                padding:12px 20px;
+                background:#6d28d9;
+                color:white;
+                text-decoration:none;
+                border-radius:6px;
+            "
+        >
+            Verify Email
+        </a>
+    </p>
 
-Welcome to ReconAI.
+    <p>
+        Or copy and paste this link into your browser:
+    </p>
 
-Please verify your email address by clicking
-the link below:
+    <p>
+        {verification_url}
+    </p>
 
-{verification_url}
+    <p>
+        This verification link will expire in 24 hours.
+    </p>
 
-This verification link will expire in 24 hours.
+    <p>
+        If you did not create a ReconAI account,
+        you can safely ignore this email.
+    </p>
 
-If you did not create a ReconAI account,
-you can safely ignore this email.
+    <p>
+        Regards,<br>
+        ReconAI Team
+    </p>
 
-Regards,
-ReconAI Team
-"""
-    )
+</body>
+</html>
+""",
+    }
 
-    # --------------------------------------------------------
-    # SEND EMAIL
-    # --------------------------------------------------------
+    try:
 
-    with smtplib.SMTP(
-        smtp_host,
-        smtp_port,
-        timeout=20,
-    ) as server:
-
-        server.ehlo()
-
-        server.starttls()
-
-        server.ehlo()
-
-        server.login(
-            smtp_username,
-            smtp_password,
-        )
-
-        server.send_message(
+        response = resend.Emails.send(
             message
         )
+
+        print(
+            "VERIFICATION EMAIL SENT SUCCESSFULLY"
+        )
+
+        print(
+            "Resend response:",
+            response,
+        )
+
+        return response
+
+    except Exception as error:
+
+        print(
+            "RESEND EMAIL ERROR:",
+            str(error),
+        )
+
+        raise
 
 
 # ============================================================
@@ -390,11 +398,8 @@ router = APIRouter(
     response_model=AuthResponse,
 )
 def signup(
-
     request: SignupRequest,
-
     db: Session = Depends(get_db),
-
 ):
 
     email = (
@@ -480,15 +485,10 @@ def signup(
     # --------------------------------------------------------
 
     user = User(
-
         name=name,
-
         email=email,
-
         hashed_password=hashed_password,
-
         is_verified=False,
-
     )
 
     db.add(user)
@@ -592,25 +592,18 @@ def signup(
     "/verify-email"
 )
 def verify_email(
-
     token: str,
-
     db: Session = Depends(get_db),
-
 ):
 
     try:
 
         payload = jwt.decode(
-
             token,
-
             SECRET_KEY,
-
             algorithms=[
                 ALGORITHM
             ],
-
         )
 
         if (
@@ -625,9 +618,7 @@ def verify_email(
                 ),
             )
 
-        user_id = (
-            payload.get("sub")
-        )
+        user_id = payload.get("sub")
 
         if not user_id:
 
@@ -670,13 +661,10 @@ def verify_email(
     if user.is_verified:
 
         return {
-
             "message": (
                 "Email is already verified."
             ),
-
             "email": user.email,
-
         }
 
     user.is_verified = True
@@ -702,14 +690,11 @@ def verify_email(
         )
 
     return {
-
         "message": (
             "Email verified successfully. "
             "You can now log in."
         ),
-
         "email": user.email,
-
     }
 
 
@@ -722,11 +707,8 @@ def verify_email(
     response_model=AuthResponse,
 )
 def login(
-
     request: LoginRequest,
-
     db: Session = Depends(get_db),
-
 ):
 
     email = (
@@ -753,11 +735,8 @@ def login(
         )
 
     if not verify_password(
-
         request.password,
-
         user.hashed_password,
-
     ):
 
         raise HTTPException(
@@ -814,15 +793,12 @@ def login(
 # ============================================================
 
 def get_current_user(
-
     credentials: HTTPAuthorizationCredentials = Depends(
         security
     ),
-
     db: Session = Depends(
         get_db
     ),
-
 ):
 
     token = credentials.credentials
@@ -830,20 +806,14 @@ def get_current_user(
     try:
 
         payload = jwt.decode(
-
             token,
-
             SECRET_KEY,
-
             algorithms=[
                 ALGORITHM
             ],
-
         )
 
-        user_id = (
-            payload.get("sub")
-        )
+        user_id = payload.get("sub")
 
         if not user_id:
 
@@ -897,11 +867,9 @@ def get_current_user(
     response_model=UserResponse,
 )
 def get_me(
-
     current_user: User = Depends(
         get_current_user
     ),
-
 ):
 
     return UserResponse(
@@ -928,17 +896,13 @@ def get_me(
     response_model=UserResponse,
 )
 def update_profile(
-
     request: UpdateProfileRequest,
-
     current_user: User = Depends(
         get_current_user
     ),
-
     db: Session = Depends(
         get_db
     ),
-
 ):
 
     name = request.name.strip()
@@ -1001,17 +965,13 @@ def update_profile(
     "/change-password"
 )
 def change_password(
-
     request: ChangePasswordRequest,
-
     current_user: User = Depends(
         get_current_user
     ),
-
     db: Session = Depends(
         get_db
     ),
-
 ):
 
     # --------------------------------------------------------
@@ -1019,11 +979,8 @@ def change_password(
     # --------------------------------------------------------
 
     if not verify_password(
-
         request.current_password,
-
         current_user.hashed_password,
-
     ):
 
         raise HTTPException(
@@ -1076,7 +1033,9 @@ def change_password(
 
         db.commit()
 
-        db.refresh(current_user)
+        db.refresh(
+            current_user
+        )
 
     except Exception as error:
 
@@ -1095,9 +1054,7 @@ def change_password(
         )
 
     return {
-
         "message": (
             "Password changed successfully."
         )
-
     }
