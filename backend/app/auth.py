@@ -444,6 +444,7 @@ def send_verification_email(
                 f"Bearer {RESEND_API_KEY}"
             ),
             "Content-Type": "application/json",
+            "User-Agent": "ReconAI/1.0",
         },
     )
 
