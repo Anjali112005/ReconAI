@@ -55,42 +55,45 @@ FRONTEND_URL = os.getenv(
 
 
 # ============================================================
-# GMAIL SMTP CONFIGURATION
+# HOSTINGER SMTP CONFIGURATION
 # ============================================================
 
-GMAIL_SMTP_HOST = "smtp.gmail.com"
+SMTP_HOST = os.getenv(
+    "SMTP_HOST",
+    "smtp.hostinger.com",
+)
 
-GMAIL_SMTP_PORT = int(
+SMTP_PORT = int(
     os.getenv(
-        "GMAIL_SMTP_PORT",
+        "SMTP_PORT",
         "587",
     )
 )
 
-GMAIL_USERNAME = os.getenv(
-    "GMAIL_USERNAME"
+SMTP_USERNAME = os.getenv(
+    "SMTP_USERNAME"
 )
 
-GMAIL_APP_PASSWORD = os.getenv(
-    "GMAIL_APP_PASSWORD"
+SMTP_PASSWORD = os.getenv(
+    "SMTP_PASSWORD"
 )
 
 EMAIL_FROM = os.getenv(
     "EMAIL_FROM",
-    GMAIL_USERNAME or "",
+    SMTP_USERNAME or "",
 )
 
 
-if GMAIL_USERNAME and GMAIL_APP_PASSWORD:
+if SMTP_USERNAME and SMTP_PASSWORD:
 
     print(
-        "Gmail SMTP email client configured successfully."
+        "Hostinger SMTP email client configured successfully."
     )
 
 else:
 
     print(
-        "WARNING: Gmail SMTP is not configured."
+        "WARNING: SMTP is not configured."
     )
 
 
@@ -105,6 +108,11 @@ pwd_context = CryptContext(
 
 
 def hash_password(password: str) -> str:
+    """
+    Hash password using bcrypt.
+
+    bcrypt has a 72-byte password limit.
+    """
 
     password_bytes = password.encode("utf-8")
 
@@ -125,6 +133,9 @@ def verify_password(
     plain_password: str,
     hashed_password: str,
 ) -> bool:
+    """
+    Verify a password against its bcrypt hash.
+    """
 
     password_bytes = plain_password.encode("utf-8")
 
@@ -214,7 +225,7 @@ def create_verification_token(
 
 
 # ============================================================
-# SEND VERIFICATION EMAIL USING GMAIL
+# SEND VERIFICATION EMAIL USING HOSTINGER SMTP
 # ============================================================
 
 def send_verification_email(
@@ -222,30 +233,46 @@ def send_verification_email(
     name: str,
     verification_token: str,
 ):
-
     """
-    Send email verification using Gmail SMTP.
+    Send email verification using Hostinger SMTP.
 
-    Uses:
-        GMAIL_USERNAME
-        GMAIL_APP_PASSWORD
+    Railway variables required:
+
+        SMTP_HOST
+        SMTP_PORT
+        SMTP_USERNAME
+        SMTP_PASSWORD
+        EMAIL_FROM
         FRONTEND_URL
+
+    Recommended SMTP settings:
+
+        SMTP_HOST=smtp.hostinger.com
+        SMTP_PORT=587
+
+    Port 587 uses STARTTLS.
     """
 
     # --------------------------------------------------------
-    # CHECK GMAIL CONFIGURATION
+    # CHECK SMTP CONFIGURATION
     # --------------------------------------------------------
 
-    if not GMAIL_USERNAME:
+    if not SMTP_USERNAME:
 
         raise RuntimeError(
-            "GMAIL_USERNAME is not configured."
+            "SMTP_USERNAME is not configured."
         )
 
-    if not GMAIL_APP_PASSWORD:
+    if not SMTP_PASSWORD:
 
         raise RuntimeError(
-            "GMAIL_APP_PASSWORD is not configured."
+            "SMTP_PASSWORD is not configured."
+        )
+
+    if not EMAIL_FROM:
+
+        raise RuntimeError(
+            "EMAIL_FROM is not configured."
         )
 
     # --------------------------------------------------------
@@ -298,34 +325,77 @@ ReconAI Team
     )
 
     # --------------------------------------------------------
-    # SEND EMAIL USING GMAIL SMTP
+    # SEND EMAIL USING HOSTINGER SMTP
     # --------------------------------------------------------
 
     try:
 
-        with smtplib.SMTP(
-            GMAIL_SMTP_HOST,
-            GMAIL_SMTP_PORT,
-            timeout=20,
-        ) as server:
+        if SMTP_PORT == 465:
 
-            server.ehlo()
+            # SSL connection
+            import ssl
 
-            server.starttls()
+            context = ssl.create_default_context()
 
-            server.ehlo()
+            with smtplib.SMTP_SSL(
+                SMTP_HOST,
+                SMTP_PORT,
+                timeout=30,
+                context=context,
+            ) as server:
 
-            server.login(
-                GMAIL_USERNAME,
-                GMAIL_APP_PASSWORD,
-            )
+                server.ehlo()
 
-            server.send_message(
-                message
-            )
+                server.login(
+                    SMTP_USERNAME,
+                    SMTP_PASSWORD,
+                )
+
+                server.send_message(
+                    message
+                )
+
+        else:
+
+            # STARTTLS connection
+            with smtplib.SMTP(
+                SMTP_HOST,
+                SMTP_PORT,
+                timeout=30,
+            ) as server:
+
+                server.ehlo()
+
+                server.starttls()
+
+                server.ehlo()
+
+                server.login(
+                    SMTP_USERNAME,
+                    SMTP_PASSWORD,
+                )
+
+                server.send_message(
+                    message
+                )
 
         print(
             "VERIFICATION EMAIL SENT SUCCESSFULLY"
+        )
+
+        print(
+            "SMTP Host:",
+            SMTP_HOST,
+        )
+
+        print(
+            "SMTP Port:",
+            SMTP_PORT,
+        )
+
+        print(
+            "Sender:",
+            EMAIL_FROM,
         )
 
         print(
@@ -336,7 +406,7 @@ ReconAI Team
     except Exception as error:
 
         print(
-            "GMAIL SMTP ERROR:",
+            "SMTP EMAIL ERROR:",
             str(error),
         )
 
@@ -667,10 +737,23 @@ def verify_email(
             ),
         )
 
+    try:
+
+        user_id_int = int(user_id)
+
+    except (TypeError, ValueError):
+
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "Invalid verification token."
+            ),
+        )
+
     user = (
         db.query(User)
         .filter(
-            User.id == int(user_id)
+            User.id == user_id_int
         )
         .first()
     )
@@ -862,10 +945,23 @@ def get_current_user(
             ),
         )
 
+    try:
+
+        user_id_int = int(user_id)
+
+    except (TypeError, ValueError):
+
+        raise HTTPException(
+            status_code=401,
+            detail=(
+                "Invalid authentication token."
+            ),
+        )
+
     user = (
         db.query(User)
         .filter(
-            User.id == int(user_id)
+            User.id == user_id_int
         )
         .first()
     )
