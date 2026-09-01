@@ -21,3 +21,11 @@ typing-inspection==0.4.4
 typing_extensions==4.16.0
 tzdata==2026.3
 uvicorn==0.52.4
+
+python-dotenv==1.2.1
+python-jose[cryptography]==3.5.0
+passlib[bcrypt]==1.7.4
+email-validator==2.3.0
+reportlab==4.4.9
+google-genai==1.55.0
+pymysql==1.1.2
