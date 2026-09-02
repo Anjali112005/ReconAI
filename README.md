@@ -167,7 +167,7 @@ The frontend supports light and dark themes to provide a better user experience.
 
 ## 🖼️ Financial Reconciliation Workflow
 
-![ReconAI Financial Reconciliation Workflow](docs/reconciliation-workflow.png)
+![ReconAI Financial Reconciliation Workflow](docs/Financial_Reconciliation_Workflow.png)
 
 ---
 
