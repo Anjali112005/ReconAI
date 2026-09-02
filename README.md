@@ -33,7 +33,7 @@ The goal of ReconAI is to provide a centralized platform where users can upload 
 You can access the deployed ReconAI application here:
 
 **🔗 Live Application:**  
-[Open ReconAI](https://recon-6u0mjpppt-anjalineelam2005-5503s-projects.vercel.app/)
+[Open ReconAI](https://recon-ai-one.vercel.app/)
 
 ---
 
