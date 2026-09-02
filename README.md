@@ -167,19 +167,7 @@ The frontend supports light and dark themes to provide a better user experience.
 
 ## 🖼️ Financial Reconciliation Workflow
 
-Replace the image below with your workflow image.
-
-```markdown
-![ReconAI Financial Reconciliation Workflow](docs/Financial_Reconciliation_Workflow.png)
-```
-
-If your image is stored somewhere else, update the path accordingly.
-
-For example:
-
-```markdown
-![ReconAI Financial Reconciliation Workflow](assets/reconciliation-workflow.png)
-```
+![ReconAI Financial Reconciliation Workflow](docs/reconciliation-workflow.png)
 
 ---
 
