@@ -1,3 +1,5 @@
+import os
+
 from fastapi import (
     FastAPI,
     HTTPException,
@@ -90,16 +92,12 @@ from app.services.history_service import (
 # ============================================================
 
 app = FastAPI(
-
     title="ReconAI API",
-
     description=(
         "AI-Powered Financial Reconciliation, "
         "Investigation and Reporting API"
     ),
-
     version="1.0.0",
-
 )
 
 
@@ -107,68 +105,68 @@ app = FastAPI(
 # CREATE DATABASE TABLES
 # ============================================================
 
-Base.metadata.create_all(
-    bind=engine
-)
+Base.metadata.create_all(bind=engine)
 
 
 # ============================================================
 # AUTHENTICATION ROUTER
 # ============================================================
 
-app.include_router(
-    auth_router
-)
+app.include_router(auth_router)
 
 
 # ============================================================
 # CORS CONFIGURATION
 # ============================================================
 
-app.add_middleware(
+# Get frontend URL from Railway environment variable.
+#
+# Railway:
+# FRONTEND_URL=https://recon-ai-one.vercel.app
+#
+# We also keep the Vercel URL explicitly here so the application
+# continues working even if the environment variable is missing.
 
+frontend_url = os.getenv(
+    "FRONTEND_URL",
+    "https://recon-ai-one.vercel.app",
+).strip().rstrip("/")
+
+
+allowed_origins = [
+    # Production Vercel frontend
+    "https://recon-ai-one.vercel.app",
+
+    # Environment-based frontend URL
+    frontend_url,
+
+    # Local development
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+
+    # LAN frontend
+    "http://192.168.56.1:3000",
+
+    # Vite development server
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://192.168.56.1:5173",
+]
+
+# Remove duplicates while preserving order
+allowed_origins = list(dict.fromkeys(allowed_origins))
+
+
+app.add_middleware(
     CORSMiddleware,
 
-    allow_origins=[
-
-        # ----------------------------------------------------
-        # Local development
-        # ----------------------------------------------------
-
-        "http://localhost:3000",
-
-        "http://127.0.0.1:3000",
-
-
-        # ----------------------------------------------------
-        # LAN frontend
-        # ----------------------------------------------------
-
-        "http://192.168.56.1:3000",
-
-
-        # ----------------------------------------------------
-        # Vite development server
-        # ----------------------------------------------------
-
-        "http://localhost:5173",
-
-        "http://127.0.0.1:5173",
-
-        "http://192.168.56.1:5173",
-
-    ],
+    allow_origins=allowed_origins,
 
     allow_credentials=True,
 
-    allow_methods=[
-        "*"
-    ],
+    allow_methods=["*"],
 
-    allow_headers=[
-        "*"
-    ],
-
+    allow_headers=["*"],
 )
 
 
@@ -200,24 +198,15 @@ class CopilotRequest(BaseModel):
 def home():
 
     return {
-
-        "message":
-            "ReconAI Backend is Running Successfully",
+        "message": "ReconAI Backend is Running Successfully",
 
         "features": [
-
             "Authentication",
-
             "Financial Reconciliation",
-
             "AI Finance Copilot",
-
             "PDF Financial Reports",
-
             "MySQL Reconciliation History",
-
         ],
-
     }
 
 
@@ -250,14 +239,11 @@ def reconcile_data(
         if not request.bank_transactions:
 
             raise HTTPException(
-
                 status_code=400,
-
                 detail=(
                     "Bank transactions "
                     "cannot be empty."
                 ),
-
             )
 
 
@@ -268,14 +254,11 @@ def reconcile_data(
         if not request.ledger_transactions:
 
             raise HTTPException(
-
                 status_code=400,
-
                 detail=(
                     "Ledger transactions "
                     "cannot be empty."
                 ),
-
             )
 
 
@@ -284,9 +267,7 @@ def reconcile_data(
         # ====================================================
 
         bank_df = pd.DataFrame(
-
             request.bank_transactions
-
         )
 
 
@@ -295,9 +276,7 @@ def reconcile_data(
         # ====================================================
 
         ledger_df = pd.DataFrame(
-
             request.ledger_transactions
-
         )
 
 
@@ -306,11 +285,8 @@ def reconcile_data(
         # ====================================================
 
         result = reconcile(
-
             bank_df,
-
             ledger_df,
-
         )
 
 
@@ -321,45 +297,27 @@ def reconcile_data(
         if result is None:
 
             raise HTTPException(
-
                 status_code=500,
-
                 detail=(
                     "Reconciliation engine "
                     "returned no result."
                 ),
-
             )
 
 
-        if not isinstance(
-            result,
-            dict,
-        ):
+        if not isinstance(result, dict):
 
             raise HTTPException(
-
                 status_code=500,
-
                 detail=(
                     "Reconciliation engine "
                     "returned an invalid result."
                 ),
-
             )
 
 
         # ====================================================
         # SAVE RECONCILIATION TO MYSQL
-        #
-        # IMPORTANT:
-        # history_service.py expects:
-        #
-        # add_reconciliation_history(
-        #     db,
-        #     reconciliation_result,
-        #     user_id
-        # )
         # ====================================================
 
         history_record = add_reconciliation_history(
@@ -374,13 +332,7 @@ def reconcile_data(
 
 
         # ====================================================
-        # HISTORY SERVICE RETURNS A DICTIONARY
-        #
-        # DO NOT USE:
-        #
-        # history_record.id
-        #
-        # because history_record is a dict.
+        # ADD HISTORY INFORMATION TO RESULT
         # ====================================================
 
         if history_record:
@@ -424,8 +376,6 @@ def reconcile_data(
 
     except HTTPException:
 
-        # FastAPI errors should pass through unchanged.
-
         raise
 
 
@@ -467,14 +417,11 @@ def reconcile_data(
         # ====================================================
 
         raise HTTPException(
-
             status_code=500,
-
             detail=(
                 "Reconciliation failed: "
                 f"{str(error)}"
             ),
-
         )
 
 
@@ -503,13 +450,10 @@ def copilot(
         if not request.question.strip():
 
             raise HTTPException(
-
                 status_code=400,
-
                 detail=(
                     "Question cannot be empty."
                 ),
-
             )
 
 
@@ -518,11 +462,8 @@ def copilot(
         # ====================================================
 
         result = generate_copilot_response(
-
             request.question,
-
             request.reconciliation_result,
-
         )
 
 
@@ -547,14 +488,11 @@ def copilot(
 
 
         raise HTTPException(
-
             status_code=500,
-
             detail=(
                 "Copilot failed: "
                 f"{str(error)}"
             ),
-
         )
 
 
@@ -583,14 +521,11 @@ def generate_report(
         if not reconciliation_result:
 
             raise HTTPException(
-
                 status_code=400,
-
                 detail=(
                     "Reconciliation result "
                     "is required."
                 ),
-
             )
 
 
@@ -599,9 +534,7 @@ def generate_report(
         # ====================================================
 
         pdf_buffer = generate_pdf_report(
-
             reconciliation_result
-
         )
 
 
@@ -616,13 +549,11 @@ def generate_report(
             media_type="application/pdf",
 
             headers={
-
                 "Content-Disposition": (
                     "attachment; "
                     "filename="
                     "ReconAI_Financial_Report.pdf"
                 ),
-
             },
 
         )
@@ -642,14 +573,11 @@ def generate_report(
 
 
         raise HTTPException(
-
             status_code=500,
-
             detail=(
                 "PDF report generation failed: "
                 f"{str(error)}"
             ),
-
         )
 
 
@@ -708,14 +636,11 @@ def get_history(
 
 
         raise HTTPException(
-
             status_code=500,
-
             detail=(
                 "Failed to retrieve history: "
                 f"{str(error)}"
             ),
-
         )
 
 
@@ -763,14 +688,11 @@ def get_history_record(
         if record is None:
 
             raise HTTPException(
-
                 status_code=404,
-
                 detail=(
                     "Reconciliation history "
                     "record not found."
                 ),
-
             )
 
 
@@ -795,14 +717,11 @@ def get_history_record(
 
 
         raise HTTPException(
-
             status_code=500,
-
             detail=(
                 "Failed to retrieve history record: "
                 f"{str(error)}"
             ),
-
         )
 
 
@@ -850,14 +769,11 @@ def delete_history(
         if not deleted:
 
             raise HTTPException(
-
                 status_code=404,
-
                 detail=(
                     "Reconciliation history "
                     "record not found."
                 ),
-
             )
 
 
@@ -891,14 +807,11 @@ def delete_history(
 
 
         raise HTTPException(
-
             status_code=500,
-
             detail=(
                 "Failed to delete history record: "
                 f"{str(error)}"
             ),
-
         )
 
 
@@ -960,12 +873,9 @@ def clear_history(
 
 
         raise HTTPException(
-
             status_code=500,
-
             detail=(
                 "Failed to clear history: "
                 f"{str(error)}"
             ),
-
         )
