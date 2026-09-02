@@ -1,11 +1,15 @@
+// ============================================================
+// API CONFIGURATION
+// ============================================================
+
 const API_URL =
   import.meta.env.VITE_API_URL ||
   "http://localhost:8000";
 
 
-/* =========================================
-   GET JWT TOKEN
-========================================= */
+// ============================================================
+// GET JWT TOKEN
+// ============================================================
 
 function getAuthToken() {
 
@@ -16,9 +20,9 @@ function getAuthToken() {
 }
 
 
-/* =========================================
-   GENERIC API HELPER
-========================================= */
+// ============================================================
+// GENERIC API HELPER
+// ============================================================
 
 async function apiRequest(
   endpoint,
@@ -31,21 +35,25 @@ async function apiRequest(
       getAuthToken();
 
 
-    /* =====================================
-       CREATE HEADERS
-    ===================================== */
+    // ========================================================
+    // CREATE HEADERS
+    // ========================================================
 
     const headers = {
       ...(options.headers || {}),
     };
 
 
-    /* =====================================
-       ADD JSON HEADER
-       ONLY WHEN BODY EXISTS
-    ===================================== */
+    // ========================================================
+    // ADD JSON HEADER
+    // ONLY WHEN BODY EXISTS
+    // AND BODY IS NOT FORCED TO ANOTHER CONTENT TYPE
+    // ========================================================
 
-    if (options.body) {
+    if (
+      options.body &&
+      !(options.body instanceof FormData)
+    ) {
 
       headers["Content-Type"] =
         "application/json";
@@ -53,9 +61,9 @@ async function apiRequest(
     }
 
 
-    /* =====================================
-       AUTOMATICALLY ATTACH JWT
-    ===================================== */
+    // ========================================================
+    // AUTOMATICALLY ATTACH JWT
+    // ========================================================
 
     if (token) {
 
@@ -65,14 +73,14 @@ async function apiRequest(
     }
 
 
-    /* =====================================
-       SEND REQUEST
-    ===================================== */
+    // ========================================================
+    // SEND REQUEST
+    // ========================================================
 
     const response =
       await fetch(
 
-        `${API_BASE_URL}${endpoint}`,
+        `${API_URL}${endpoint}`,
 
         {
           ...options,
@@ -84,20 +92,15 @@ async function apiRequest(
       );
 
 
-    /* =====================================
-       HANDLE UNAUTHORIZED
-    ===================================== */
+    // ========================================================
+    // HANDLE UNAUTHORIZED
+    // ========================================================
 
     if (response.status === 401) {
-
-      /*
-       * Remove invalid/expired token.
-       */
 
       localStorage.removeItem(
         "reconai_token"
       );
-
 
       throw new Error(
         "Your session has expired. Please login again."
@@ -106,9 +109,9 @@ async function apiRequest(
     }
 
 
-    /* =====================================
-       HANDLE API ERRORS
-    ===================================== */
+    // ========================================================
+    // HANDLE API ERRORS
+    // ========================================================
 
     if (!response.ok) {
 
@@ -135,7 +138,6 @@ async function apiRequest(
       catch {
 
         errorMessage =
-
           `Request failed with status ${response.status}`;
 
       }
@@ -148,25 +150,20 @@ async function apiRequest(
     }
 
 
-    /* =====================================
-       RETURN RESPONSE
-    ===================================== */
+    // ========================================================
+    // RETURN RESPONSE
+    // ========================================================
 
     return response;
-
 
   }
 
   catch (error) {
 
     console.error(
-
       `API Error: ${endpoint}`,
-
       error
-
     );
-
 
     throw error;
 
@@ -175,24 +172,23 @@ async function apiRequest(
 }
 
 
-/* =========================================
-   HEALTH CHECK
-========================================= */
+// ============================================================
+// HEALTH CHECK
+// ============================================================
 
 export async function checkBackendHealth() {
 
   const response =
     await apiRequest("/");
 
-
   return await response.json();
 
 }
 
 
-/* =========================================
-   RECONCILIATION
-========================================= */
+// ============================================================
+// RECONCILIATION
+// ============================================================
 
 export async function runReconciliation(
 
@@ -231,9 +227,9 @@ export async function runReconciliation(
 }
 
 
-/* =========================================
-   AI FINANCE COPILOT
-========================================= */
+// ============================================================
+// AI FINANCE COPILOT
+// ============================================================
 
 export async function askCopilot(
 
@@ -272,9 +268,9 @@ export async function askCopilot(
 }
 
 
-/* =========================================
-   PDF REPORT
-========================================= */
+// ============================================================
+// PDF REPORT
+// ============================================================
 
 export async function generatePdfReport(
 
@@ -305,9 +301,9 @@ export async function generatePdfReport(
 }
 
 
-/* =========================================
-   GET ALL HISTORY
-========================================= */
+// ============================================================
+// GET ALL HISTORY
+// ============================================================
 
 export async function getHistory() {
 
@@ -322,9 +318,9 @@ export async function getHistory() {
 }
 
 
-/* =========================================
-   GET SINGLE HISTORY RECORD
-========================================= */
+// ============================================================
+// GET SINGLE HISTORY RECORD
+// ============================================================
 
 export async function getHistoryById(
 
@@ -345,9 +341,9 @@ export async function getHistoryById(
 }
 
 
-/* =========================================
-   DELETE HISTORY RECORD
-========================================= */
+// ============================================================
+// DELETE HISTORY RECORD
+// ============================================================
 
 export async function deleteHistoryRecord(
 
@@ -374,9 +370,9 @@ export async function deleteHistoryRecord(
 }
 
 
-/* =========================================
-   CLEAR ALL HISTORY
-========================================= */
+// ============================================================
+// CLEAR ALL HISTORY
+// ============================================================
 
 export async function clearHistory() {
 
