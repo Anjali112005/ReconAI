@@ -31,6 +31,8 @@ import { Login } from "./pages/Login";
 import { Signup } from "./pages/Signup";
 import { VerifyEmail } from "./pages/VerifyEmail";
 
+import { DeveloperFooter } from "./components/DeveloperFooter";
+
 
 /* =========================================================
    PUBLIC ROUTE
@@ -43,6 +45,10 @@ const PublicRoute = () => {
     loading,
   } = useAuth();
 
+
+  /* =======================================================
+     AUTHENTICATION LOADING
+     ======================================================= */
 
   if (loading) {
 
@@ -102,6 +108,10 @@ const PublicRoute = () => {
   }
 
 
+  /* =======================================================
+     REDIRECT AUTHENTICATED USERS
+     ======================================================= */
+
   if (isAuthenticated) {
 
     return (
@@ -116,7 +126,40 @@ const PublicRoute = () => {
   }
 
 
-  return <Outlet />;
+  /* =======================================================
+     PUBLIC PAGE LAYOUT
+     ======================================================= */
+
+  return (
+
+    <div
+      className="
+        min-h-screen
+        flex
+        flex-col
+        bg-recon-light-bg
+        dark:bg-recon-dark-bg
+        text-recon-light-text
+        dark:text-recon-dark-text
+      "
+    >
+
+      {/* Public Page Content */}
+
+      <div className="flex-1">
+
+        <Outlet />
+
+      </div>
+
+
+      {/* Developer Footer */}
+
+      <DeveloperFooter />
+
+    </div>
+
+  );
 
 };
 
@@ -128,13 +171,14 @@ const PublicRoute = () => {
 const ProtectedRoute = () => {
 
   const {
-
     isAuthenticated,
-
     loading,
-
   } = useAuth();
 
+
+  /* =======================================================
+     AUTHENTICATION LOADING
+     ======================================================= */
 
   if (loading) {
 
@@ -194,6 +238,10 @@ const ProtectedRoute = () => {
   }
 
 
+  /* =======================================================
+     REDIRECT UNAUTHENTICATED USERS
+     ======================================================= */
+
   if (!isAuthenticated) {
 
     return (
@@ -220,11 +268,8 @@ const ProtectedRoute = () => {
 const DashboardLayout = () => {
 
   const [
-
     isSidebarOpen,
-
     setIsSidebarOpen,
-
   ] = useState(false);
 
 
@@ -244,6 +289,10 @@ const DashboardLayout = () => {
       "
     >
 
+      {/* ===================================================
+          SIDEBAR
+         =================================================== */}
+
       <Sidebar
 
         isOpen={
@@ -257,6 +306,10 @@ const DashboardLayout = () => {
       />
 
 
+      {/* ===================================================
+          MAIN APPLICATION AREA
+         =================================================== */}
+
       <div
         className="
           flex-1
@@ -267,6 +320,10 @@ const DashboardLayout = () => {
         "
       >
 
+        {/* =================================================
+            HEADER
+           ================================================= */}
+
         <Header
 
           onOpenSidebar={() =>
@@ -275,6 +332,10 @@ const DashboardLayout = () => {
 
         />
 
+
+        {/* =================================================
+            PAGE CONTENT
+           ================================================= */}
 
         <main
           className="
@@ -292,8 +353,19 @@ const DashboardLayout = () => {
 
         </main>
 
+
+        {/* =================================================
+            DEVELOPER FOOTER
+           ================================================= */}
+
+        <DeveloperFooter />
+
       </div>
 
+
+      {/* ===================================================
+          FLOATING AI COPILOT
+         =================================================== */}
 
       <FloatingCopilot />
 
@@ -319,115 +391,194 @@ export default function App() {
         <Routes>
 
 
-          {/* ===============================================
+          {/* =================================================
               PUBLIC ROUTES
-             =============================================== */}
+             ================================================= */}
 
           <Route
-            element={<PublicRoute />}
+            element={
+              <PublicRoute />
+            }
           >
+
+            {/* ===============================================
+                HOME
+               =============================================== */}
 
             <Route
               path="/"
-              element={<Home />}
+              element={
+                <Home />
+              }
             />
+
+
+            {/* ===============================================
+                LOGIN
+               =============================================== */}
 
             <Route
               path="/login"
-              element={<Login />}
+              element={
+                <Login />
+              }
             />
+
+
+            {/* ===============================================
+                SIGNUP
+               =============================================== */}
 
             <Route
               path="/signup"
-              element={<Signup />}
+              element={
+                <Signup />
+              }
             />
+
+
+            {/* ===============================================
+                VERIFY EMAIL
+               =============================================== */}
 
             <Route
               path="/verify-email"
-              element={<VerifyEmail />}
+              element={
+                <VerifyEmail />
+              }
             />
 
           </Route>
 
 
-          {/* ===============================================
+          {/* =================================================
               PROTECTED ROUTES
-             =============================================== */}
+             ================================================= */}
 
           <Route
-            element={<ProtectedRoute />}
+            element={
+              <ProtectedRoute />
+            }
           >
 
             <Route
-              element={<DashboardLayout />}
+              element={
+                <DashboardLayout />
+              }
             >
 
 
+              {/* =============================================
+                  DASHBOARD
+                 ============================================= */}
+
               <Route
                 path="/dashboard"
-                element={<Dashboard />}
+                element={
+                  <Dashboard />
+                }
               />
 
+
+              {/* =============================================
+                  UPLOAD DATA
+                 ============================================= */}
 
               <Route
                 path="/upload"
-                element={<UploadData />}
+                element={
+                  <UploadData />
+                }
               />
 
+
+              {/* =============================================
+                  RECONCILIATION
+                 ============================================= */}
 
               <Route
                 path="/reconciliation"
-                element={<Reconciliation />}
+                element={
+                  <Reconciliation />
+                }
               />
 
+
+              {/* =============================================
+                  RISK CENTER
+                 ============================================= */}
 
               <Route
                 path="/risk-center"
-                element={<RiskCenter />}
+                element={
+                  <RiskCenter />
+                }
               />
 
+
+              {/* =============================================
+                  AI INVESTIGATION
+                 ============================================= */}
 
               <Route
                 path="/investigation"
-                element={<AIInvestigation />}
+                element={
+                  <AIInvestigation />
+                }
               />
 
+
+              {/* =============================================
+                  REPORTS
+                 ============================================= */}
 
               <Route
                 path="/reports"
-                element={<Reports />}
+                element={
+                  <Reports />
+                }
               />
 
+
+              {/* =============================================
+                  HISTORY
+                 ============================================= */}
 
               <Route
                 path="/history"
-                element={<History />}
+                element={
+                  <History />
+                }
               />
 
 
-              {/* ===========================================
-                  MY PROFILE
-                 =========================================== */}
+              {/* =============================================
+                  PROFILE
+                 ============================================= */}
 
               <Route
                 path="/profile"
-                element={<Profile />}
+                element={
+                  <Profile />
+                }
               />
 
 
-              {/* ===========================================
+              {/* =============================================
                   SETTINGS
-                 =========================================== */}
+                 ============================================= */}
 
               <Route
                 path="/settings"
-                element={<SettingsPage />}
+                element={
+                  <SettingsPage />
+                }
               />
 
 
-              {/* ===========================================
+              {/* =============================================
                   DEFAULT PROTECTED ROUTE
-                 =========================================== */}
+                 ============================================= */}
 
               <Route
                 path="*"
@@ -445,9 +596,9 @@ export default function App() {
           </Route>
 
 
-          {/* ===============================================
+          {/* =================================================
               GLOBAL FALLBACK
-             =============================================== */}
+             ================================================= */}
 
           <Route
             path="*"

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import {
   ShieldCheck,
   ArrowRight,
@@ -11,6 +12,9 @@ import {
   CheckCircle2,
   LockKeyhole,
   Zap,
+  Github,
+  Linkedin,
+  Mail,
 } from 'lucide-react';
 
 import { useAuth } from '../context/AuthContext';
@@ -22,9 +26,9 @@ export const Home = () => {
   return (
     <div className="min-h-screen bg-recon-light-bg dark:bg-recon-dark-bg text-recon-light-text dark:text-recon-dark-text">
 
-      {/* =========================================
+      {/* =========================================================
           NAVBAR
-      ========================================= */}
+      ========================================================= */}
 
       <header className="sticky top-0 z-40 border-b border-recon-light-border dark:border-recon-dark-border bg-white/90 dark:bg-recon-dark-card/90 backdrop-blur-xl">
 
@@ -88,6 +92,7 @@ export const Home = () => {
                     Sign In
                   </button>
 
+
                   <button
                     onClick={() => navigate('/signup')}
                     className="px-4 py-2 rounded-xl bg-recon-forest dark:bg-recon-dark-accent text-white text-xs font-extrabold hover:bg-recon-forestHover transition-colors"
@@ -108,9 +113,9 @@ export const Home = () => {
       </header>
 
 
-      {/* =========================================
+      {/* =========================================================
           HERO
-      ========================================= */}
+      ========================================================= */}
 
       <section className="relative overflow-hidden">
 
@@ -208,6 +213,7 @@ export const Home = () => {
 
               </span>
 
+
               <span className="flex items-center gap-1.5">
 
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
@@ -215,6 +221,7 @@ export const Home = () => {
                 AI Investigation
 
               </span>
+
 
               <span className="flex items-center gap-1.5">
 
@@ -229,9 +236,9 @@ export const Home = () => {
           </div>
 
 
-          {/* =========================================
+          {/* =========================================================
               DASHBOARD PREVIEW
-          ========================================= */}
+          ========================================================= */}
 
           <div className="mt-14 max-w-6xl mx-auto">
 
@@ -270,6 +277,7 @@ export const Home = () => {
 
                   </div>
 
+
                   <div className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold">
 
                     <CheckCircle2 className="w-4 h-4" />
@@ -291,6 +299,7 @@ export const Home = () => {
                     value="1,248"
                   />
 
+
                   <PreviewCard
                     icon={<FileCheck2 className="w-4 h-4" />}
                     label="Matched"
@@ -298,12 +307,14 @@ export const Home = () => {
                     positive
                   />
 
+
                   <PreviewCard
                     icon={<AlertTriangle className="w-4 h-4" />}
                     label="Exceptions"
                     value="72"
                     danger
                   />
+
 
                   <PreviewCard
                     icon={<ShieldCheck className="w-4 h-4" />}
@@ -342,13 +353,16 @@ export const Home = () => {
                         BANK-{String(item).padStart(4, '0')}
                       </span>
 
+
                       <span>
                         LEDGER-{String(item).padStart(4, '0')}
                       </span>
 
+
                       <span>
                         ₹{(12500 * item).toLocaleString()}
                       </span>
+
 
                       <span className="text-emerald-600 dark:text-emerald-400">
                         MATCHED
@@ -371,9 +385,9 @@ export const Home = () => {
       </section>
 
 
-      {/* =========================================
+      {/* =========================================================
           FEATURES
-      ========================================= */}
+      ========================================================= */}
 
       <section className="bg-white dark:bg-recon-dark-card border-y border-recon-light-border dark:border-recon-dark-border">
 
@@ -385,9 +399,11 @@ export const Home = () => {
               Built for Financial Teams
             </p>
 
+
             <h2 className="text-2xl sm:text-3xl font-black mt-2">
               Everything you need to reconcile with confidence
             </h2>
+
 
             <p className="text-sm text-recon-light-muted dark:text-recon-dark-muted mt-3 font-medium">
               From transaction matching to risk investigation and reporting,
@@ -405,17 +421,20 @@ export const Home = () => {
               description="Compare bank and ledger transactions quickly and identify successful matches automatically."
             />
 
+
             <FeatureCard
               icon={<AlertTriangle />}
               title="Exception Detection"
               description="Identify amount mismatches, missing transactions, settlement delays and possible duplicates."
             />
 
+
             <FeatureCard
               icon={<BrainCircuit />}
               title="AI Investigation"
               description="Use AI-powered investigation results to understand risk and prioritize financial exceptions."
             />
+
 
             <FeatureCard
               icon={<BarChart3 />}
@@ -430,9 +449,9 @@ export const Home = () => {
       </section>
 
 
-      {/* =========================================
+      {/* =========================================================
           HOW IT WORKS
-      ========================================= */}
+      ========================================================= */}
 
       <section>
 
@@ -443,6 +462,7 @@ export const Home = () => {
             <p className="text-[10px] uppercase tracking-[0.2em] font-extrabold text-recon-forest dark:text-recon-dark-accent">
               Simple Workflow
             </p>
+
 
             <h2 className="text-2xl sm:text-3xl font-black mt-2">
               From raw data to financial intelligence
@@ -459,11 +479,13 @@ export const Home = () => {
               description="Upload your bank and ledger CSV files into ReconAI."
             />
 
+
             <StepCard
               number="02"
               title="Run Reconciliation"
               description="ReconAI compares transactions and identifies matches and exceptions."
             />
+
 
             <StepCard
               number="03"
@@ -478,9 +500,9 @@ export const Home = () => {
       </section>
 
 
-      {/* =========================================
+      {/* =========================================================
           SECURITY
-      ========================================= */}
+      ========================================================= */}
 
       <section className="pb-16">
 
@@ -502,9 +524,11 @@ export const Home = () => {
 
                 </div>
 
+
                 <h2 className="text-2xl sm:text-3xl font-black">
                   Keep every reconciliation run organized.
                 </h2>
+
 
                 <p className="text-sm text-white/75 mt-3 max-w-xl leading-relaxed">
                   With authenticated accounts, each user's reconciliation
@@ -535,29 +559,125 @@ export const Home = () => {
       </section>
 
 
-      {/* =========================================
-          FOOTER
-      ========================================= */}
+      {/* =========================================================
+          DEVELOPER FOOTER
+      ========================================================= */}
 
       <footer className="border-t border-recon-light-border dark:border-recon-dark-border bg-white dark:bg-recon-dark-card">
 
-        <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 py-6">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 py-10">
 
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
 
-            <div className="flex items-center gap-2">
+            {/* RECONAI */}
 
-              <ShieldCheck className="w-4 h-4 text-recon-forest dark:text-recon-dark-accent" />
+            <div className="text-center md:text-left">
 
-              <span className="text-xs font-bold">
-                ReconAI
-              </span>
+              <div className="flex items-center justify-center md:justify-start gap-2">
+
+                <div className="w-9 h-9 rounded-xl bg-recon-forest dark:bg-recon-dark-accent flex items-center justify-center">
+
+                  <ShieldCheck className="w-5 h-5 text-white" />
+
+                </div>
+
+
+                <div>
+
+                  <p className="text-sm font-black">
+                    ReconAI
+                  </p>
+
+                  <p className="text-[9px] uppercase tracking-wider font-bold text-recon-light-muted dark:text-recon-dark-muted">
+                    Financial Intelligence
+                  </p>
+
+                </div>
+
+              </div>
+
+
+              <p className="text-xs text-recon-light-muted dark:text-recon-dark-muted font-medium mt-3">
+                AI-powered financial reconciliation and intelligence.
+              </p>
 
             </div>
 
-            <p className="text-[10px] text-recon-light-muted dark:text-recon-dark-muted font-medium">
-              AI-powered financial reconciliation and intelligence.
-            </p>
+
+            {/* DEVELOPER */}
+
+            <div className="text-center md:text-right">
+
+              <p className="text-sm font-black">
+
+                Built by{' '}
+
+                <span className="text-recon-forest dark:text-recon-dark-accent uppercase">
+                  NEELAM ANJALI
+                </span>
+
+              </p>
+
+
+              <p className="text-xs text-recon-light-muted dark:text-recon-dark-muted mt-1 font-medium">
+                Computer Science and Engineering • Final Year
+              </p>
+
+
+              <p className="text-xs text-recon-light-muted dark:text-recon-dark-muted mt-1 font-medium">
+                Passionate about AI, Technology & Creative Development
+              </p>
+
+
+              {/* SOCIAL LINKS */}
+
+              <div className="flex items-center justify-center md:justify-end gap-3 mt-4">
+
+                {/* GITHUB */}
+
+                <a
+                  href="https://github.com/Anjali112005"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Neelam Anjali GitHub"
+                  className="w-9 h-9 rounded-lg border border-recon-light-border dark:border-recon-dark-border bg-recon-light-bg dark:bg-recon-dark-bg flex items-center justify-center text-recon-light-text dark:text-recon-dark-text hover:text-recon-forest dark:hover:text-recon-dark-accent hover:border-recon-forest dark:hover:border-recon-dark-accent transition-colors"
+                >
+
+                  <Github className="w-4 h-4" />
+
+                </a>
+
+
+                {/* LINKEDIN */}
+
+                <a
+                  href="https://www.linkedin.com/in/anjali-neelam-a1a1422a6/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Neelam Anjali LinkedIn"
+                  className="w-9 h-9 rounded-lg border border-recon-light-border dark:border-recon-dark-border bg-recon-light-bg dark:bg-recon-dark-bg flex items-center justify-center text-recon-light-text dark:text-recon-dark-text hover:text-recon-forest dark:hover:text-recon-dark-accent hover:border-recon-forest dark:hover:border-recon-dark-accent transition-colors"
+                >
+
+                  <Linkedin className="w-4 h-4" />
+
+                </a>
+
+
+                {/* EMAIL */}
+
+                <a
+                  href="mailto:anjalineelam11@gmail.com"
+                  aria-label="Email Neelam Anjali"
+                  className="w-9 h-9 rounded-lg border border-recon-light-border dark:border-recon-dark-border bg-recon-light-bg dark:bg-recon-dark-bg flex items-center justify-center text-recon-light-text dark:text-recon-dark-text hover:text-recon-forest dark:hover:text-recon-dark-accent hover:border-recon-forest dark:hover:border-recon-dark-accent transition-colors"
+                >
+
+                  <Mail className="w-4 h-4" />
+
+                </a>
+
+              </div>
+
+            </div>
 
           </div>
 
@@ -595,6 +715,7 @@ const PreviewCard = ({
         </span>
 
       </div>
+
 
       <p
         className={`text-lg sm:text-xl font-black mt-2 ${
@@ -636,9 +757,11 @@ const FeatureCard = ({
 
       </div>
 
+
       <h3 className="text-sm font-extrabold">
         {title}
       </h3>
+
 
       <p className="text-xs text-recon-light-muted dark:text-recon-dark-muted mt-2 leading-relaxed font-medium">
         {description}
@@ -668,9 +791,11 @@ const StepCard = ({
         {number}
       </span>
 
+
       <h3 className="text-base font-extrabold mt-3">
         {title}
       </h3>
+
 
       <p className="text-xs text-recon-light-muted dark:text-recon-dark-muted mt-2 leading-relaxed font-medium">
         {description}
