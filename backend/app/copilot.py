@@ -5,22 +5,34 @@ from dotenv import load_dotenv
 from google import genai
 
 
-# =====================================
+# ============================================================
 # LOAD ENVIRONMENT VARIABLES
-# =====================================
+# ============================================================
 
 load_dotenv()
+
 
 GEMINI_API_KEY = os.getenv(
     "GEMINI_API_KEY"
 )
 
 
-# =====================================
+# ============================================================
+# GEMINI MODEL
+# ============================================================
+
+GEMINI_MODEL = os.getenv(
+    "GEMINI_MODEL",
+    "gemini-3.6-flash"
+)
+
+
+# ============================================================
 # CREATE GEMINI CLIENT
-# =====================================
+# ============================================================
 
 client = None
+
 
 if GEMINI_API_KEY:
 
@@ -31,13 +43,28 @@ if GEMINI_API_KEY:
         )
 
         print(
+            "=================================================="
+        )
+
+        print(
             "Gemini AI client initialized successfully."
+        )
+
+        print(
+            f"Gemini model: {GEMINI_MODEL}"
+        )
+
+        print(
+            "=================================================="
         )
 
     except Exception as error:
 
         print(
-            "Failed to initialize Gemini client:",
+            "Gemini client initialization failed:"
+        )
+
+        print(
             str(error)
         )
 
@@ -46,15 +73,26 @@ if GEMINI_API_KEY:
 else:
 
     print(
-        "GEMINI_API_KEY not found. "
+        "=================================================="
+    )
+
+    print(
+        "WARNING: GEMINI_API_KEY is not configured."
+    )
+
+    print(
         "ReconAI will use the rule-based fallback."
     )
 
+    print(
+        "=================================================="
+    )
 
-# =====================================
-# HELPER FUNCTION
+
+# ============================================================
+# HELPER
 # CONVERT VALUE TO FLOAT SAFELY
-# =====================================
+# ============================================================
 
 def get_float_value(value):
 
@@ -72,18 +110,14 @@ def get_float_value(value):
         return 0.0
 
 
-# =====================================
+# ============================================================
 # RULE-BASED FALLBACK RESPONSE
-# =====================================
+# ============================================================
 
 def generate_fallback_response(
     question,
     reconciliation_result
 ):
-
-    # ---------------------------------
-    # NORMALIZE QUESTION
-    # ---------------------------------
 
     question = (
         question
@@ -92,9 +126,9 @@ def generate_fallback_response(
     )
 
 
-    # =====================================
+    # ========================================================
     # GENERAL CONVERSATION
-    # =====================================
+    # ========================================================
 
     if any(
         phrase in question
@@ -133,9 +167,9 @@ def generate_fallback_response(
         )
 
 
-    # =====================================
+    # ========================================================
     # GREETINGS
-    # =====================================
+    # ========================================================
 
     if any(
         phrase in question
@@ -160,9 +194,9 @@ def generate_fallback_response(
         )
 
 
-    # =====================================
-    # WHAT CAN YOU DO?
-    # =====================================
+    # ========================================================
+    # CAPABILITIES
+    # ========================================================
 
     if any(
         phrase in question
@@ -196,14 +230,23 @@ def generate_fallback_response(
         )
 
 
-    # =====================================
-    # GET RECONCILIATION DATA
-    # =====================================
+    # ========================================================
+    # SAFELY GET RECONCILIATION DATA
+    # ========================================================
+
+    if not isinstance(
+        reconciliation_result,
+        dict
+    ):
+
+        reconciliation_result = {}
+
 
     exceptions = reconciliation_result.get(
         "exceptions",
         []
     )
+
 
     summary = reconciliation_result.get(
         "summary",
@@ -211,9 +254,25 @@ def generate_fallback_response(
     )
 
 
-    # =====================================
+    if not isinstance(
+        exceptions,
+        list
+    ):
+
+        exceptions = []
+
+
+    if not isinstance(
+        summary,
+        dict
+    ):
+
+        summary = {}
+
+
+    # ========================================================
     # NO EXCEPTIONS
-    # =====================================
+    # ========================================================
 
     if not exceptions:
 
@@ -228,9 +287,9 @@ def generate_fallback_response(
         )
 
 
-    # =====================================
-    # CALCULATE FINANCIAL EXPOSURE
-    # =====================================
+    # ========================================================
+    # CALCULATE TOTAL FINANCIAL EXPOSURE
+    # ========================================================
 
     total_risk = sum(
 
@@ -243,12 +302,17 @@ def generate_fallback_response(
 
         for item in exceptions
 
+        if isinstance(
+            item,
+            dict
+        )
+
     )
 
 
-    # =====================================
+    # ========================================================
     # GROUP ISSUES BY PRIORITY
-    # =====================================
+    # ========================================================
 
     critical_issues = [
 
@@ -256,7 +320,12 @@ def generate_fallback_response(
 
         for item in exceptions
 
-        if str(
+        if isinstance(
+            item,
+            dict
+        )
+
+        and str(
             item.get(
                 "priority",
                 ""
@@ -272,7 +341,12 @@ def generate_fallback_response(
 
         for item in exceptions
 
-        if str(
+        if isinstance(
+            item,
+            dict
+        )
+
+        and str(
             item.get(
                 "priority",
                 ""
@@ -288,7 +362,12 @@ def generate_fallback_response(
 
         for item in exceptions
 
-        if str(
+        if isinstance(
+            item,
+            dict
+        )
+
+        and str(
             item.get(
                 "priority",
                 ""
@@ -304,7 +383,12 @@ def generate_fallback_response(
 
         for item in exceptions
 
-        if str(
+        if isinstance(
+            item,
+            dict
+        )
+
+        and str(
             item.get(
                 "priority",
                 ""
@@ -314,13 +398,27 @@ def generate_fallback_response(
     ]
 
 
-    # =====================================
-    # IDENTIFY HIGHEST-RISK EXCEPTION
-    # =====================================
+    # ========================================================
+    # HIGHEST-RISK EXCEPTION
+    # ========================================================
+
+    valid_exceptions = [
+
+        item
+
+        for item in exceptions
+
+        if isinstance(
+            item,
+            dict
+        )
+
+    ]
+
 
     highest_risk = max(
 
-        exceptions,
+        valid_exceptions,
 
         key=lambda item: (
 
@@ -343,9 +441,9 @@ def generate_fallback_response(
     )
 
 
-    # =====================================
-    # BIGGEST / HIGHEST FINANCIAL RISK
-    # =====================================
+    # ========================================================
+    # BIGGEST FINANCIAL RISK
+    # ========================================================
 
     if any(
         keyword in question
@@ -381,9 +479,9 @@ def generate_fallback_response(
         )
 
 
-    # =====================================
+    # ========================================================
     # TOTAL FINANCIAL EXPOSURE
-    # =====================================
+    # ========================================================
 
     if any(
         keyword in question
@@ -420,9 +518,9 @@ def generate_fallback_response(
         )
 
 
-    # =====================================
+    # ========================================================
     # INVESTIGATION PRIORITY
-    # =====================================
+    # ========================================================
 
     if any(
         keyword in question
@@ -476,9 +574,9 @@ def generate_fallback_response(
         )
 
 
-    # =====================================
-    # EXCEPTIONS QUESTION
-    # =====================================
+    # ========================================================
+    # EXCEPTIONS
+    # ========================================================
 
     if any(
         keyword in question
@@ -520,9 +618,9 @@ def generate_fallback_response(
         return response
 
 
-    # =====================================
-    # FINANCIAL SUMMARY
-    # =====================================
+    # ========================================================
+    # EXECUTIVE SUMMARY
+    # ========================================================
 
     if any(
         keyword in question
@@ -556,22 +654,23 @@ def generate_fallback_response(
         match_rate = 0
 
 
-        if bank_transactions:
+        try:
 
-            try:
+            if bank_transactions:
 
                 match_rate = (
                     float(total_matches)
-                    / float(bank_transactions)
+                    /
+                    float(bank_transactions)
                 ) * 100
 
-            except (
-                TypeError,
-                ValueError,
-                ZeroDivisionError
-            ):
+        except (
+            TypeError,
+            ValueError,
+            ZeroDivisionError
+        ):
 
-                match_rate = 0
+            match_rate = 0
 
 
         return (
@@ -620,9 +719,9 @@ def generate_fallback_response(
         )
 
 
-    # =====================================
-    # MATCH RATE QUESTION
-    # =====================================
+    # ========================================================
+    # MATCH RATE
+    # ========================================================
 
     if any(
         keyword in question
@@ -650,22 +749,23 @@ def generate_fallback_response(
         match_rate = 0
 
 
-        if bank_transactions:
+        try:
 
-            try:
+            if bank_transactions:
 
                 match_rate = (
                     float(total_matches)
-                    / float(bank_transactions)
+                    /
+                    float(bank_transactions)
                 ) * 100
 
-            except (
-                TypeError,
-                ValueError,
-                ZeroDivisionError
-            ):
+        except (
+            TypeError,
+            ValueError,
+            ZeroDivisionError
+        ):
 
-                match_rate = 0
+            match_rate = 0
 
 
         return (
@@ -683,9 +783,9 @@ def generate_fallback_response(
         )
 
 
-    # =====================================
-    # DEFAULT RESPONSE
-    # =====================================
+    # ========================================================
+    # DEFAULT
+    # ========================================================
 
     return (
         "🤖 I can help you understand your current "
@@ -709,13 +809,21 @@ def generate_fallback_response(
     )
 
 
-# =====================================
+# ============================================================
 # BUILD FINANCIAL CONTEXT
-# =====================================
+# ============================================================
 
 def build_finance_context(
     reconciliation_result
 ):
+
+    if not isinstance(
+        reconciliation_result,
+        dict
+    ):
+
+        reconciliation_result = {}
+
 
     summary = reconciliation_result.get(
         "summary",
@@ -766,18 +874,18 @@ def build_finance_context(
     )
 
 
-# =====================================
-# MAIN AI COPILOT FUNCTION
-# =====================================
+# ============================================================
+# MAIN AI COPILOT
+# ============================================================
 
 def generate_copilot_response(
     question,
     reconciliation_result
 ):
 
-    # =====================================
+    # ========================================================
     # VALIDATE QUESTION
-    # =====================================
+    # ========================================================
 
     if not question or not question.strip():
 
@@ -786,72 +894,70 @@ def generate_copilot_response(
         )
 
 
-    # =====================================
+    # ========================================================
     # BUILD FINANCIAL CONTEXT
-    # =====================================
+    # ========================================================
 
-    financial_context = build_finance_context(
-        reconciliation_result
-    )
+    financial_context =build_finance_context(
+            reconciliation_result
+        )
 
 
-    # =====================================
+    # ========================================================
     # AI PROMPT
-    # =====================================
+    # ========================================================
 
     prompt = f"""
-You are ReconAI Finance Copilot, an AI-powered
-financial reconciliation assistant.
+You are ReconAI Finance Copilot.
 
-You help finance teams understand reconciliation
-results, financial discrepancies, risk exposure,
-and investigation priorities.
+You are an AI-powered financial reconciliation
+assistant that helps finance teams understand:
+
+- reconciliation results
+- transaction discrepancies
+- financial exposure
+- risk levels
+- investigation priorities
+- executive financial summaries
 
 IMPORTANT RULES:
 
-1. For questions about financial data, use ONLY
-   the reconciliation data provided below.
+1. For financial questions, use ONLY the reconciliation
+   data supplied below.
 
-2. For general questions about yourself, explain
-   that you are ReconAI Finance Copilot and describe
-   your role and capabilities.
+2. Never invent transactions, amounts, dates, risks,
+   or financial conclusions.
 
-3. Never invent transactions, amounts, dates,
-   financial risks, or financial conclusions.
-
-4. Clearly explain financial discrepancies.
-
-5. Prioritize CRITICAL issues over HIGH, MEDIUM,
+3. Prioritize CRITICAL issues over HIGH, MEDIUM,
    and LOW issues.
 
-6. Give practical and actionable recommendations.
+4. Give practical and actionable recommendations.
 
-7. Use Indian Rupees (₹) when discussing money.
+5. Use Indian Rupees (₹) when discussing money.
 
-8. Be concise, professional, and easy to understand.
+6. Be concise, professional, and easy to understand.
 
-9. For CFO or executive questions, provide an
+7. For CFO or executive questions, provide an
    executive-level analysis.
 
-10. Identify patterns when multiple exceptions exist.
+8. Identify patterns when multiple exceptions exist.
 
-11. Explain why an issue matters to the business.
+9. Explain why an issue matters to the business.
 
-12. Clearly distinguish between facts from the
-    data and reasonable interpretations.
+10. Clearly distinguish facts from reasonable
+    interpretations.
 
-13. Do not claim to replace an accountant, auditor,
+11. Do not claim to replace an accountant, auditor,
     or financial professional.
 
-14. If a financial answer cannot be determined
-    from the provided reconciliation data,
-    clearly say so.
+12. If an answer cannot be determined from the
+    reconciliation data, clearly say so.
 
-15. You may answer general questions about
-    ReconAI, its purpose, and its capabilities.
+13. For general questions about ReconAI, explain
+    your role and capabilities naturally.
 
-16. If the user asks a greeting or casual question,
-    respond naturally and professionally.
+14. For greetings and casual questions, respond
+    naturally and professionally.
 
 RECONCILIATION DATA:
 
@@ -861,23 +967,15 @@ USER QUESTION:
 
 {question}
 
-INSTRUCTIONS:
-
-For financial questions, answer using the
-reconciliation data provided above.
-
-For general questions about ReconAI, answer based
-on your defined role and capabilities.
-
-Do not invent financial information.
+Answer the user's question directly.
 """
 
 
-    # =====================================
-    # USE GEMINI IF AVAILABLE
-    # =====================================
+    # ========================================================
+    # USE GEMINI
+    # ========================================================
 
-    if GEMINI_API_KEY and client is not None:
+    if client is not None:
 
         try:
 
@@ -886,11 +984,12 @@ Do not invent financial information.
             )
 
 
-            response = (
-                client.models.generate_content(
-                    model="gemini-3.6-flash",
-                    contents=prompt
-                )
+            response = client.models.generate_content(
+
+                model=GEMINI_MODEL,
+
+                contents=prompt
+
             )
 
 
@@ -919,8 +1018,19 @@ Do not invent financial information.
         except Exception as error:
 
             print(
-                "Gemini error:",
+                "=================================================="
+            )
+
+            print(
+                "GEMINI API ERROR:"
+            )
+
+            print(
                 str(error)
+            )
+
+            print(
+                "=================================================="
             )
 
 
@@ -940,9 +1050,9 @@ Do not invent financial information.
             )
 
 
-    # =====================================
+    # ========================================================
     # FALLBACK
-    # =====================================
+    # ========================================================
 
     print(
         "Using rule-based ReconAI fallback."

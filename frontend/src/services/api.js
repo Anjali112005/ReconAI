@@ -1,10 +1,20 @@
 // ============================================================
-// API CONFIGURATION
+// RECONAI API CONFIGURATION
 // ============================================================
 
-const API_URL =
+const API_BASE_URL =
   import.meta.env.VITE_API_URL ||
   "http://localhost:8000";
+
+
+// ============================================================
+// DEBUG API URL
+// ============================================================
+
+console.log(
+  "ReconAI API Base URL:",
+  API_BASE_URL
+);
 
 
 // ============================================================
@@ -45,9 +55,9 @@ async function apiRequest(
 
 
     // ========================================================
-    // ADD JSON HEADER
-    // ONLY WHEN BODY EXISTS
-    // AND BODY IS NOT FORCED TO ANOTHER CONTENT TYPE
+    // ADD JSON HEADER ONLY WHEN BODY EXISTS
+    //
+    // Do NOT add JSON content type for FormData.
     // ========================================================
 
     if (
@@ -62,7 +72,7 @@ async function apiRequest(
 
 
     // ========================================================
-    // AUTOMATICALLY ATTACH JWT
+    // ATTACH JWT
     // ========================================================
 
     if (token) {
@@ -80,7 +90,7 @@ async function apiRequest(
     const response =
       await fetch(
 
-        `${API_URL}${endpoint}`,
+        `${API_BASE_URL}${endpoint}`,
 
         {
           ...options,
@@ -96,11 +106,14 @@ async function apiRequest(
     // HANDLE UNAUTHORIZED
     // ========================================================
 
-    if (response.status === 401) {
+    if (
+      response.status === 401
+    ) {
 
       localStorage.removeItem(
         "reconai_token"
       );
+
 
       throw new Error(
         "Your session has expired. Please login again."
@@ -126,11 +139,8 @@ async function apiRequest(
 
 
         errorMessage =
-
           errorData.detail ||
-
           errorData.message ||
-
           errorMessage;
 
       }
@@ -181,6 +191,7 @@ export async function checkBackendHealth() {
   const response =
     await apiRequest("/");
 
+
   return await response.json();
 
 }
@@ -191,11 +202,8 @@ export async function checkBackendHealth() {
 // ============================================================
 
 export async function runReconciliation(
-
   bankTransactions,
-
   ledgerTransactions
-
 ) {
 
   const response =
@@ -232,11 +240,8 @@ export async function runReconciliation(
 // ============================================================
 
 export async function askCopilot(
-
   question,
-
   reconciliationResult
-
 ) {
 
   const response =
@@ -273,9 +278,7 @@ export async function askCopilot(
 // ============================================================
 
 export async function generatePdfReport(
-
   reconciliationResult
-
 ) {
 
   const response =
@@ -323,9 +326,7 @@ export async function getHistory() {
 // ============================================================
 
 export async function getHistoryById(
-
   historyId
-
 ) {
 
   const response =
@@ -346,9 +347,7 @@ export async function getHistoryById(
 // ============================================================
 
 export async function deleteHistoryRecord(
-
   historyId
-
 ) {
 
   const response =

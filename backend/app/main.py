@@ -105,27 +105,29 @@ app = FastAPI(
 # CREATE DATABASE TABLES
 # ============================================================
 
-Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(
+    bind=engine
+)
 
 
 # ============================================================
 # AUTHENTICATION ROUTER
 # ============================================================
 
-app.include_router(auth_router)
+app.include_router(
+    auth_router
+)
 
 
 # ============================================================
 # CORS CONFIGURATION
 # ============================================================
 
-# Get frontend URL from Railway environment variable.
+# Railway environment variable:
 #
-# Railway:
 # FRONTEND_URL=https://recon-ai-one.vercel.app
 #
-# We also keep the Vercel URL explicitly here so the application
-# continues working even if the environment variable is missing.
+# The production Vercel URL is also included as a fallback.
 
 frontend_url = os.getenv(
     "FRONTEND_URL",
@@ -133,29 +135,47 @@ frontend_url = os.getenv(
 ).strip().rstrip("/")
 
 
+# ------------------------------------------------------------
+# Allowed frontend origins
+# ------------------------------------------------------------
+
 allowed_origins = [
-    # Production Vercel frontend
+    # Production frontend
     "https://recon-ai-one.vercel.app",
 
-    # Environment-based frontend URL
+    # Environment-configured frontend
     frontend_url,
 
     # Local development
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 
-    # LAN frontend
-    "http://192.168.56.1:3000",
-
-    # Vite development server
+    # Vite development
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+
+    # LAN development
+    "http://192.168.56.1:3000",
     "http://192.168.56.1:5173",
 ]
 
-# Remove duplicates while preserving order
-allowed_origins = list(dict.fromkeys(allowed_origins))
 
+# ------------------------------------------------------------
+# Remove duplicate origins
+# ------------------------------------------------------------
+
+allowed_origins = list(
+    dict.fromkeys(
+        origin
+        for origin in allowed_origins
+        if origin
+    )
+)
+
+
+# ------------------------------------------------------------
+# Configure CORS
+# ------------------------------------------------------------
 
 app.add_middleware(
     CORSMiddleware,
@@ -164,9 +184,13 @@ app.add_middleware(
 
     allow_credentials=True,
 
-    allow_methods=["*"],
+    allow_methods=[
+        "*"
+    ],
 
-    allow_headers=["*"],
+    allow_headers=[
+        "*"
+    ],
 )
 
 
@@ -198,7 +222,9 @@ class CopilotRequest(BaseModel):
 def home():
 
     return {
-        "message": "ReconAI Backend is Running Successfully",
+        "message": (
+            "ReconAI Backend is Running Successfully"
+        ),
 
         "features": [
             "Authentication",
@@ -207,6 +233,8 @@ def home():
             "PDF Financial Reports",
             "MySQL Reconciliation History",
         ],
+
+        "cors_origins": allowed_origins,
     }
 
 
@@ -305,7 +333,10 @@ def reconcile_data(
             )
 
 
-        if not isinstance(result, dict):
+        if not isinstance(
+            result,
+            dict,
+        ):
 
             raise HTTPException(
                 status_code=500,
@@ -320,14 +351,16 @@ def reconcile_data(
         # SAVE RECONCILIATION TO MYSQL
         # ====================================================
 
-        history_record = add_reconciliation_history(
+        history_record = (
+            add_reconciliation_history(
 
-            db=db,
+                db=db,
 
-            reconciliation_result=result,
+                reconciliation_result=result,
 
-            user_id=current_user.id,
+                user_id=current_user.id,
 
+            )
         )
 
 
@@ -462,8 +495,11 @@ def copilot(
         # ====================================================
 
         result = generate_copilot_response(
+
             request.question,
+
             request.reconciliation_result,
+
         )
 
 
@@ -534,7 +570,9 @@ def generate_report(
         # ====================================================
 
         pdf_buffer = generate_pdf_report(
+
             reconciliation_result
+
         )
 
 
@@ -839,12 +877,14 @@ def clear_history(
         # DELETE CURRENT USER'S HISTORY
         # ====================================================
 
-        deleted_count = clear_reconciliation_history(
+        deleted_count = (
+            clear_reconciliation_history(
 
-            db=db,
+                db=db,
 
-            user_id=current_user.id,
+                user_id=current_user.id,
 
+            )
         )
 
 
