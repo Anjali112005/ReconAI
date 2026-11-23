@@ -1,6 +1,6 @@
-from app.database import Base, engine
-from app.models import User, ReconciliationRun
 
+from app.database import Base, engine
+from app.models import User, ReconciliationHistory
 
 print("Creating database tables...")
 
